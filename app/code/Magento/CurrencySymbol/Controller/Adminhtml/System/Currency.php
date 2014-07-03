@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,8 +25,6 @@
 /**
  * Currency controller
  *
- * @category   Magento
- * @package    Magento_Adminhtml
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\CurrencySymbol\Controller\Adminhtml\System;
@@ -38,18 +34,16 @@ class Currency extends \Magento\Backend\App\Action
     /**
      * Core registry
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Registry $coreRegistry
+     * @param \Magento\Framework\Registry $coreRegistry
      */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Registry $coreRegistry
-    ) {
+    public function __construct(\Magento\Backend\App\Action\Context $context, \Magento\Framework\Registry $coreRegistry)
+    {
         $this->_coreRegistry = $coreRegistry;
         parent::__construct($context);
     }
@@ -79,7 +73,9 @@ class Currency extends \Magento\Backend\App\Action
 
         $this->_view->loadLayout();
         $this->_setActiveMenu('Magento_CurrencySymbol::system_currency_rates');
-        $this->_addContent($this->_view->getLayout()->createBlock('Magento\CurrencySymbol\Block\Adminhtml\System\Currency'));
+        $this->_addContent(
+            $this->_view->getLayout()->createBlock('Magento\CurrencySymbol\Block\Adminhtml\System\Currency')
+        );
         $this->_view->renderLayout();
     }
 
@@ -87,7 +83,7 @@ class Currency extends \Magento\Backend\App\Action
      * Fetch rates action
      *
      * @return void
-     * @throws \Exception|\Magento\Core\Exception
+     * @throws \Exception|\Magento\Framework\Model\Exception
      */
     public function fetchRatesAction()
     {
@@ -101,10 +97,13 @@ class Currency extends \Magento\Backend\App\Action
             }
             try {
                 /** @var \Magento\Directory\Model\Currency\Import\ImportInterface $importModel */
-                $importModel = $this->_objectManager->get('Magento\Directory\Model\Currency\Import\Factory')
-                    ->create($service);
+                $importModel = $this->_objectManager->get(
+                    'Magento\Directory\Model\Currency\Import\Factory'
+                )->create(
+                    $service
+                );
             } catch (\Exception $e) {
-                throw new \Magento\Core\Exception(__('We can\'t initialize the import model.'));
+                throw new \Magento\Framework\Model\Exception(__('We can\'t initialize the import model.'));
             }
             $rates = $importModel->fetchRates();
             $errors = $importModel->getMessages();
@@ -112,14 +111,15 @@ class Currency extends \Magento\Backend\App\Action
                 foreach ($errors as $error) {
                     $this->messageManager->addWarning($error);
                 }
-                $this->messageManager->addWarning(__('All possible rates were fetched, please click on "Save" to apply'));
+                $this->messageManager->addWarning(
+                    __('All possible rates were fetched, please click on "Save" to apply')
+                );
             } else {
                 $this->messageManager->addSuccess(__('All rates were fetched, please click on "Save" to apply'));
             }
 
             $backendSession->setRates($rates);
-        }
-        catch (\Exception $e){
+        } catch (\Exception $e) {
             $this->messageManager->addError($e->getMessage());
         }
         $this->_redirect('adminhtml/*/');
@@ -136,13 +136,10 @@ class Currency extends \Magento\Backend\App\Action
         if (is_array($data)) {
             try {
                 foreach ($data as $currencyCode => $rate) {
-                    foreach( $rate as $currencyTo => $value ) {
-                        $value = abs($this->_objectManager
-                                ->get('Magento\Locale\FormatInterface')
-                                ->getNumber($value)
-                        );
+                    foreach ($rate as $currencyTo => $value) {
+                        $value = abs($this->_objectManager->get('Magento\Framework\Locale\FormatInterface')->getNumber($value));
                         $data[$currencyCode][$currencyTo] = $value;
-                        if( $value == 0 ) {
+                        if ($value == 0) {
                             $this->messageManager->addWarning(
                                 __('Please correct the input data for %1 => %2 rate', $currencyCode, $currencyTo)
                             );

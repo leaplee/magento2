@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Index
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,11 +26,9 @@ namespace Magento\Index\Model\Resource\Process;
 /**
  * Index Process Collection
  *
- * @category    Magento
- * @package     Magento_Index
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+class Collection extends \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
 {
     /**
      * Initialize resource
@@ -51,19 +47,26 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
      */
     public function addEventsStats()
     {
-        $countsSelect = $this->getConnection()
-            ->select()
-            ->from($this->getTable('index_process_event'), array('process_id', 'events' => 'COUNT(*)'))
-            ->where('status=?', \Magento\Index\Model\Process::EVENT_STATUS_NEW)
-            ->group('process_id');
-        $this->getSelect()
-            ->joinLeft(
-                array('e' => $countsSelect),
-                'e.process_id=main_table.process_id',
-                array('events' => $this->getConnection()->getCheckSql(
-                    $this->getConnection()->prepareSqlCondition('e.events', array('null' => null)), 0, 'e.events'
-                ))
-            );
+        $countsSelect = $this->getConnection()->select()->from(
+            $this->getTable('index_process_event'),
+            array('process_id', 'events' => 'COUNT(*)')
+        )->where(
+            'status=?',
+            \Magento\Index\Model\Process::EVENT_STATUS_NEW
+        )->group(
+            'process_id'
+        );
+        $this->getSelect()->joinLeft(
+            array('e' => $countsSelect),
+            'e.process_id=main_table.process_id',
+            array(
+                'events' => $this->getConnection()->getCheckSql(
+                    $this->getConnection()->prepareSqlCondition('e.events', array('null' => null)),
+                    0,
+                    'e.events'
+                )
+            )
+        );
         return $this;
     }
 }

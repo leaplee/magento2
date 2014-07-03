@@ -18,27 +18,32 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Cms
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Cms\Helper;
 
-use Magento\App\Action\Action;
+use Magento\Framework\App\Action\Action;
 
 /**
  * CMS Page Helper
- *
- * @category   Magento
- * @package    Magento_Cms
- * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Page extends \Magento\App\Helper\AbstractHelper
+class Page extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const XML_PATH_NO_ROUTE_PAGE        = 'web/default/cms_no_route';
-    const XML_PATH_NO_COOKIES_PAGE      = 'web/default/cms_no_cookies';
-    const XML_PATH_HOME_PAGE            = 'web/default/cms_home_page';
+    /**
+     * CMS no-route config path
+     */
+    const XML_PATH_NO_ROUTE_PAGE = 'web/default/cms_no_route';
+
+    /**
+     * CMS no cookies config path
+     */
+    const XML_PATH_NO_COOKIES_PAGE = 'web/default/cms_no_cookies';
+
+    /**
+     * CMS home page config path
+     */
+    const XML_PATH_HOME_PAGE = 'web/default/cms_home_page';
 
     /**
      * Catalog product
@@ -50,7 +55,7 @@ class Page extends \Magento\App\Helper\AbstractHelper
     /**
      * Design package instance
      *
-     * @var \Magento\View\DesignInterface
+     * @var \Magento\Framework\View\DesignInterface
      */
     protected $_design;
 
@@ -60,19 +65,19 @@ class Page extends \Magento\App\Helper\AbstractHelper
     protected $_page;
 
     /**
-     * @var \Magento\Message\ManagerInterface
+     * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $messageManager;
 
     /**
-     * @var \Magento\Stdlib\DateTime\TimezoneInterface
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
     protected $_localeDate;
 
     /**
      * Store manager
      *
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
@@ -84,38 +89,38 @@ class Page extends \Magento\App\Helper\AbstractHelper
     protected $_pageFactory;
 
     /**
-     * @var \Magento\Escaper
+     * @var \Magento\Framework\Escaper
      */
     protected $_escaper;
 
     /**
-     * @var \Magento\App\ViewInterface
+     * @var \Magento\Framework\App\ViewInterface
      */
     protected $_view;
 
     /**
-     * @param \Magento\App\Helper\Context $context
-     * @param \Magento\Message\ManagerInterface $messageManager
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Magento\Cms\Model\Page $page
      * @param \Magento\Theme\Helper\Layout $pageLayout
-     * @param \Magento\View\DesignInterface $design
+     * @param \Magento\Framework\View\DesignInterface $design
      * @param \Magento\Cms\Model\PageFactory $pageFactory
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Stdlib\DateTime\TimezoneInterface $localeDate
-     * @param \Magento\Escaper $escaper
-     * @param \Magento\App\ViewInterface $view
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
+     * @param \Magento\Framework\Escaper $escaper
+     * @param \Magento\Framework\App\ViewInterface $view
      */
     public function __construct(
-        \Magento\App\Helper\Context $context,
-        \Magento\Message\ManagerInterface $messageManager,
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Cms\Model\Page $page,
         \Magento\Theme\Helper\Layout $pageLayout,
-        \Magento\View\DesignInterface $design,
+        \Magento\Framework\View\DesignInterface $design,
         \Magento\Cms\Model\PageFactory $pageFactory,
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
-        \Magento\Stdlib\DateTime\TimezoneInterface $localeDate,
-        \Magento\Escaper $escaper,
-        \Magento\App\ViewInterface $view
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
+        \Magento\Framework\Escaper $escaper,
+        \Magento\Framework\App\ViewInterface $view
     ) {
         $this->messageManager = $messageManager;
         $this->_view = $view;
@@ -152,9 +157,9 @@ class Page extends \Magento\App\Helper\AbstractHelper
      * @param bool $renderLayout
      * @return bool
      */
-    protected function _renderPage(Action  $action, $pageId = null, $renderLayout = true)
+    protected function _renderPage(Action $action, $pageId = null, $renderLayout = true)
     {
-        if (!is_null($pageId) && $pageId!==$this->_page->getId()) {
+        if (!is_null($pageId) && $pageId !== $this->_page->getId()) {
             $delimiterPosition = strrpos($pageId, '|');
             if ($delimiterPosition) {
                 $pageId = substr($pageId, 0, $delimiterPosition);
@@ -170,8 +175,11 @@ class Page extends \Magento\App\Helper\AbstractHelper
             return false;
         }
 
-        $inRange = $this->_localeDate->isScopeDateInInterval(null, $this->_page->getCustomThemeFrom(),
-            $this->_page->getCustomThemeTo());
+        $inRange = $this->_localeDate->isScopeDateInInterval(
+            null,
+            $this->_page->getCustomThemeFrom(),
+            $this->_page->getCustomThemeTo()
+        );
 
         if ($this->_page->getCustomTheme()) {
             if ($inRange) {
@@ -183,9 +191,14 @@ class Page extends \Magento\App\Helper\AbstractHelper
 
         $this->_view->addActionLayoutHandles();
         if ($this->_page->getRootTemplate()) {
-            $handle = ($this->_page->getCustomRootTemplate()
-                        && $this->_page->getCustomRootTemplate() != 'empty'
-                        && $inRange) ? $this->_page->getCustomRootTemplate() : $this->_page->getRootTemplate();
+            if ($this->_page->getCustomRootTemplate()
+                && $this->_page->getCustomRootTemplate() != 'empty'
+                && $inRange
+            ) {
+                $handle = $this->_page->getCustomRootTemplate();
+            } else {
+                $handle = $this->_page->getRootTemplate();
+            }
             $this->_pageLayout->applyHandle($handle);
         }
 
@@ -195,8 +208,11 @@ class Page extends \Magento\App\Helper\AbstractHelper
         );
 
         $this->_view->loadLayoutUpdates();
-        $layoutUpdate = ($this->_page->getCustomLayoutUpdateXml() && $inRange)
-            ? $this->_page->getCustomLayoutUpdateXml() : $this->_page->getLayoutUpdateXml();
+        if ($this->_page->getCustomLayoutUpdateXml() && $inRange) {
+            $layoutUpdate = $this->_page->getCustomLayoutUpdateXml();
+        } else {
+            $layoutUpdate = $this->_page->getLayoutUpdateXml();
+        }
         if (!empty($layoutUpdate)) {
             $this->_view->getLayout()->getUpdate()->addUpdate($layoutUpdate);
         }
@@ -215,9 +231,7 @@ class Page extends \Magento\App\Helper\AbstractHelper
         /* @TODO: Move catalog and checkout storage types to appropriate modules */
         $messageBlock = $this->_view->getLayout()->getMessagesBlock();
         $messageBlock->addStorageType($this->messageManager->getDefaultGroup());
-        $messageBlock->addMessages(
-            $this->messageManager->getMessages(true)
-        );
+        $messageBlock->addMessages($this->messageManager->getMessages(true));
 
         if ($renderLayout) {
             $this->_view->renderLayout();

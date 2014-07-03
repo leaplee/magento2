@@ -18,31 +18,32 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Customer
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-/* @var $installer \Magento\Customer\Model\Entity\Setup */
+/* @var $installer \Magento\Customer\Model\Resource\Setup */
 $installer = $this;
 $installer->startSetup();
 
 // Add reset password link token attribute
-$installer->addAttribute('customer', 'rp_token', array(
-    'type'     => 'varchar',
-    'input'    => 'hidden',
-    'visible'  => false,
-    'required' => false
-));
+$installer->addAttribute(
+    'customer',
+    'rp_token',
+    array('type' => 'varchar', 'input' => 'hidden', 'visible' => false, 'required' => false)
+);
 
 // Add reset password link token creation date attribute
-$installer->addAttribute('customer', 'rp_token_created_at', array(
-    'type'           => 'datetime',
-    'input'          => 'date',
-    'validate_rules' => 'a:1:{s:16:"input_validation";s:4:"date";}',
-    'visible'        => false,
-    'required'       => false
-));
+$installer->addAttribute(
+    'customer',
+    'rp_token_created_at',
+    array(
+        'type' => 'datetime',
+        'input' => 'date',
+        'validate_rules' => 'a:1:{s:16:"input_validation";s:4:"date";}',
+        'visible' => false,
+        'required' => false
+    )
+);
 
 $installer->endSetup();

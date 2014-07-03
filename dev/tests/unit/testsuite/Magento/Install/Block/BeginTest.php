@@ -18,9 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Install
- * @subpackage  unit_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -50,19 +47,24 @@ class BeginTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLicenseHtmlWhenFileExists($fileName, $expectedTxt)
     {
-        $directoryMock = $this->getMock('Magento\Filesystem\Directory\Read', array(), array(), '', false);
-        $directoryMock->expects($this->once())
-            ->method('readFile')
-            ->with($this->equalTo($fileName))
-            ->will($this->returnValue($expectedTxt));
+        $directoryMock = $this->getMock('Magento\Framework\Filesystem\Directory\Read', array(), array(), '', false);
+        $directoryMock->expects(
+            $this->once()
+        )->method(
+            'readFile'
+        )->with(
+            $this->equalTo($fileName)
+        )->will(
+            $this->returnValue($expectedTxt)
+        );
 
-        $fileSystem = $this->getMock('Magento\App\Filesystem', array(), array(), '', false);
-        $fileSystem->expects($this->once())
-            ->method('getDirectoryRead')
-            ->will($this->returnValue($directoryMock));
+        $fileSystem = $this->getMock('Magento\Framework\App\Filesystem', array(), array(), '', false);
+        $fileSystem->expects($this->once())->method('getDirectoryRead')->will($this->returnValue($directoryMock));
 
-        $block = $this->_objectManager->getObject('Magento\Install\Block\Begin',
-            array('filesystem' => $fileSystem, 'eulaFile' => $fileName));
+        $block = $this->_objectManager->getObject(
+            'Magento\Install\Block\Begin',
+            array('filesystem' => $fileSystem, 'eulaFile' => $fileName)
+        );
 
         $this->assertEquals($expectedTxt, $block->getLicenseHtml());
     }
@@ -76,11 +78,13 @@ class BeginTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLicenseHtmlWhenFileIsEmpty($fileName)
     {
-        $fileSystem = $this->getMock('Magento\App\Filesystem', array(), array(), '', false);
+        $fileSystem = $this->getMock('Magento\Framework\App\Filesystem', array(), array(), '', false);
         $fileSystem->expects($this->never())->method('read');
 
-        $block = $this->_objectManager->getObject('Magento\Install\Block\Begin',
-            array('filesystem' => $fileSystem, 'eulaFile' => $fileName));
+        $block = $this->_objectManager->getObject(
+            'Magento\Install\Block\Begin',
+            array('filesystem' => $fileSystem, 'eulaFile' => $fileName)
+        );
         $this->assertEquals('', $block->getLicenseHtml());
     }
 
@@ -92,18 +96,9 @@ class BeginTest extends \PHPUnit_Framework_TestCase
     public function getLicenseHtmlWhenFileExistsDataProvider()
     {
         return array(
-            'Lycense for EE' => array(
-                'LICENSE_TEST1.html',
-                'HTML for EE LICENSE'
-            ),
-            'Lycense for CE' => array(
-                'LICENSE_TEST2.html',
-                'HTML for CE LICENSE'
-            ),
-            'empty file' => array(
-                'LICENSE_TEST3.html',
-                ''
-            )
+            'Lycense for EE' => array('LICENSE_TEST1.html', 'HTML for EE LICENSE'),
+            'Lycense for CE' => array('LICENSE_TEST2.html', 'HTML for CE LICENSE'),
+            'empty file' => array('LICENSE_TEST3.html', '')
         );
     }
 
@@ -114,9 +109,6 @@ class BeginTest extends \PHPUnit_Framework_TestCase
      */
     public function getLicenseHtmlWhenFileIsEmptyDataProvider()
     {
-        return array(
-            'no filename' => array(null),
-            'empty filename' => array('')
-        );
+        return array('no filename' => array(null), 'empty filename' => array(''));
     }
 }

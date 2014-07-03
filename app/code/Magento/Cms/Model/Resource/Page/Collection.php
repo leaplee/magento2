@@ -18,18 +18,15 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Cms
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Cms\Model\Resource\Page;
 
 /**
  * CMS page collection
  */
-class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+class Collection extends \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
 {
     /**
      * Load data for preview flag
@@ -38,31 +35,30 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
      */
     protected $_previewFlag;
 
-
     /**
      * Store manager
      *
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
     /**
      * @param \Magento\Core\Model\EntityFactory $entityFactory
-     * @param \Magento\Logger $logger
-     * @param \Magento\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
-     * @param \Magento\Event\ManagerInterface $eventManager
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Logger $logger
+     * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param mixed $connection
-     * @param \Magento\Core\Model\Resource\Db\AbstractDb $resource
+     * @param \Magento\Framework\Model\Resource\Db\AbstractDb $resource
      */
     public function __construct(
         \Magento\Core\Model\EntityFactory $entityFactory,
-        \Magento\Logger $logger,
-        \Magento\Data\Collection\Db\FetchStrategyInterface $fetchStrategy,
-        \Magento\Event\ManagerInterface $eventManager,
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Logger $logger,
+        \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy,
+        \Magento\Framework\Event\ManagerInterface $eventManager,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         $connection = null,
-        \Magento\Core\Model\Resource\Db\AbstractDb $resource = null
+        \Magento\Framework\Model\Resource\Db\AbstractDb $resource = null
     ) {
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $connection, $resource);
         $this->_storeManager = $storeManager;
@@ -77,7 +73,7 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     {
         $this->_init('Magento\Cms\Model\Page', 'Magento\Cms\Model\Resource\Page');
         $this->_map['fields']['page_id'] = 'main_table.page_id';
-        $this->_map['fields']['store']   = 'store_table.store_id';
+        $this->_map['fields']['store'] = 'store_table.store_id';
     }
 
     /**
@@ -131,9 +127,12 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
             $items = $this->getColumnValues('page_id');
             $connection = $this->getConnection();
             if (count($items)) {
-                $select = $connection->select()
-                        ->from(array('cps'=>$this->getTable('cms_page_store')))
-                        ->where('cps.page_id IN (?)', $items);
+                $select = $connection->select()->from(
+                    array('cps' => $this->getTable('cms_page_store'))
+                )->where(
+                    'cps.page_id IN (?)',
+                    $items
+                );
 
                 if ($result = $connection->fetchPairs($select)) {
                     foreach ($this as $item) {
@@ -161,14 +160,14 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     /**
      * Add filter by store
      *
-     * @param int|\Magento\Core\Model\Store $store
+     * @param int|\Magento\Store\Model\Store $store
      * @param bool $withAdmin
      * @return $this
      */
     public function addStoreFilter($store, $withAdmin = true)
     {
         if (!$this->getFlag('store_filter_added')) {
-            if ($store instanceof \Magento\Core\Model\Store) {
+            if ($store instanceof \Magento\Store\Model\Store) {
                 $store = array($store->getId());
             }
 
@@ -177,7 +176,7 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
             }
 
             if ($withAdmin) {
-                $store[] = \Magento\Core\Model\Store::DEFAULT_STORE_ID;
+                $store[] = \Magento\Store\Model\Store::DEFAULT_STORE_ID;
             }
 
             $this->addFilter('store', array('in' => $store), 'public');
@@ -197,17 +196,18 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
                 array('store_table' => $this->getTable('cms_page_store')),
                 'main_table.page_id = store_table.page_id',
                 array()
-            )->group('main_table.page_id');
+            )->group(
+                'main_table.page_id'
+            );
         }
         return parent::_renderFiltersBefore();
     }
-
 
     /**
      * Get SQL for get record count.
      * Extra GROUP BY strip added.
      *
-     * @return \Magento\DB\Select
+     * @return \Magento\Framework\DB\Select
      */
     public function getSelectCountSql()
     {

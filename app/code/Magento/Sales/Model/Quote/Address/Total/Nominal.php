@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -63,7 +61,8 @@ class Nominal extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
 
         // aggregate collected amounts into one to have sort of grand total per item
         foreach ($address->getAllNominalItems() as $item) {
-            $rowTotal = 0; $baseRowTotal = 0;
+            $rowTotal = 0;
+            $baseRowTotal = 0;
             $totalDetails = array();
             foreach ($collector->getCollectors() as $model) {
                 $itemRowTotal = $model->getItemRowTotal($item);
@@ -74,12 +73,10 @@ class Nominal extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
                 } else {
                     $isCompounded = false;
                 }
-                if ((float)$itemRowTotal > 0 && $label = $model->getLabel()) {
-                    $totalDetails[] = new \Magento\Object(array(
-                        'label'  => $label,
-                        'amount' => $itemRowTotal,
-                        'is_compounded' => $isCompounded,
-                    ));
+                if ((double)$itemRowTotal > 0 && ($label = $model->getLabel())) {
+                    $totalDetails[] = new \Magento\Framework\Object(
+                        array('label' => $label, 'amount' => $itemRowTotal, 'is_compounded' => $isCompounded)
+                    );
                 }
             }
             $item->setNominalRowTotal($rowTotal);
@@ -100,12 +97,14 @@ class Nominal extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
     {
         $items = $address->getAllNominalItems();
         if ($items) {
-            $address->addTotal(array(
-                'code'    => $this->getCode(),
-                'title'   => __('Subscription Items'),
-                'items'   => $items,
-                'area'    => 'footer',
-            ));
+            $address->addTotal(
+                array(
+                    'code' => $this->getCode(),
+                    'title' => __('Subscription Items'),
+                    'items' => $items,
+                    'area' => 'footer'
+                )
+            );
         }
         return $this;
     }

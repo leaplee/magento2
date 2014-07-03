@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sitemap
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -41,12 +39,16 @@ namespace Magento\Sitemap\Model;
  * @method int getStoreId()
  * @method \Magento\Sitemap\Model\Sitemap setStoreId(int $value)
  */
-class Sitemap extends \Magento\Core\Model\AbstractModel
+class Sitemap extends \Magento\Framework\Model\AbstractModel
 {
     const OPEN_TAG_KEY = 'start';
+
     const CLOSE_TAG_KEY = 'end';
+
     const INDEX_FILE_PREFIX = 'sitemap';
+
     const TYPE_INDEX = 'sitemap';
+
     const TYPE_URL = 'url';
 
     /**
@@ -99,12 +101,12 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
     private $_crlf = array("win" => "\r\n", "unix" => "\n", "mac" => "\r");
 
     /**
-     * @var \Magento\Filesystem\Directory\Write
+     * @var \Magento\Framework\Filesystem\Directory\Write
      */
     protected $_directory;
 
     /**
-     * @var \Magento\Filesystem\File\Write
+     * @var \Magento\Framework\Filesystem\File\Write
      */
     protected $_stream;
 
@@ -116,7 +118,7 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
     protected $_sitemapData;
 
     /**
-     * @var \Magento\Escaper
+     * @var \Magento\Framework\Escaper
      */
     protected $_escaper;
 
@@ -136,62 +138,62 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
     protected $_cmsFactory;
 
     /**
-     * @var \Magento\Stdlib\DateTime\DateTime
+     * @var \Magento\Framework\Stdlib\DateTime\DateTime
      */
     protected $_dateModel;
 
     /**
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
     /**
-     * @var \Magento\App\RequestInterface
+     * @var \Magento\Framework\App\RequestInterface
      */
     protected $_request;
 
     /**
-     * @var \Magento\Stdlib\DateTime
+     * @var \Magento\Framework\Stdlib\DateTime
      */
     protected $dateTime;
 
     /**
-     * @param \Magento\Model\Context $context
-     * @param \Magento\Registry $registry
-     * @param \Magento\Escaper $escaper
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Escaper $escaper
      * @param \Magento\Sitemap\Helper\Data $sitemapData
-     * @param \Magento\App\Filesystem $filesystem
+     * @param \Magento\Framework\App\Filesystem $filesystem
      * @param \Magento\Sitemap\Model\Resource\Catalog\CategoryFactory $categoryFactory
      * @param \Magento\Sitemap\Model\Resource\Catalog\ProductFactory $productFactory
      * @param \Magento\Sitemap\Model\Resource\Cms\PageFactory $cmsFactory
-     * @param \Magento\Stdlib\DateTime\DateTime $modelDate
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
-     * @param \Magento\App\RequestInterface $request
-     * @param \Magento\Stdlib\DateTime $dateTime
-     * @param \Magento\Core\Model\Resource\AbstractResource $resource
-     * @param \Magento\Data\Collection\Db $resourceCollection
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $modelDate
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\App\RequestInterface $request
+     * @param \Magento\Framework\Stdlib\DateTime $dateTime
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\Db $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Magento\Model\Context $context,
-        \Magento\Registry $registry,
-        \Magento\Escaper $escaper,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Escaper $escaper,
         \Magento\Sitemap\Helper\Data $sitemapData,
-        \Magento\App\Filesystem $filesystem,
+        \Magento\Framework\App\Filesystem $filesystem,
         \Magento\Sitemap\Model\Resource\Catalog\CategoryFactory $categoryFactory,
         \Magento\Sitemap\Model\Resource\Catalog\ProductFactory $productFactory,
         \Magento\Sitemap\Model\Resource\Cms\PageFactory $cmsFactory,
-        \Magento\Stdlib\DateTime\DateTime $modelDate,
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
-        \Magento\App\RequestInterface $request,
-        \Magento\Stdlib\DateTime $dateTime,
-        \Magento\Core\Model\Resource\AbstractResource $resource = null,
-        \Magento\Data\Collection\Db $resourceCollection = null,
+        \Magento\Framework\Stdlib\DateTime\DateTime $modelDate,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\App\RequestInterface $request,
+        \Magento\Framework\Stdlib\DateTime $dateTime,
+        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\Db $resourceCollection = null,
         array $data = array()
     ) {
         $this->_escaper = $escaper;
         $this->_sitemapData = $sitemapData;
-        $this->_directory = $filesystem->getDirectoryWrite(\Magento\App\Filesystem::ROOT_DIR);
+        $this->_directory = $filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem::ROOT_DIR);
         $this->_categoryFactory = $categoryFactory;
         $this->_productFactory = $productFactory;
         $this->_cmsFactory = $cmsFactory;
@@ -215,15 +217,15 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
     /**
      * Get file handler
      *
-     * @return \Magento\Filesystem\File\WriteInterface
-     * @throws \Magento\Core\Exception
+     * @return \Magento\Framework\Filesystem\File\WriteInterface
+     * @throws \Magento\Framework\Model\Exception
      */
     protected function _getStream()
     {
         if ($this->_stream) {
             return $this->_stream;
         } else {
-            throw new \Magento\Core\Exception(__('File handler unreachable'));
+            throw new \Magento\Framework\Model\Exception(__('File handler unreachable'));
         }
     }
 
@@ -238,35 +240,45 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
         $helper = $this->_sitemapData;
         $storeId = $this->getStoreId();
 
-        $this->_sitemapItems[] = new \Magento\Object(array(
-            'changefreq' => $helper->getCategoryChangefreq($storeId),
-            'priority' => $helper->getCategoryPriority($storeId),
-            'collection' => $this->_categoryFactory->create()->getCollection($storeId)
-        ));
+        $this->_sitemapItems[] = new \Magento\Framework\Object(
+            array(
+                'changefreq' => $helper->getCategoryChangefreq($storeId),
+                'priority' => $helper->getCategoryPriority($storeId),
+                'collection' => $this->_categoryFactory->create()->getCollection($storeId)
+            )
+        );
 
-        $this->_sitemapItems[] = new \Magento\Object(array(
-            'changefreq' => $helper->getProductChangefreq($storeId),
-            'priority' => $helper->getProductPriority($storeId),
-            'collection' => $this->_productFactory->create()->getCollection($storeId)
-        ));
+        $this->_sitemapItems[] = new \Magento\Framework\Object(
+            array(
+                'changefreq' => $helper->getProductChangefreq($storeId),
+                'priority' => $helper->getProductPriority($storeId),
+                'collection' => $this->_productFactory->create()->getCollection($storeId)
+            )
+        );
 
-        $this->_sitemapItems[] = new \Magento\Object(array(
-            'changefreq' => $helper->getPageChangefreq($storeId),
-            'priority' => $helper->getPagePriority($storeId),
-            'collection' => $this->_cmsFactory->create()->getCollection($storeId)
-        ));
+        $this->_sitemapItems[] = new \Magento\Framework\Object(
+            array(
+                'changefreq' => $helper->getPageChangefreq($storeId),
+                'priority' => $helper->getPagePriority($storeId),
+                'collection' => $this->_cmsFactory->create()->getCollection($storeId)
+            )
+        );
 
         $this->_tags = array(
             self::TYPE_INDEX => array(
-                self::OPEN_TAG_KEY => '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL
-                . '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL,
+                self::OPEN_TAG_KEY => '<?xml version="1.0" encoding="UTF-8"?>' .
+                PHP_EOL .
+                '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' .
+                PHP_EOL,
                 self::CLOSE_TAG_KEY => '</sitemapindex>'
             ),
             self::TYPE_URL => array(
-                self::OPEN_TAG_KEY => '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL
-                . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
-                . ' xmlns:content="http://www.google.com/schemas/sitemap-content/1.0"'
-                . ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . PHP_EOL,
+                self::OPEN_TAG_KEY => '<?xml version="1.0" encoding="UTF-8"?>' .
+                PHP_EOL .
+                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' .
+                ' xmlns:content="http://www.google.com/schemas/sitemap-content/1.0"' .
+                ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' .
+                PHP_EOL,
                 self::CLOSE_TAG_KEY => '</urlset>'
             )
         );
@@ -275,8 +287,8 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
     /**
      * Check sitemap file location and permissions
      *
-     * @return \Magento\Core\Model\AbstractModel
-     * @throws \Magento\Core\Exception
+     * @return \Magento\Framework\Model\AbstractModel
+     * @throws \Magento\Framework\Model\Exception
      */
     protected function _beforeSave()
     {
@@ -286,25 +298,34 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
          * Check path is allow
          */
         if ($path && preg_match('#\.\.[\\\/]#', $path)) {
-            throw new \Magento\Core\Exception(__('Please define a correct path.'));
+            throw new \Magento\Framework\Model\Exception(__('Please define a correct path.'));
         }
         /**
          * Check exists and writable path
          */
         if (!$this->_directory->isExist($path)) {
-            throw new \Magento\Core\Exception(__('Please create the specified folder "%1" before saving the sitemap.',
-                $this->_escaper->escapeHtml($this->getSitemapPath())));
+            throw new \Magento\Framework\Model\Exception(
+                __(
+                    'Please create the specified folder "%1" before saving the sitemap.',
+                    $this->_escaper->escapeHtml($this->getSitemapPath())
+                )
+            );
         }
 
         if (!$this->_directory->isWritable($path)) {
-            throw new \Magento\Core\Exception(__('Please make sure that "%1" is writable by the web-server.',
-                $this->getSitemapPath()));
+            throw new \Magento\Framework\Model\Exception(
+                __('Please make sure that "%1" is writable by the web-server.', $this->getSitemapPath())
+            );
         }
         /**
          * Check allow filename
          */
         if (!preg_match('#^[a-zA-Z0-9_\.]+$#', $this->getSitemapFilename())) {
-            throw new \Magento\Core\Exception(__('Please use only letters (a-z or A-Z), numbers (0-9) or underscores (_) in the filename. No spaces or other characters are allowed.'));
+            throw new \Magento\Framework\Model\Exception(
+                __(
+                    'Please use only letters (a-z or A-Z), numbers (0-9) or underscores (_) in the filename. No spaces or other characters are allowed.'
+                )
+            );
         }
         if (!preg_match('#\.xml$#', $this->getSitemapFilename())) {
             $this->setSitemapFilename($this->getSitemapFilename() . '.xml');
@@ -325,7 +346,7 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
     public function generateXml()
     {
         $this->_initSitemapItems();
-        /** @var $sitemapItem \Magento\Object */
+        /** @var $sitemapItem \Magento\Framework\Object */
         foreach ($this->_sitemapItems as $sitemapItem) {
             $changefreq = $sitemapItem->getChangefreq();
             $priority = $sitemapItem->getPriority();
@@ -353,8 +374,12 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
 
         if ($this->_sitemapIncrement == 1) {
             // In case when only one increment file was created use it as default sitemap
-            $path = rtrim($this->getSitemapPath(), '/') . '/' .
-                $this->_getCurrentSitemapFilename($this->_sitemapIncrement);
+            $path = rtrim(
+                $this->getSitemapPath(),
+                '/'
+            ) . '/' . $this->_getCurrentSitemapFilename(
+                $this->_sitemapIncrement
+            );
             $destination = rtrim($this->getSitemapPath(), '/') . '/' . $this->getSitemapFilename();
 
             $this->_directory->renameFile($path, $destination);
@@ -430,7 +455,6 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
      * @param null|string $priority
      * @param null|array $images
      * @return string
-
      * Sitemap images
      * @see http://support.google.com/webmasters/bin/answer.py?hl=en&answer=178636
      *
@@ -463,9 +487,10 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
             }
             // Add PageMap image for Google web search
             $row .= '<PageMap xmlns="http://www.google.com/schemas/sitemap-pagemap/1.0"><DataObject type="thumbnail">';
-            $row .= '<Attribute name="name" value="' . htmlspecialchars($images->getTitle()) .'"/>';
-            $row .= '<Attribute name="src" value="'
-                . htmlspecialchars($this->_getMediaUrl($images->getThumbnail())) . '"/>';
+            $row .= '<Attribute name="name" value="' . htmlspecialchars($images->getTitle()) . '"/>';
+            $row .= '<Attribute name="src" value="' . htmlspecialchars(
+                $this->_getMediaUrl($images->getThumbnail())
+            ) . '"/>';
             $row .= '</DataObject></PageMap>';
         }
 
@@ -496,7 +521,7 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
      * @param null|string $fileName
      * @param string $type
      * @return void
-     * @throws \Magento\Core\Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     protected function _createSitemap($fileName = null, $type = self::TYPE_URL)
     {
@@ -569,7 +594,7 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
      * @param string $type
      * @return string
      */
-    protected function _getStoreBaseUrl($type = \Magento\UrlInterface::URL_TYPE_LINK)
+    protected function _getStoreBaseUrl($type = \Magento\Framework\UrlInterface::URL_TYPE_LINK)
     {
         return rtrim($this->_storeManager->getStore($this->getStoreId())->getBaseUrl($type), '/') . '/';
     }
@@ -581,7 +606,7 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
      * @param string $type
      * @return string
      */
-    protected function _getUrl($url, $type = \Magento\UrlInterface::URL_TYPE_LINK)
+    protected function _getUrl($url, $type = \Magento\Framework\UrlInterface::URL_TYPE_LINK)
     {
         return $this->_getStoreBaseUrl($type) . ltrim($url, '/');
     }
@@ -594,7 +619,7 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
      */
     protected function _getMediaUrl($url)
     {
-        return $this->_getUrl($url, \Magento\UrlInterface::URL_TYPE_MEDIA);
+        return $this->_getUrl($url, \Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
     }
 
     /**
@@ -631,13 +656,13 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
         $documentRoot = trim(str_replace('\\', '/', $this->_getDocumentRoot()), '/');
         $baseDir = trim(str_replace('\\', '/', $this->_getBaseDir()), '/');
 
-        if ((strpos($baseDir, $documentRoot) === 0)) {
+        if (strpos($baseDir, $documentRoot) === 0) {
             //case when basedir is in document root
             $installationFolder = trim(str_replace($documentRoot, '', $baseDir), '/');
             $storeDomain = rtrim($url . '/' . $installationFolder, '/');
         } else {
             //case when documentRoot contains symlink to basedir
-            $url = $this->_getStoreBaseUrl(\Magento\UrlInterface::URL_TYPE_WEB);
+            $url = $this->_getStoreBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_WEB);
             $storeDomain = rtrim($url, '/');
         }
 
@@ -666,7 +691,7 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
         /** @var $helper \Magento\Sitemap\Helper\Data */
         $helper = $this->_sitemapData;
         $storeId = $this->getStoreId();
-        return (bool) $helper->getEnableSubmissionRobots($storeId);
+        return (bool)$helper->getEnableSubmissionRobots($storeId);
     }
 
     /**
@@ -711,5 +736,4 @@ class Sitemap extends \Magento\Core\Model\AbstractModel
 
         return PHP_EOL;
     }
-
 }

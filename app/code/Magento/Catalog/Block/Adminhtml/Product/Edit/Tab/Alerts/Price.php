@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,14 +26,12 @@
 /**
  * Sign up for an alert when the product price changes grid
  *
- * @category   Magento
- * @package    Magento_Catalog
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Alerts;
 
 use Magento\Backend\Block\Widget\Grid;
-use \Magento\Backend\Block\Widget\Grid\Extended;
+use Magento\Backend\Block\Widget\Grid\Extended;
 
 class Price extends Extended
 {
@@ -96,8 +92,7 @@ class Price extends Extended
             $websiteId = $this->_storeManager->getStore($store)->getWebsiteId();
         }
         if ($this->_catalogData->isModuleEnabled('Magento_ProductAlert')) {
-            $collection = $this->_priceFactory->create()->getCustomerCollection()
-                ->join($productId, $websiteId);
+            $collection = $this->_priceFactory->create()->getCustomerCollection()->join($productId, $websiteId);
             $this->setCollection($collection);
         }
         return parent::_prepareCollection();
@@ -108,45 +103,33 @@ class Price extends Extended
      */
     protected function _prepareColumns()
     {
-        $this->addColumn('firstname', array(
-            'header'    => __('First Name'),
-            'index'     => 'firstname',
-        ));
+        $this->addColumn('firstname', array('header' => __('First Name'), 'index' => 'firstname'));
 
-        $this->addColumn('lastname', array(
-            'header'    => __('Last Name'),
-            'index'     => 'lastname',
-        ));
+        $this->addColumn('lastname', array('header' => __('Last Name'), 'index' => 'lastname'));
 
-        $this->addColumn('email', array(
-            'header'    => __('Email'),
-            'index'     => 'email',
-        ));
+        $this->addColumn('email', array('header' => __('Email'), 'index' => 'email'));
 
-        $this->addColumn('price', array(
-            'header'    => __('Price'),
-            'index'     => 'price',
-            'type'      => 'currency',
-            'currency_code'
-                        => $this->_storeConfig->getConfig(\Magento\Directory\Model\Currency::XML_PATH_CURRENCY_BASE)
-        ));
+        $this->addColumn(
+            'price',
+            array(
+                'header' => __('Price'),
+                'index' => 'price',
+                'type' => 'currency',
+                'currency_code' => $this->_scopeConfig->getValue(
+                    \Magento\Directory\Model\Currency::XML_PATH_CURRENCY_BASE,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
+            )
+        );
 
-        $this->addColumn('add_date', array(
-            'header'    => __('Subscribe Date'),
-            'index'     => 'add_date',
-            'type'      => 'date'
-        ));
+        $this->addColumn('add_date', array('header' => __('Subscribe Date'), 'index' => 'add_date', 'type' => 'date'));
 
-        $this->addColumn('last_send_date', array(
-            'header'    => __('Last Notified'),
-            'index'     => 'last_send_date',
-            'type'      => 'date'
-        ));
+        $this->addColumn(
+            'last_send_date',
+            array('header' => __('Last Notified'), 'index' => 'last_send_date', 'type' => 'date')
+        );
 
-        $this->addColumn('send_count', array(
-            'header'    => __('Send Count'),
-            'index'     => 'send_count',
-        ));
+        $this->addColumn('send_count', array('header' => __('Send Count'), 'index' => 'send_count'));
 
         return parent::_prepareColumns();
     }
@@ -157,13 +140,10 @@ class Price extends Extended
     public function getGridUrl()
     {
         $productId = $this->getRequest()->getParam('id');
-        $storeId   = $this->getRequest()->getParam('store', 0);
+        $storeId = $this->getRequest()->getParam('store', 0);
         if ($storeId) {
             $storeId = $this->_storeManager->getStore($storeId)->getId();
         }
-        return $this->getUrl('catalog/product/alertsPriceGrid', array(
-            'id'    => $productId,
-            'store' => $storeId
-        ));
+        return $this->getUrl('catalog/product/alertsPriceGrid', array('id' => $productId, 'store' => $storeId));
     }
 }

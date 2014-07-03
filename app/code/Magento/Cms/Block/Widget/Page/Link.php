@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Cms
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,9 +26,7 @@ namespace Magento\Cms\Block\Widget\Page;
 /**
  * Widget to display link to CMS page
  */
-class Link
-    extends \Magento\View\Element\Html\Link
-    implements \Magento\Widget\Block\BlockInterface
+class Link extends \Magento\Framework\View\Element\Html\Link implements \Magento\Widget\Block\BlockInterface
 {
     /**
      * Prepared href attribute
@@ -66,13 +62,13 @@ class Link
     protected $_cmsPage;
 
     /**
-     * @param \Magento\View\Element\Template\Context $context
+     * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Cms\Model\Resource\Page $resourcePage
      * @param \Magento\Cms\Helper\Page $cmsPage
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Template\Context $context,
+        \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Cms\Model\Resource\Page $resourcePage,
         \Magento\Cms\Helper\Page $cmsPage,
         array $data = array()
@@ -117,7 +113,7 @@ class Link
                 $this->_title = $this->getData('title');
             } else if ($this->getData('page_id')) {
                 $this->_title = $this->_resourcePage->getCmsPageTitleById($this->getData('page_id'));
-            } else if ($this->getData('href')) {
+            } elseif ($this->getData('href')) {
                 $this->_title = $this->_resourcePage->setStore($this->_storeManager->getStore())
                     ->getCmsPageTitleByIdentifier($this->getData('href'));
             }
@@ -140,8 +136,11 @@ class Link
         } elseif ($this->getTitle()) {
             $this->_anchorText = $this->getTitle();
         } elseif ($this->getData('href')) {
-            $this->_anchorText = $this->_resourcePage->setStore($this->_storeManager->getStore())
-                ->getCmsPageTitleByIdentifier($this->getData('href'));
+            $this->_anchorText = $this->_resourcePage->setStore(
+                $this->_storeManager->getStore()
+            )->getCmsPageTitleByIdentifier(
+                $this->getData('href')
+            );
         } elseif ($this->getData('page_id')) {
             $this->_anchorText = $this->_resourcePage->getCmsPageTitleById($this->getData('page_id'));
         } else {

@@ -21,20 +21,19 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Cms\Block\Adminhtml\Page\Grid\Renderer\Action;
 
 class UrlBuilder
 {
     /**
-     * @var \Magento\UrlInterface
+     * @var \Magento\Framework\UrlInterface
      */
     protected $frontendUrlBuilder;
 
     /**
-     * @param \Magento\UrlInterface $frontendUrlBuilder
+     * @param \Magento\Framework\UrlInterface $frontendUrlBuilder
      */
-    public function __construct(\Magento\UrlInterface $frontendUrlBuilder)
+    public function __construct(\Magento\Framework\UrlInterface $frontendUrlBuilder)
     {
         $this->frontendUrlBuilder = $frontendUrlBuilder;
     }

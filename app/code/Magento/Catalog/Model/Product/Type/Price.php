@@ -18,39 +18,36 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-/**
- * Product type price model
- *
- * @category    Magento
- * @package     Magento_Catalog
- * @author      Magento Core Team <core@magentocommerce.com>
- */
 namespace Magento\Catalog\Model\Product\Type;
 
 use Magento\Catalog\Model\Product;
-use Magento\Core\Model\Store;
+use Magento\Store\Model\Store;
 
+/**
+ * Product type price model
+ */
 class Price
 {
+    /**
+     * Product price cache tag
+     */
     const CACHE_TAG = 'PRODUCT_PRICE';
 
     /**
      * @var array
      */
-    static $attributeCache = array();
+    protected static $attributeCache = array();
 
     /**
      * Core event manager proxy
      *
-     * @var \Magento\Event\ManagerInterface
+     * @var \Magento\Framework\Event\ManagerInterface
      */
-    protected $_eventManager = null;
+    protected $_eventManager;
 
     /**
      * Customer session
@@ -60,14 +57,14 @@ class Price
     protected $_customerSession;
 
     /**
-     * @var \Magento\Stdlib\DateTime\TimezoneInterface
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
     protected $_localeDate;
 
     /**
      * Store manager
      *
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
@@ -82,17 +79,17 @@ class Price
      * Construct
      *
      * @param \Magento\CatalogRule\Model\Resource\RuleFactory $ruleFactory
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Stdlib\DateTime\TimezoneInterface $localeDate
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
      * @param \Magento\Customer\Model\Session $customerSession
-     * @param \Magento\Event\ManagerInterface $eventManager
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
      */
     public function __construct(
         \Magento\CatalogRule\Model\Resource\RuleFactory $ruleFactory,
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
-        \Magento\Stdlib\DateTime\TimezoneInterface $localeDate,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
         \Magento\Customer\Model\Session $customerSession,
-        \Magento\Event\ManagerInterface $eventManager
+        \Magento\Framework\Event\ManagerInterface $eventManager
     ) {
         $this->_ruleFactory = $ruleFactory;
         $this->_storeManager = $storeManager;
@@ -122,12 +119,13 @@ class Price
      */
     public function getBasePrice($product, $qty = null)
     {
-        $price = (float)$product->getPrice();
-        return min($this->_applyGroupPrice($product, $price), $this->_applyTierPrice($product, $qty, $price),
+        $price = (float) $product->getPrice();
+        return min(
+            $this->_applyGroupPrice($product, $price),
+            $this->_applyTierPrice($product, $qty, $price),
             $this->_applySpecialPrice($product, $price)
         );
     }
-
 
     /**
      * Retrieve product final price
@@ -188,6 +186,7 @@ class Price
      *
      * @param Product $product
      * @return float
+     * @deprecated see \Magento\Catalog\Pricing\Price\GroupPrice
      */
     public function getGroupPrice($product)
     {
@@ -233,7 +232,7 @@ class Price
             return $finalPrice;
         }
 
-        $tierPrice  = $product->getTierPrice($qty);
+        $tierPrice = $product->getTierPrice($qty);
         if (is_numeric($tierPrice)) {
             $finalPrice = min($finalPrice, $tierPrice);
         }
@@ -246,10 +245,11 @@ class Price
      * @param   float $qty
      * @param   Product $product
      * @return  float|array
+     * @deprecated
      */
     public function getTierPrice($qty, $product)
     {
-        $allGroups = \Magento\Customer\Model\Group::CUST_GROUP_ALL;
+        $allGroups = \Magento\Customer\Service\V1\CustomerGroupServiceInterface::CUST_GROUP_ALL;
         $prices = $product->getData('tier_price');
 
         if (is_null($prices)) {
@@ -264,12 +264,14 @@ class Price
             if (!is_null($qty)) {
                 return $product->getPrice();
             }
-            return array(array(
-                'price'         => $product->getPrice(),
-                'website_price' => $product->getPrice(),
-                'price_qty'     => 1,
-                'cust_group'    => $allGroups,
-            ));
+            return array(
+                array(
+                    'price' => $product->getPrice(),
+                    'website_price' => $product->getPrice(),
+                    'price_qty' => 1,
+                    'cust_group' => $allGroups
+                )
+            );
         }
 
         $custGroup = $this->_getCustomerGroupId($product);
@@ -279,7 +281,7 @@ class Price
             $prevGroup = $allGroups;
 
             foreach ($prices as $price) {
-                if ($price['cust_group']!=$custGroup && $price['cust_group']!=$allGroups) {
+                if ($price['cust_group'] != $custGroup && $price['cust_group'] != $allGroups) {
                     // tier not for current customer group nor is for all groups
                     continue;
                 }
@@ -291,37 +293,38 @@ class Price
                     // higher tier qty already found
                     continue;
                 }
-                if ($price['price_qty'] == $prevQty && $prevGroup != $allGroups && $price['cust_group'] == $allGroups) {
+                if ($price['price_qty'] == $prevQty && $prevGroup != $allGroups && $price['cust_group'] == $allGroups
+                ) {
                     // found tier qty is same as current tier qty but current tier group is ALL_GROUPS
                     continue;
                 }
                 if ($price['website_price'] < $prevPrice) {
-                    $prevPrice  = $price['website_price'];
-                    $prevQty    = $price['price_qty'];
-                    $prevGroup  = $price['cust_group'];
+                    $prevPrice = $price['website_price'];
+                    $prevQty = $price['price_qty'];
+                    $prevGroup = $price['cust_group'];
                 }
             }
             return $prevPrice;
         } else {
             $qtyCache = array();
-            foreach ($prices as $i => $price) {
+            foreach ($prices as $priceKey => $price) {
                 if ($price['cust_group'] != $custGroup && $price['cust_group'] != $allGroups) {
-                    unset($prices[$i]);
-                } else if (isset($qtyCache[$price['price_qty']])) {
-                    $j = $qtyCache[$price['price_qty']];
-                    if ($prices[$j]['website_price'] > $price['website_price']) {
-                        unset($prices[$j]);
-                        $qtyCache[$price['price_qty']] = $i;
+                    unset($prices[$priceKey]);
+                } elseif (isset($qtyCache[$price['price_qty']])) {
+                    $priceQty = $qtyCache[$price['price_qty']];
+                    if ($prices[$priceQty]['website_price'] > $price['website_price']) {
+                        unset($prices[$priceQty]);
+                        $qtyCache[$price['price_qty']] = $priceKey;
                     } else {
-                        unset($prices[$i]);
+                        unset($prices[$priceKey]);
                     }
                 } else {
-                    $qtyCache[$price['price_qty']] = $i;
+                    $qtyCache[$price['price_qty']] = $priceKey;
                 }
             }
         }
 
-        return ($prices) ? $prices : array();
+        return $prices ? $prices : array();
     }
 
     /**
@@ -345,8 +348,12 @@ class Price
      */
     protected function _applySpecialPrice($product, $finalPrice)
     {
-        return $this->calculateSpecialPrice($finalPrice, $product->getSpecialPrice(), $product->getSpecialFromDate(),
-                        $product->getSpecialToDate(), $product->getStore()
+        return $this->calculateSpecialPrice(
+            $finalPrice,
+            $product->getSpecialPrice(),
+            $product->getSpecialFromDate(),
+            $product->getSpecialToDate(),
+            $product->getStore()
         );
     }
 
@@ -355,6 +362,7 @@ class Price
      *
      * @param   Product $product
      * @return  int
+     * @deprecated
      */
     public function getTierPriceCount($product)
     {
@@ -368,18 +376,19 @@ class Price
      * @param   float $qty
      * @param   Product $product
      * @return  array|float
+     * @deprecated
      */
     public function getFormatedTierPrice($qty, $product)
     {
         $price = $product->getTierPrice($qty);
         if (is_array($price)) {
-            foreach ($price as $index => $value) {
+            foreach (array_keys($price) as $index) {
                 $price[$index]['formated_price'] = $this->_storeManager->getStore()->convertPrice(
-                        $price[$index]['website_price'], true
+                    $price[$index]['website_price'],
+                    true
                 );
             }
-        }
-        else {
+        } else {
             $price = $this->_storeManager->getStore()->formatPrice($price);
         }
 
@@ -404,14 +413,16 @@ class Price
      * @param int $qty
      * @param float $finalPrice
      * @return float
+     * @deprecated
      */
     protected function _applyOptionsPrice($product, $qty, $finalPrice)
     {
-        if ($optionIds = $product->getCustomOption('option_ids')) {
+        $optionIds = $product->getCustomOption('option_ids');
+        if ($optionIds) {
             $basePrice = $finalPrice;
             foreach (explode(',', $optionIds->getValue()) as $optionId) {
                 if ($option = $product->getOptionById($optionId)) {
-                    $confItemOption = $product->getCustomOption('option_'.$option->getId());
+                    $confItemOption = $product->getCustomOption('option_' . $option->getId());
 
                     $group = $option->groupFactory($option->getType())
                         ->setOption($option)
@@ -431,16 +442,23 @@ class Price
      * @param   float $specialPrice
      * @param   string $specialPriceFrom
      * @param   string $specialPriceTo
-     * @param   float|null|false $rulePrice
+     * @param   bool|float|null $rulePrice
      * @param   mixed|null $wId
-     * @param   mixed|null $gId
+     * @param   integer|null $gId
      * @param   int|null $productId
      * @return  float
      */
-    public function calculatePrice($basePrice, $specialPrice, $specialPriceFrom, $specialPriceTo,
-            $rulePrice = false, $wId = null, $gId = null, $productId = null)
-    {
-        \Magento\Profiler::start('__PRODUCT_CALCULATE_PRICE__');
+    public function calculatePrice(
+        $basePrice,
+        $specialPrice,
+        $specialPriceFrom,
+        $specialPriceTo,
+        $rulePrice = false,
+        $wId = null,
+        $gId = null,
+        $productId = null
+    ) {
+        \Magento\Framework\Profiler::start('__PRODUCT_CALCULATE_PRICE__');
         if ($wId instanceof Store) {
             $sId = $wId->getId();
             $wId = $wId->getWebsiteId();
@@ -449,16 +467,18 @@ class Price
         }
 
         $finalPrice = $basePrice;
-        if ($gId instanceof \Magento\Customer\Model\Group) {
-            $gId = $gId->getId();
-        }
 
-        $finalPrice = $this->calculateSpecialPrice($finalPrice, $specialPrice, $specialPriceFrom, $specialPriceTo, $sId);
+        $finalPrice = $this->calculateSpecialPrice(
+            $finalPrice,
+            $specialPrice,
+            $specialPriceFrom,
+            $specialPriceTo,
+            $sId
+        );
 
         if ($rulePrice === false) {
             $storeTimestamp = $this->_localeDate->scopeTimeStamp($sId);
-            $rulePrice = $this->_ruleFactory->create()
-                ->getRulePrice($storeTimestamp, $wId, $gId, $productId);
+            $rulePrice = $this->_ruleFactory->create()->getRulePrice($storeTimestamp, $wId, $gId, $productId);
         }
 
         if ($rulePrice !== null && $rulePrice !== false) {
@@ -466,7 +486,7 @@ class Price
         }
 
         $finalPrice = max($finalPrice, 0);
-        \Magento\Profiler::stop('__PRODUCT_CALCULATE_PRICE__');
+        \Magento\Framework\Profiler::stop('__PRODUCT_CALCULATE_PRICE__');
         return $finalPrice;
     }
 
@@ -480,12 +500,16 @@ class Price
      * @param int|string|Store $store
      * @return float
      */
-    public function calculateSpecialPrice($finalPrice, $specialPrice, $specialPriceFrom, $specialPriceTo,
-            $store = null)
-    {
+    public function calculateSpecialPrice(
+        $finalPrice,
+        $specialPrice,
+        $specialPriceFrom,
+        $specialPriceTo,
+        $store = null
+    ) {
         if (!is_null($specialPrice) && $specialPrice != false) {
             if ($this->_localeDate->isScopeDateInInterval($store, $specialPriceFrom, $specialPriceTo)) {
-                $finalPrice     = min($finalPrice, $specialPrice);
+                $finalPrice = min($finalPrice, $specialPrice);
             }
         }
         return $finalPrice;

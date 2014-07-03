@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Paypal
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,12 +26,30 @@ namespace Magento\Paypal\Block\Payflow\Advanced;
 /**
  * Payflow Advanced iframe block
  *
- * @category   Magento
- * @package    Magento_Paypal
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Iframe extends \Magento\Paypal\Block\Payflow\Link\Iframe
 {
+    /**
+     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Paypal\Helper\Hss $hssHelper
+     * @param \Magento\Payment\Helper\Data $paymentData
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Sales\Model\OrderFactory $orderFactory,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Paypal\Helper\Hss $hssHelper,
+        \Magento\Payment\Helper\Data $paymentData,
+        array $data = array()
+    ) {
+        parent::__construct($context, $orderFactory, $checkoutSession, $hssHelper, $paymentData, $data);
+        $this->_isScopePrivate = false;
+    }
+
     /**
      * Set payment method code
      *
@@ -62,9 +78,11 @@ class Iframe extends \Magento\Paypal\Block\Payflow\Link\Iframe
      */
     public function isTestMode()
     {
-        $mode = $this->_paymentData
-            ->getMethodInstance(\Magento\Paypal\Model\Config::METHOD_PAYFLOWADVANCED)
-            ->getConfigData('sandbox_flag');
-        return (bool) $mode;
+        $mode = $this->_paymentData->getMethodInstance(
+            \Magento\Paypal\Model\Config::METHOD_PAYFLOWADVANCED
+        )->getConfigData(
+            'sandbox_flag'
+        );
+        return (bool)$mode;
     }
 }

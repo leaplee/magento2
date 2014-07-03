@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Shipping
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -42,16 +40,15 @@ class Result
     protected $_error = null;
 
     /**
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
     /**
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
-    public function __construct(
-        \Magento\Core\Model\StoreManagerInterface $storeManager
-    ) {
+    public function __construct(\Magento\Store\Model\StoreManagerInterface $storeManager)
+    {
         $this->_storeManager = $storeManager;
     }
 
@@ -100,8 +97,7 @@ class Result
         }
         if ($result instanceof \Magento\Sales\Model\Quote\Address\RateResult\AbstractResult) {
             $this->_rates[] = $result;
-        }
-        elseif ($result instanceof \Magento\Shipping\Model\Rate\Result) {
+        } elseif ($result instanceof \Magento\Shipping\Model\Rate\Result) {
             $rates = $result->getAllRates();
             foreach ($rates as $rate) {
                 $this->append($rate);
@@ -163,7 +159,7 @@ class Result
             $rates[$rate->getCarrier()]['methods'][$rate->getMethod()] = array(
                 'title' => $rate->getMethodTitle(),
                 'price' => $rate->getPrice(),
-                'price_formatted' => $currencyFilter->filter($rate->getPrice()),
+                'price_formatted' => $currencyFilter->filter($rate->getPrice())
             );
         }
         return $rates;

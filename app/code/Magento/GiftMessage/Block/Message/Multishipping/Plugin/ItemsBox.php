@@ -23,7 +23,6 @@
  */
 namespace Magento\GiftMessage\Block\Message\Multishipping\Plugin;
 
-
 /**
  * Multishipping items box plugin
  */
@@ -51,7 +50,7 @@ class ItemsBox
      *
      * @param \Magento\Multishipping\Block\Checkout\Shipping $subject
      * @param callable $proceed
-     * @param \Magento\Object $addressEntity
+     * @param \Magento\Framework\Object $addressEntity
      *
      * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -59,7 +58,7 @@ class ItemsBox
     public function aroundGetItemsBoxTextAfter(
         \Magento\Multishipping\Block\Checkout\Shipping $subject,
         \Closure $proceed,
-        \Magento\Object $addressEntity
+        \Magento\Framework\Object $addressEntity
     ) {
         $itemsBoxText = $proceed($addressEntity);
         return $itemsBoxText . $this->helper->getInline('multishipping_address', $addressEntity);

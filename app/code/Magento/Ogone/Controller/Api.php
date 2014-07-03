@@ -18,19 +18,17 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Ogone
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Ogone\Controller;
 
-use \Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order;
 
 /**
  * Ogone Api Controller
  */
-class Api extends \Magento\App\Action\Action
+class Api extends \Magento\Framework\App\Action\Action
 {
     /**
      * Order instance
@@ -45,18 +43,18 @@ class Api extends \Magento\App\Action\Action
     protected $_salesOrderFactory;
 
     /**
-     * @var \Magento\Core\Model\Resource\TransactionFactory
+     * @var \Magento\Framework\DB\TransactionFactory
      */
     protected $_transactionFactory;
 
     /**
-     * @param \Magento\App\Action\Context $context
-     * @param \Magento\Core\Model\Resource\TransactionFactory $transactionFactory
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\DB\TransactionFactory $transactionFactory
      * @param \Magento\Sales\Model\OrderFactory $salesOrderFactory
      */
     public function __construct(
-        \Magento\App\Action\Context $context,
-        \Magento\Core\Model\Resource\TransactionFactory $transactionFactory,
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\DB\TransactionFactory $transactionFactory,
         \Magento\Sales\Model\OrderFactory $salesOrderFactory
     ) {
         parent::__construct($context);
@@ -93,8 +91,7 @@ class Api extends \Magento\App\Action\Action
     {
         if (empty($this->_order)) {
             $orderId = $this->getRequest()->getParam('orderID');
-            $this->_order = $this->_salesOrderFactory->create()
-                ->loadByIncrementId($orderId);
+            $this->_order = $this->_salesOrderFactory->create()->loadByIncrementId($orderId);
         }
         return $this->_order;
     }
@@ -147,8 +144,7 @@ class Api extends \Magento\App\Action\Action
     {
         $lastIncrementId = $this->_getCheckout()->getLastRealOrderId();
         if ($lastIncrementId) {
-            $order = $this->_salesOrderFactory->create()
-                ->loadByIncrementId($lastIncrementId);
+            $order = $this->_salesOrderFactory->create()->loadByIncrementId($lastIncrementId);
             if ($order->getId()) {
                 $order->setState(
                     \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT,
@@ -219,9 +215,9 @@ class Api extends \Magento\App\Action\Action
     {
         $status = $this->getRequest()->getParam('STATUS');
         switch ($status) {
-            case \Magento\Ogone\Model\Api::OGONE_AUTHORIZED :
+            case \Magento\Ogone\Model\Api::OGONE_AUTHORIZED:
             case \Magento\Ogone\Model\Api::OGONE_AUTH_PROCESSING:
-            case \Magento\Ogone\Model\Api::OGONE_PAYMENT_REQUESTED_STATUS :
+            case \Magento\Ogone\Model\Api::OGONE_PAYMENT_REQUESTED_STATUS:
                 $this->_acceptProcess();
                 break;
             case \Magento\Ogone\Model\Api::OGONE_AUTH_REFUZED:
@@ -286,9 +282,9 @@ class Api extends \Magento\App\Action\Action
                     $this->_processDirectSale();
                     break;
                 default:
-                    throw new \Exception (__('Can\'t detect Ogone payment action'));
+                    throw new \Exception(__('Can\'t detect Ogone payment action'));
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->messageManager->addError(__('The order cannot be saved.'));
             $this->_redirect('checkout/cart');
             return;
@@ -313,7 +309,7 @@ class Api extends \Magento\App\Action\Action
                 );
                 $order->save();
             } elseif ($order->getState() == \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT) {
-                if ($status ==  \Magento\Ogone\Model\Api::OGONE_AUTHORIZED) {
+                if ($status == \Magento\Ogone\Model\Api::OGONE_AUTHORIZED) {
                     if ($order->getStatus() != \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT) {
                         $order->setState(
                             \Magento\Sales\Model\Order::STATE_PROCESSING,
@@ -335,10 +331,7 @@ class Api extends \Magento\App\Action\Action
                     $invoice->setState(\Magento\Sales\Model\Order\Invoice::STATE_PAID);
                     $invoice->getOrder()->setIsInProcess(true);
 
-                    $this->_transactionFactory->create()
-                        ->addObject($invoice)
-                        ->addObject($invoice->getOrder())
-                        ->save();
+                    $this->_transactionFactory->create()->addObject($invoice)->addObject($invoice->getOrder())->save();
                     $order->sendNewOrderEmail();
                 }
             } else {
@@ -364,7 +357,7 @@ class Api extends \Magento\App\Action\Action
         $order = $this->_getOrder();
         $status = $this->getRequest()->getParam('STATUS');
         try {
-            if ($status ==  \Magento\Ogone\Model\Api::OGONE_AUTH_PROCESSING) {
+            if ($status == \Magento\Ogone\Model\Api::OGONE_AUTH_PROCESSING) {
                 $order->setState(
                     \Magento\Sales\Model\Order::STATE_PROCESSING,
                     \Magento\Ogone\Model\Api::WAITING_AUTHORIZATION,
@@ -372,7 +365,7 @@ class Api extends \Magento\App\Action\Action
                 );
             } else {
                 //to send new order email only when state is pending payment
-                if ($order->getState()==\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT) {
+                if ($order->getState() == \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT) {
                     $order->sendNewOrderEmail();
                 }
                 $order->setState(
@@ -409,7 +402,6 @@ class Api extends \Magento\App\Action\Action
         return $this;
     }
 
-
     /**
      * The payment result is uncertain
      * exception status can be 52 or 92
@@ -441,11 +433,15 @@ class Api extends \Magento\App\Action\Action
         }
 
         switch ($params['STATUS']) {
-            case \Magento\Ogone\Model\Api::OGONE_PAYMENT_UNCERTAIN_STATUS :
-                $exception = __('Something went wrong during the payment process, and so the result is unpredictable.');
+            case \Magento\Ogone\Model\Api::OGONE_PAYMENT_UNCERTAIN_STATUS:
+                $exception = __(
+                    'Something went wrong during the payment process, and so the result is unpredictable.'
+                );
                 break;
-            case \Magento\Ogone\Model\Api::OGONE_AUTH_UKNKOWN_STATUS :
-                $exception = __('Something went wrong during the authorization process, and so the result is unpredictable.');
+            case \Magento\Ogone\Model\Api::OGONE_AUTH_UKNKOWN_STATUS:
+                $exception = __(
+                    'Something went wrong during the authorization process, and so the result is unpredictable.'
+                );
                 break;
             default:
                 $exception = __('Unknown exception');
@@ -458,10 +454,11 @@ class Api extends \Magento\App\Action\Action
                 $this->_prepareCCInfo($order, $params);
                 $order->getPayment()->setLastTransId($params['PAYID']);
                 //to send new order email only when state is pending payment
-                if ($order->getState()==\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT) {
+                if ($order->getState() == \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT) {
                     $order->sendNewOrderEmail();
                     $order->setState(
-                        \Magento\Sales\Model\Order::STATE_PROCESSING, \Magento\Ogone\Model\Api::PROCESSING_OGONE_STATUS,
+                        \Magento\Sales\Model\Order::STATE_PROCESSING,
+                        \Magento\Ogone\Model\Api::PROCESSING_OGONE_STATUS,
                         $exception
                     );
                 } else {
@@ -502,8 +499,8 @@ class Api extends \Magento\App\Action\Action
      */
     protected function _declineProcess()
     {
-        $status     = \Magento\Ogone\Model\Api::DECLINE_OGONE_STATUS;
-        $comment    = __('Declined Order on Ogone side');
+        $status = \Magento\Ogone\Model\Api::DECLINE_OGONE_STATUS;
+        $comment = __('Declined Order on Ogone side');
         $this->messageManager->addError(__('The payment transaction has been declined.'));
         $this->_cancelOrder($status, $comment);
     }
@@ -532,8 +529,8 @@ class Api extends \Magento\App\Action\Action
      */
     public function _cancelProcess()
     {
-        $status     = \Magento\Ogone\Model\Api::CANCEL_OGONE_STATUS;
-        $comment    = __('The order was canceled on the Ogone side.');
+        $status = \Magento\Ogone\Model\Api::CANCEL_OGONE_STATUS;
+        $comment = __('The order was canceled on the Ogone side.');
         $this->_cancelOrder($status, $comment);
         return $this;
     }
@@ -545,7 +542,7 @@ class Api extends \Magento\App\Action\Action
      * @param string $comment
      * @return void|$this
      */
-    protected function _cancelOrder($status, $comment='')
+    protected function _cancelOrder($status, $comment = '')
     {
         $order = $this->_getOrder();
         if (!$this->_isOrderValid($order)) {

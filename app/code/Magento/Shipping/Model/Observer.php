@@ -21,13 +21,12 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Shipping\Model;
 
 class Observer
 {
     /**
-     * @var \Magento\Locale\ResolverInterface
+     * @var \Magento\Framework\Locale\ResolverInterface
      */
     protected $_localeResolver;
 
@@ -37,11 +36,11 @@ class Observer
     protected $_shippingFactory;
 
     /**
-     * @param \Magento\Locale\ResolverInterface $localeResolver
+     * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      * @param \Magento\Sales\Model\Resource\Report\ShippingFactory $shippingFactory
      */
     public function __construct(
-        \Magento\Locale\ResolverInterface $localeResolver,
+        \Magento\Framework\Locale\ResolverInterface $localeResolver,
         \Magento\Sales\Model\Resource\Report\ShippingFactory $shippingFactory
     ) {
         $this->_localeResolver = $localeResolver;

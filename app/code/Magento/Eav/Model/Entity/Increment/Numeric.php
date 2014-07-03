@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Eav
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -51,7 +49,7 @@ class Numeric extends \Magento\Eav\Model\Entity\Increment\AbstractIncrement
             $last = (int)$last;
         }
 
-        $next = $last+1;
+        $next = $last + 1;
 
         return $this->format($next);
     }

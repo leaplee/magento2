@@ -22,14 +22,13 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Install\App\Action\Plugin;
 
-use Magento\App\Filesystem,
-    Magento\Filesystem\FilesystemException,
-    Magento\Filesystem\Directory\Write,
-    Magento\App\State,
-    Magento\Logger;
+use Magento\Framework\App\Filesystem;
+use Magento\Framework\Filesystem\FilesystemException;
+use Magento\Framework\Filesystem\Directory\Write;
+use Magento\Framework\App\State;
+use Magento\Framework\Logger;
 
 class Dir
 {
@@ -70,12 +69,12 @@ class Dir
      * Clear temporary directories
      *
      * @param \Magento\Install\Controller\Index $subject
-     * @param \Magento\App\RequestInterface $request
+     * @param \Magento\Framework\App\RequestInterface $request
      *
      * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function beforeDispatch(\Magento\Install\Controller\Index $subject, \Magento\App\RequestInterface $request)
+    public function beforeDispatch(\Magento\Install\Controller\Index $subject, \Magento\Framework\App\RequestInterface $request)
     {
         if (!$this->appState->isInstalled()) {
             foreach ($this->varDirectory->read() as $dir) {
@@ -89,4 +88,4 @@ class Dir
             }
         }
     }
-} 
+}

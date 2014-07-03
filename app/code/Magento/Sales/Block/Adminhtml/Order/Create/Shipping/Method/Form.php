@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,12 +26,9 @@ namespace Magento\Sales\Block\Adminhtml\Order\Create\Shipping\Method;
 /**
  * Adminhtml sales order create shipping method form block
  *
- * @category   Magento
- * @package    Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Form
-    extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
+class Form extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
 {
     /**
      * Shipping rates
@@ -109,7 +104,12 @@ class Form
      */
     public function getCarrierName($carrierCode)
     {
-        if ($name = $this->_storeConfig->getConfig('carriers/'.$carrierCode.'/title', $this->getStore()->getId())) {
+        if ($name = $this->_scopeConfig->getValue(
+            'carriers/' . $carrierCode . '/title',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStore()->getId()
+        )
+        ) {
             return $name;
         }
         return $carrierCode;
@@ -133,7 +133,7 @@ class Form
      */
     public function isMethodActive($code)
     {
-        return $code===$this->getShippingMethod();
+        return $code === $this->getShippingMethod();
     }
 
     /**
@@ -181,7 +181,6 @@ class Form
                 $flag,
                 $this->getAddress(),
                 null,
-                //We should send exact quote store to prevent fetching default config for admin store.
                 $this->getAddress()->getQuote()->getStore()
             ),
             true

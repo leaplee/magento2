@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,8 +28,6 @@ use Magento\Backend\Block\Widget\Accordion;
 /**
  * Accordion item
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Item extends \Magento\Backend\Block\Widget
@@ -56,7 +52,7 @@ class Item extends \Magento\Backend\Block\Widget
      */
     public function getTarget()
     {
-        return ($this->getAjax()) ? 'ajax' : '';
+        return $this->getAjax() ? 'ajax' : '';
     }
 
     /**
@@ -66,8 +62,9 @@ class Item extends \Magento\Backend\Block\Widget
     {
         $title = $this->getData('title');
         $url = $this->getContentUrl() ? $this->getContentUrl() : '#';
-        $title = '<a href="' . $url . '" class="' . $this->getTarget() . '"' . $this->getUiId('title-link') . '>'
-            . $title . '</a>';
+        $title = '<a href="' . $url . '" class="' . $this->getTarget() . '"' . $this->getUiId(
+            'title-link'
+        ) . '>' . $title . '</a>';
 
         return $title;
     }
@@ -81,7 +78,7 @@ class Item extends \Magento\Backend\Block\Widget
         if (is_string($content)) {
             return $content;
         }
-        if ($content instanceof \Magento\View\Element\AbstractBlock) {
+        if ($content instanceof \Magento\Framework\View\Element\AbstractBlock) {
             return $content->toHtml();
         }
         return null;
@@ -94,7 +91,7 @@ class Item extends \Magento\Backend\Block\Widget
     {
         $class = $this->getData('class');
         if ($this->getOpen()) {
-            $class.= ' open';
+            $class .= ' open';
         }
         return $class;
     }

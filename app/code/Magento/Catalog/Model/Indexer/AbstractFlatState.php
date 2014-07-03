@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Indexer;
 
 abstract class AbstractFlatState
@@ -37,9 +36,9 @@ abstract class AbstractFlatState
     const INDEXER_ENABLED_XML_PATH = '';
 
     /**
-     * @var \Magento\Core\Model\Store\ConfigInterface
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $storeConfig;
+    protected $scopeConfig;
 
     /**
      * @var bool
@@ -52,16 +51,16 @@ abstract class AbstractFlatState
     protected $flatIndexer;
 
     /**
-     * @param \Magento\Core\Model\Store\ConfigInterface $storeConfig
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Indexer\Model\IndexerInterface $flatIndexer
      * @param bool $isAvailable
      */
     public function __construct(
-        \Magento\Core\Model\Store\ConfigInterface $storeConfig,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Indexer\Model\IndexerInterface $flatIndexer,
         $isAvailable = false
     ) {
-        $this->storeConfig = $storeConfig;
+        $this->scopeConfig = $scopeConfig;
         $this->flatIndexer = $flatIndexer;
         $this->isAvailable = $isAvailable;
     }
@@ -73,7 +72,7 @@ abstract class AbstractFlatState
      */
     public function isFlatEnabled()
     {
-        return $this->storeConfig->getConfigFlag(static::INDEXER_ENABLED_XML_PATH);
+        return $this->scopeConfig->isSetFlag(static::INDEXER_ENABLED_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
     /**

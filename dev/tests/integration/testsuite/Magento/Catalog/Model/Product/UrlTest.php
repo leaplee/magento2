@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Product;
 
 /**
@@ -41,36 +37,39 @@ class UrlTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Product\Url');
+        $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Catalog\Model\Product\Url'
+        );
     }
 
     public function testGetUrlInstance()
     {
         $instance = $this->_model->getUrlInstance();
-        $this->assertInstanceOf('Magento\Url', $instance);
+        $this->assertInstanceOf('Magento\Framework\Url', $instance);
         $this->assertSame($instance, $this->_model->getUrlInstance());
     }
 
     public function testGetUrlRewrite()
     {
         $instance = $this->_model->getUrlRewrite();
-        $this->assertInstanceOf('Magento\Core\Model\Url\Rewrite', $instance);
+        $this->assertInstanceOf('Magento\UrlRewrite\Model\UrlRewrite', $instance);
         $this->assertSame($instance, $this->_model->getUrlRewrite());
     }
 
     public function testGetUrlInStore()
     {
-        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Product');
+        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Catalog\Model\Product'
+        );
         $product->load(1);
         $this->assertStringEndsWith('simple-product.html', $this->_model->getUrlInStore($product));
     }
 
     public function testGetProductUrl()
     {
-        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Product');
+        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Catalog\Model\Product'
+        );
         $product->load(1);
         $this->assertStringEndsWith('simple-product.html', $this->_model->getProductUrl($product));
     }
@@ -83,13 +82,15 @@ class UrlTest extends \PHPUnit_Framework_TestCase
     public function testGetUrlPath()
     {
         /** @var $product \Magento\Catalog\Model\Product */
-        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Product');
+        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Catalog\Model\Product'
+        );
         $product->setUrlPath('product.html');
 
         /** @var $category \Magento\Catalog\Model\Category */
-        $category = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Category');
+        $category = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Catalog\Model\Category'
+        );
         $category->setUrlPath('category.html');
         $this->assertEquals('product.html', $this->_model->getUrlPath($product));
         $this->assertEquals('category/product.html', $this->_model->getUrlPath($product, $category));
@@ -98,13 +99,15 @@ class UrlTest extends \PHPUnit_Framework_TestCase
     public function testGetUrl()
     {
         /** @var $product \Magento\Catalog\Model\Product */
-        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Product');
+        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Catalog\Model\Product'
+        );
         $product->load(1);
         $this->assertStringEndsWith('simple-product.html', $this->_model->getUrl($product));
 
-        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Product');
+        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Catalog\Model\Product'
+        );
         $product->setId(100);
         $this->assertStringEndsWith('catalog/product/view/id/100/', $this->_model->getUrl($product));
     }

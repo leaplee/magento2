@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_AdminNotification
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@
 /**
  * AdminNotification survey model
  *
- * @category   Magento
- * @package    Magento_AdminNotification
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\AdminNotification\Model;
@@ -41,30 +37,30 @@ class Survey
     /**
      * @var string
      */
-    protected $_flagCode  = 'admin_notification_survey';
+    protected $_flagCode = 'admin_notification_survey';
 
     /**
-     * @var \Magento\Core\Model\Flag
+     * @var \Magento\Framework\Flag
      */
     protected $_flagModel = null;
 
     /**
-     * @var \Magento\Core\Model\FlagFactory
+     * @var \Magento\Framework\FlagFactory
      */
     protected $_flagFactory;
 
     /**
-     * @var \Magento\App\RequestInterface
+     * @var \Magento\Framework\App\RequestInterface
      */
     protected $_request;
 
     /**
-     * @param \Magento\Core\Model\FlagFactory $flagFactory
-     * @param \Magento\App\RequestInterface $request
+     * @param \Magento\Framework\FlagFactory $flagFactory
+     * @param \Magento\Framework\App\RequestInterface $request
      */
     public function __construct(
-        \Magento\Core\Model\FlagFactory $flagFactory,
-        \Magento\App\RequestInterface $request
+        \Magento\Framework\FlagFactory $flagFactory,
+        \Magento\Framework\App\RequestInterface $request
     ) {
         $this->_request = $request;
         $this->_flagFactory = $flagFactory;
@@ -77,9 +73,8 @@ class Survey
      */
     public function isSurveyUrlValid()
     {
-        $curl = new \Magento\HTTP\Adapter\Curl();
-        $curl->setConfig(array('timeout'   => 5))
-            ->write(\Zend_Http_Client::GET, $this->getSurveyUrl(), '1.0');
+        $curl = new \Magento\Framework\HTTP\Adapter\Curl();
+        $curl->setConfig(array('timeout' => 5))->write(\Zend_Http_Client::GET, $this->getSurveyUrl(), '1.0');
         $response = $curl->read();
         $curl->close();
 
@@ -103,14 +98,14 @@ class Survey
     /**
      * Return core flag model
      *
-     * @return \Magento\Core\Model\Flag
+     * @return \Magento\Framework\Flag
      */
     protected function _getFlagModel()
     {
         if ($this->_flagModel === null) {
             $this->_flagModel = $this->_flagFactory->create(
-                array('data' => array('flag_code' => $this->_flagCode)))
-                ->loadSelf();
+                array('data' => array('flag_code' => $this->_flagCode))
+            )->loadSelf();
         }
         return $this->_flagModel;
     }

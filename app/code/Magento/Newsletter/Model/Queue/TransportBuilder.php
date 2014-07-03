@@ -23,7 +23,7 @@
  */
 namespace Magento\Newsletter\Model\Queue;
 
-class TransportBuilder extends \Magento\Mail\Template\TransportBuilder
+class TransportBuilder extends \Magento\Framework\Mail\Template\TransportBuilder
 {
     /**
      * Template data
@@ -51,9 +51,13 @@ class TransportBuilder extends \Magento\Mail\Template\TransportBuilder
     {
         $template = $this->getTemplate()->setData($this->templateData);
 
-        $this->message->setMessageType(\Magento\Mail\MessageInterface::TYPE_HTML)
-            ->setBody($template->getProcessedTemplate())
-            ->setSubject($template->getSubject());
+        $this->message->setMessageType(
+            \Magento\Framework\Mail\MessageInterface::TYPE_HTML
+        )->setBody(
+            $template->getProcessedTemplate()
+        )->setSubject(
+            $template->getSubject()
+        );
 
         return $this;
     }

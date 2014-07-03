@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -31,7 +29,7 @@ class Totals extends \Magento\Backend\Model\Widget\Grid\AbstractTotals
      * Count collection column sum based on column index
      *
      * @param string $index
-     * @param \Magento\Data\Collection $collection
+     * @param \Magento\Framework\Data\Collection $collection
      * @return float|int
      */
     protected function _countSum($index, $collection)
@@ -43,7 +41,6 @@ class Totals extends \Magento\Backend\Model\Widget\Grid\AbstractTotals
             } else {
                 $sum += $this->_countSum($index, $item->getChildren());
             }
-
         }
         return $sum;
     }
@@ -52,7 +49,7 @@ class Totals extends \Magento\Backend\Model\Widget\Grid\AbstractTotals
      * Count collection column average based on column index
      *
      * @param string $index
-     * @param \Magento\Data\Collection $collection
+     * @param \Magento\Framework\Data\Collection $collection
      * @return float|int
      */
     protected function _countAverage($index, $collection)
@@ -68,5 +65,4 @@ class Totals extends \Magento\Backend\Model\Widget\Grid\AbstractTotals
 
         return $itemsCount ? $this->_countSum($index, $collection) / $itemsCount : $itemsCount;
     }
-
 }

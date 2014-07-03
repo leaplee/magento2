@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Reports
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@
 /**
  * Admin abstract reports controller
  *
- * @category   Magento
- * @package    Magento_Reports
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Reports\Controller\Adminhtml\Report;
@@ -37,24 +33,24 @@ namespace Magento\Reports\Controller\Adminhtml\Report;
 abstract class AbstractReport extends \Magento\Backend\App\Action
 {
     /**
-     * @var \Magento\App\Response\Http\FileFactory
+     * @var \Magento\Framework\App\Response\Http\FileFactory
      */
     protected $_fileFactory;
 
     /**
-     * @var \Magento\Stdlib\DateTime\Filter\Date
+     * @var \Magento\Framework\Stdlib\DateTime\Filter\Date
      */
     protected $_dateFilter;
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\App\Response\Http\FileFactory $fileFactory
-     * @param \Magento\Stdlib\DateTime\Filter\Date $dateFilter
+     * @param \Magento\Framework\App\Response\Http\FileFactory $fileFactory
+     * @param \Magento\Framework\Stdlib\DateTime\Filter\Date $dateFilter
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Magento\App\Response\Http\FileFactory $fileFactory,
-        \Magento\Stdlib\DateTime\Filter\Date $dateFilter
+        \Magento\Framework\App\Response\Http\FileFactory $fileFactory,
+        \Magento\Framework\Stdlib\DateTime\Filter\Date $dateFilter
     ) {
         parent::__construct($context);
         $this->_fileFactory = $fileFactory;
@@ -96,7 +92,7 @@ abstract class AbstractReport extends \Magento\Backend\App\Action
     /**
      * Report action init operations
      *
-     * @param array|\Magento\Object $blocks
+     * @param array|\Magento\Framework\Object $blocks
      * @return $this
      */
     public function _initReportAction($blocks)
@@ -105,13 +101,19 @@ abstract class AbstractReport extends \Magento\Backend\App\Action
             $blocks = array($blocks);
         }
 
-        $requestData = $this->_objectManager->get('Magento\Backend\Helper\Data')
-            ->prepareFilterString($this->getRequest()->getParam('filter'));
-        $inputFilter = new \Zend_Filter_Input(array('from' => $this->_dateFilter, 'to' => $this->_dateFilter),
-            array(), $requestData);
+        $requestData = $this->_objectManager->get(
+            'Magento\Backend\Helper\Data'
+        )->prepareFilterString(
+            $this->getRequest()->getParam('filter')
+        );
+        $inputFilter = new \Zend_Filter_Input(
+            array('from' => $this->_dateFilter, 'to' => $this->_dateFilter),
+            array(),
+            $requestData
+        );
         $requestData = $inputFilter->getUnescaped();
         $requestData['store_ids'] = $this->getRequest()->getParam('store_ids');
-        $params = new \Magento\Object();
+        $params = new \Magento\Framework\Object();
 
         foreach ($requestData as $key => $value) {
             if (!empty($value)) {
@@ -141,20 +143,31 @@ abstract class AbstractReport extends \Magento\Backend\App\Action
         $flag = $this->_objectManager->create('Magento\Reports\Model\Flag')->setReportFlagCode($flagCode)->loadSelf();
         $updatedAt = 'undefined';
         if ($flag->hasData()) {
-            $date = new \Magento\Stdlib\DateTime\Date(
+            $date = new \Magento\Framework\Stdlib\DateTime\Date(
                 $flag->getLastUpdate(),
-                \Magento\Stdlib\DateTime::DATETIME_INTERNAL_FORMAT
+                \Magento\Framework\Stdlib\DateTime::DATETIME_INTERNAL_FORMAT
             );
-            $updatedAt = $this->_objectManager->get('Magento\Stdlib\DateTime\TimezoneInterface')
-                ->scopeDate(0, $date, true);
+            $updatedAt = $this->_objectManager->get(
+                'Magento\Framework\Stdlib\DateTime\TimezoneInterface'
+            )->scopeDate(
+                0,
+                $date,
+                true
+            );
         }
 
         $refreshStatsLink = $this->getUrl('reports/report_statistics');
         $directRefreshLink = $this->getUrl('reports/report_statistics/refreshRecent', array('code' => $refreshCode));
 
-        $this->messageManager
-            ->addNotice(__('Last updated: %1. To refresh last day\'s <a href="%2">statistics</a>, '
-                . 'click <a href="%3">here</a>.', $updatedAt, $refreshStatsLink, $directRefreshLink));
+        $this->messageManager->addNotice(
+            __(
+                'Last updated: %1. To refresh last day\'s <a href="%2">statistics</a>, ' .
+                'click <a href="%3">here</a>.',
+                $updatedAt,
+                $refreshStatsLink,
+                $directRefreshLink
+            )
+        );
         return $this;
     }
 }

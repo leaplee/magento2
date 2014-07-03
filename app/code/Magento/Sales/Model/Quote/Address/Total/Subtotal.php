@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -41,9 +39,8 @@ class Subtotal extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
     /**
      * @param \Magento\Sales\Helper\Data $salesData
      */
-    public function __construct(
-        \Magento\Sales\Helper\Data $salesData
-    ) {
+    public function __construct(\Magento\Sales\Helper\Data $salesData)
+    {
         $this->_salesData = $salesData;
     }
 
@@ -73,8 +70,7 @@ class Subtotal extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
                     $virtualAmount += $item->getRowTotal();
                     $baseVirtualAmount += $item->getBaseRowTotal();
                 }
-            }
-            else {
+            } else {
                 $this->_removeItem($address, $item);
             }
         }
@@ -101,8 +97,7 @@ class Subtotal extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
     {
         if ($item instanceof AddressItem) {
             $quoteItem = $item->getAddress()->getQuote()->getItemById($item->getQuoteItemId());
-        }
-        else {
+        } else {
             $quoteItem = $item;
         }
         $product = $quoteItem->getProduct();
@@ -115,34 +110,48 @@ class Subtotal extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
             if (!$product) {
                 return false;
             }
-        }
-        else {
+        } else {
             if (!$product || !$product->isVisibleInCatalog()) {
                 return false;
             }
         }
 
+        $originalPrice = $product->getPrice();
         if ($quoteItem->getParentItem() && $quoteItem->isChildrenCalculated()) {
             $finalPrice = $quoteItem->getParentItem()->getProduct()->getPriceModel()->getChildFinalPrice(
-               $quoteItem->getParentItem()->getProduct(),
-               $quoteItem->getParentItem()->getQty(),
-               $quoteItem->getProduct(),
-               $quoteItem->getQty()
+                $quoteItem->getParentItem()->getProduct(),
+                $quoteItem->getParentItem()->getQty(),
+                $product,
+                $quoteItem->getQty()
             );
-            $item->setPrice($finalPrice)
-                ->setBaseOriginalPrice($finalPrice);
-            $item->calcRowTotal();
+            $this->_calculateRowTotal($item, $finalPrice, $originalPrice);
         } else if (!$quoteItem->getParentItem()) {
             $finalPrice = $product->getFinalPrice($quoteItem->getQty());
-            $item->setPrice($finalPrice)
-                ->setBaseOriginalPrice($finalPrice);
-            $item->calcRowTotal();
+            $this->_calculateRowTotal($item, $finalPrice, $originalPrice);
             $this->_addAmount($item->getRowTotal());
             $this->_addBaseAmount($item->getBaseRowTotal());
             $address->setTotalQty($address->getTotalQty() + $item->getQty());
         }
 
         return true;
+    }
+
+    /**
+     * Processing calculation of row price for address item
+     *
+     * @param AddressItem|Item $item
+     * @param int $finalPrice
+     * @param int $originalPrice
+     * @return $this
+     */
+    protected function _calculateRowTotal($item, $finalPrice, $originalPrice)
+    {
+        if (!$originalPrice) {
+            $originalPrice = $finalPrice;
+        }
+        $item->setPrice($finalPrice)->setBaseOriginalPrice($originalPrice);
+        $item->calcRowTotal();
+        return $this;
     }
 
     /**
@@ -159,8 +168,7 @@ class Subtotal extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
             if ($address->getQuote()) {
                 $address->getQuote()->removeItem($item->getId());
             }
-        }
-        elseif ($item instanceof AddressItem) {
+        } elseif ($item instanceof AddressItem) {
             $address->removeItem($item->getId());
             if ($address->getQuote()) {
                 $address->getQuote()->removeItem($item->getQuoteItemId());
@@ -178,11 +186,9 @@ class Subtotal extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
      */
     public function fetch(Address $address)
     {
-        $address->addTotal(array(
-            'code'  => $this->getCode(),
-            'title' => __('Subtotal'),
-            'value' => $address->getSubtotal()
-        ));
+        $address->addTotal(
+            array('code' => $this->getCode(), 'title' => __('Subtotal'), 'value' => $address->getSubtotal())
+        );
         return $this;
     }
 

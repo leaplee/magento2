@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,12 +26,9 @@ namespace Magento\Catalog\Model\Resource\Product\Option\Value;
 /**
  * Catalog product option values collection
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Collection
-    extends \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+class Collection extends \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
 {
     /**
      * Resource initialization
@@ -42,7 +37,10 @@ class Collection
      */
     protected function _construct()
     {
-        $this->_init('Magento\Catalog\Model\Product\Option\Value', 'Magento\Catalog\Model\Resource\Product\Option\Value');
+        $this->_init(
+            'Magento\Catalog\Model\Product\Option\Value',
+            'Magento\Catalog\Model\Resource\Product\Option\Value'
+        );
     }
 
     /**
@@ -53,8 +51,7 @@ class Collection
      */
     public function getValues($storeId)
     {
-        $this->addPriceToResult($storeId)
-             ->addTitleToResult($storeId);
+        $this->addPriceToResult($storeId)->addTitleToResult($storeId);
 
         return $this;
     }
@@ -69,7 +66,7 @@ class Collection
     {
         $adapter = $this->getConnection();
         $optionTypePriceTable = $this->getTable('catalog_product_option_type_price');
-        $optionTitleTable     = $this->getTable('catalog_product_option_type_title');
+        $optionTitleTable = $this->getTable('catalog_product_option_type_title');
         $priceExpr = $adapter->getCheckSql(
             'store_value_price.price IS NULL',
             'default_value_price.price',
@@ -85,44 +82,42 @@ class Collection
             'default_value_title.title',
             'store_value_title.title'
         );
-        $joinExprDefaultPrice = 'default_value_price.option_type_id = main_table.option_type_id AND '
-                  . $adapter->quoteInto('default_value_price.store_id = ?', \Magento\Core\Model\Store::DEFAULT_STORE_ID);
+        $joinExprDefaultPrice = 'default_value_price.option_type_id = main_table.option_type_id AND ' .
+            $adapter->quoteInto('default_value_price.store_id = ?', \Magento\Store\Model\Store::DEFAULT_STORE_ID);
 
-        $joinExprStorePrice = 'store_value_price.option_type_id = main_table.option_type_id AND '
-                       . $adapter->quoteInto('store_value_price.store_id = ?', $storeId);
+        $joinExprStorePrice = 'store_value_price.option_type_id = main_table.option_type_id AND ' .
+            $adapter->quoteInto('store_value_price.store_id = ?', $storeId);
 
-        $joinExprTitle = 'store_value_title.option_type_id = main_table.option_type_id AND '
-                       . $adapter->quoteInto('store_value_title.store_id = ?', $storeId);
+        $joinExprTitle = 'store_value_title.option_type_id = main_table.option_type_id AND ' . $adapter->quoteInto(
+            'store_value_title.store_id = ?',
+            $storeId
+        );
 
-        $this->getSelect()
-            ->joinLeft(
-                array('default_value_price' => $optionTypePriceTable),
-                $joinExprDefaultPrice,
-                array('default_price'=>'price','default_price_type'=>'price_type')
+        $this->getSelect()->joinLeft(
+            array('default_value_price' => $optionTypePriceTable),
+            $joinExprDefaultPrice,
+            array('default_price' => 'price', 'default_price_type' => 'price_type')
+        )->joinLeft(
+            array('store_value_price' => $optionTypePriceTable),
+            $joinExprStorePrice,
+            array(
+                'store_price' => 'price',
+                'store_price_type' => 'price_type',
+                'price' => $priceExpr,
+                'price_type' => $priceTypeExpr
             )
-            ->joinLeft(
-                array('store_value_price' => $optionTypePriceTable),
-                $joinExprStorePrice,
-                array(
-                    'store_price'       => 'price',
-                    'store_price_type'  => 'price_type',
-                    'price'             => $priceExpr,
-                    'price_type'        => $priceTypeExpr
-                )
-            )
-            ->join(
-                array('default_value_title' => $optionTitleTable),
-                'default_value_title.option_type_id = main_table.option_type_id',
-                array('default_title' => 'title')
-            )
-            ->joinLeft(
-                array('store_value_title' => $optionTitleTable),
-                $joinExprTitle,
-                array(
-                    'store_title' => 'title',
-                    'title'       => $titleExpr)
-            )
-            ->where('default_value_title.store_id = ?', \Magento\Core\Model\Store::DEFAULT_STORE_ID);
+        )->join(
+            array('default_value_title' => $optionTitleTable),
+            'default_value_title.option_type_id = main_table.option_type_id',
+            array('default_title' => 'title')
+        )->joinLeft(
+            array('store_value_title' => $optionTitleTable),
+            $joinExprTitle,
+            array('store_title' => 'title', 'title' => $titleExpr)
+        )->where(
+            'default_value_title.store_id = ?',
+            \Magento\Store\Model\Store::DEFAULT_STORE_ID
+        );
 
         return $this;
     }
@@ -136,26 +131,26 @@ class Collection
     public function addTitleToResult($storeId)
     {
         $optionTitleTable = $this->getTable('catalog_product_option_type_title');
-        $titleExpr = $this->getConnection()
-            ->getCheckSql('store_value_title.title IS NULL', 'default_value_title.title', 'store_value_title.title');
+        $titleExpr = $this->getConnection()->getCheckSql(
+            'store_value_title.title IS NULL',
+            'default_value_title.title',
+            'store_value_title.title'
+        );
 
-        $joinExpr = 'store_value_title.option_type_id = main_table.option_type_id AND '
-                  . $this->getConnection()->quoteInto('store_value_title.store_id = ?', $storeId);
-        $this->getSelect()
-            ->join(
-                array('default_value_title' => $optionTitleTable),
-                'default_value_title.option_type_id = main_table.option_type_id',
-                array('default_title' => 'title')
-            )
-            ->joinLeft(
-                array('store_value_title' => $optionTitleTable),
-                $joinExpr,
-                array(
-                    'store_title'   => 'title',
-                    'title'         => $titleExpr
-                )
-            )
-            ->where('default_value_title.store_id = ?', \Magento\Core\Model\Store::DEFAULT_STORE_ID);
+        $joinExpr = 'store_value_title.option_type_id = main_table.option_type_id AND ' .
+            $this->getConnection()->quoteInto('store_value_title.store_id = ?', $storeId);
+        $this->getSelect()->join(
+            array('default_value_title' => $optionTitleTable),
+            'default_value_title.option_type_id = main_table.option_type_id',
+            array('default_title' => 'title')
+        )->joinLeft(
+            array('store_value_title' => $optionTitleTable),
+            $joinExpr,
+            array('store_title' => 'title', 'title' => $titleExpr)
+        )->where(
+            'default_value_title.store_id = ?',
+            \Magento\Store\Model\Store::DEFAULT_STORE_ID
+        );
 
         return $this;
     }
@@ -169,38 +164,38 @@ class Collection
     public function addPriceToResult($storeId)
     {
         $optionTypeTable = $this->getTable('catalog_product_option_type_price');
-        $priceExpr = $this->getConnection()
-            ->getCheckSql('store_value_price.price IS NULL', 'default_value_price.price', 'store_value_price.price');
-        $priceTypeExpr = $this->getConnection()
-            ->getCheckSql(
-                'store_value_price.price_type IS NULL',
-                'default_value_price.price_type',
-                'store_value_price.price_type'
-            );
+        $priceExpr = $this->getConnection()->getCheckSql(
+            'store_value_price.price IS NULL',
+            'default_value_price.price',
+            'store_value_price.price'
+        );
+        $priceTypeExpr = $this->getConnection()->getCheckSql(
+            'store_value_price.price_type IS NULL',
+            'default_value_price.price_type',
+            'store_value_price.price_type'
+        );
 
-        $joinExprDefault = 'default_value_price.option_type_id = main_table.option_type_id AND '
-                        . $this->getConnection()->quoteInto('default_value_price.store_id = ?', \Magento\Core\Model\Store::DEFAULT_STORE_ID);
-        $joinExprStore = 'store_value_price.option_type_id = main_table.option_type_id AND '
-                       . $this->getConnection()->quoteInto('store_value_price.store_id = ?', $storeId);
-        $this->getSelect()
-            ->joinLeft(
-                array('default_value_price' => $optionTypeTable),
-                $joinExprDefault,
-                array(
-                    'default_price' => 'price',
-                    'default_price_type'=>'price_type'
-                )
-            )
-            ->joinLeft(
-                array('store_value_price' => $optionTypeTable),
-                $joinExprStore,
-                array(
-                    'store_price'       => 'price',
-                    'store_price_type'  => 'price_type',
-                    'price'             => $priceExpr,
-                    'price_type'        => $priceTypeExpr
-                )
+        $joinExprDefault = 'default_value_price.option_type_id = main_table.option_type_id AND ' .
+            $this->getConnection()->quoteInto(
+                'default_value_price.store_id = ?',
+                \Magento\Store\Model\Store::DEFAULT_STORE_ID
             );
+        $joinExprStore = 'store_value_price.option_type_id = main_table.option_type_id AND ' .
+            $this->getConnection()->quoteInto('store_value_price.store_id = ?', $storeId);
+        $this->getSelect()->joinLeft(
+            array('default_value_price' => $optionTypeTable),
+            $joinExprDefault,
+            array('default_price' => 'price', 'default_price_type' => 'price_type')
+        )->joinLeft(
+            array('store_value_price' => $optionTypeTable),
+            $joinExprStore,
+            array(
+                'store_price' => 'price',
+                'store_price_type' => 'price_type',
+                'price' => $priceExpr,
+                'price_type' => $priceTypeExpr
+            )
+        );
 
         return $this;
     }

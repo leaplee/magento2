@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -59,8 +57,6 @@ namespace Magento\Sales\Model\Quote;
  * @method string getCcSsIssue()
  * @method \Magento\Sales\Model\Quote\Payment setCcSsIssue(string $value)
  *
- * @category    Magento
- * @package     Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Payment extends \Magento\Payment\Model\Info
@@ -88,36 +84,27 @@ class Payment extends \Magento\Payment\Model\Info
     protected $methodSpecificationFactory;
 
     /**
-     * @param \Magento\Model\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
      * @param \Magento\Payment\Helper\Data $paymentData
-     * @param \Magento\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      * @param \Magento\Payment\Model\Checks\SpecificationFactory $methodSpecificationFactory
-     * @param \Magento\Core\Model\Resource\AbstractResource $resource
-     * @param \Magento\Data\Collection\Db $resourceCollection
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\Db $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Magento\Model\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
         \Magento\Payment\Helper\Data $paymentData,
-        \Magento\Encryption\EncryptorInterface $encryptor,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Payment\Model\Checks\SpecificationFactory $methodSpecificationFactory,
-        \Magento\Core\Model\Resource\AbstractResource $resource = null,
-        \Magento\Data\Collection\Db $resourceCollection = null,
+        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\Db $resourceCollection = null,
         array $data = array()
     ) {
         $this->methodSpecificationFactory = $methodSpecificationFactory;
-        parent::__construct(
-            $context,
-            $registry,
-            $paymentData,
-            $encryptor,
-            $resource,
-            $resourceCollection,
-            $data
-        );
-
+        parent::__construct($context, $registry, $paymentData, $encryptor, $resource, $resourceCollection, $data);
     }
 
     /**
@@ -160,17 +147,14 @@ class Payment extends \Magento\Payment\Model\Info
      *
      * @param array $data
      * @return $this
-     * @throws \Magento\Core\Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     public function importData(array $data)
     {
-        $data = new \Magento\Object($data);
+        $data = new \Magento\Framework\Object($data);
         $this->_eventManager->dispatch(
             $this->_eventPrefix . '_import_data_before',
-            array(
-                $this->_eventObject=>$this,
-                'input'=>$data,
-            )
+            array($this->_eventObject => $this, 'input' => $data)
         );
 
         $this->setMethod($data->getMethod());
@@ -182,17 +166,22 @@ class Payment extends \Magento\Payment\Model\Info
          */
         $this->getQuote()->collectTotals();
 
-        if (!$method->isAvailable($this->getQuote())
-            || !$this->methodSpecificationFactory->create($data->getChecks())
-                ->isApplicable($method, $this->getQuote())
+        if (!$method->isAvailable(
+            $this->getQuote()
+        ) || !$this->methodSpecificationFactory->create(
+            $data->getChecks()
+        )->isApplicable(
+            $method,
+            $this->getQuote()
+        )
         ) {
-            throw new \Magento\Core\Exception(__('The requested Payment Method is not available.'));
+            throw new \Magento\Framework\Model\Exception(__('The requested Payment Method is not available.'));
         }
 
         $method->assignData($data);
         /*
-        * validating the payment data
-        */
+         * validating the payment data
+         */
         $method->validate();
         return $this;
     }
@@ -209,7 +198,7 @@ class Payment extends \Magento\Payment\Model\Info
         }
         try {
             $method = $this->getMethodInstance();
-        } catch (\Magento\Core\Exception $e) {
+        } catch (\Magento\Framework\Model\Exception $e) {
             return parent::_beforeSave();
         }
         $method->prepareSave();

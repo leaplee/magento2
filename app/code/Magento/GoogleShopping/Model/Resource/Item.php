@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_GoogleShopping
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,13 +25,11 @@
 /**
  * Google Content Item resource model
  *
- * @category   Magento
- * @package    Magento_GoogleShopping
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\GoogleShopping\Model\Resource;
 
-class Item extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Item extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
      * @return void
@@ -51,7 +47,7 @@ class Item extends \Magento\Core\Model\Resource\Db\AbstractDb
      */
     public function loadByProduct($model)
     {
-        if (!($model->getProduct() instanceof \Magento\Object)) {
+        if (!$model->getProduct() instanceof \Magento\Framework\Object) {
             return $this;
         }
 
@@ -63,9 +59,15 @@ class Item extends \Magento\Core\Model\Resource\Db\AbstractDb
         $select = $read->select();
 
         if ($productId !== null) {
-            $select->from($this->getMainTable())
-                ->where("product_id = ?", $productId)
-                ->where('store_id = ?', (int)$storeId);
+            $select->from(
+                $this->getMainTable()
+            )->where(
+                "product_id = ?",
+                $productId
+            )->where(
+                'store_id = ?',
+                (int)$storeId
+            );
 
             $data = $read->fetchRow($select);
             $data = is_array($data) ? $data : array();

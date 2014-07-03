@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Eav
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,18 +28,16 @@ use Magento\Eav\Model\Entity\Type;
 /**
  * EAV attribute resource collection
  *
- * @category    Magento
- * @package     Magento_Eav
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+class Collection extends \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
 {
     /**
      * Add attribute set info flag
      *
      * @var bool
      */
-    protected $_addSetInfoFlag   = false;
+    protected $_addSetInfoFlag = false;
 
     /**
      * Resource model initialization
@@ -69,7 +65,7 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
             'backend_type',
             'backend_table',
             'frontend_input',
-            'source_model',
+            'source_model'
         );
     }
 
@@ -172,18 +168,16 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     public function setInAllAttributeSetsFilter(array $setIds)
     {
         foreach ($setIds as $setId) {
-            $setId = (int) $setId;
+            $setId = (int)$setId;
             if (!$setId) {
                 continue;
             }
-            $alias         = sprintf('entity_attribute_%d', $setId);
-            $joinCondition = $this->getConnection()
-                ->quoteInto("{$alias}.attribute_id = main_table.attribute_id AND {$alias}.attribute_set_id =?", $setId);
-            $this->join(
-                array($alias => 'eav_entity_attribute'),
-                $joinCondition,
-                'attribute_id'
+            $alias = sprintf('entity_attribute_%d', $setId);
+            $joinCondition = $this->getConnection()->quoteInto(
+                "{$alias}.attribute_id = main_table.attribute_id AND {$alias}.attribute_set_id =?",
+                $setId
             );
+            $this->join(array($alias => 'eav_entity_attribute'), $joinCondition, 'attribute_id');
         }
 
         //$this->getSelect()->distinct(true);
@@ -211,9 +205,12 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
      */
     public function setExcludeSetFilter($setId)
     {
-        $existsSelect = $this->getConnection()->select()
-            ->from(array('entity_attribute' => $this->getTable('eav_entity_attribute')))
-            ->where('entity_attribute.attribute_set_id = ?', $setId);
+        $existsSelect = $this->getConnection()->select()->from(
+            array('entity_attribute' => $this->getTable('eav_entity_attribute'))
+        )->where(
+            'entity_attribute.attribute_set_id = ?',
+            $setId
+        );
         $this->getSelect()->order('attribute_id ' . self::SORT_ORDER_DESC);
 
         $this->getSelect()->exists($existsSelect, 'entity_attribute.attribute_id = main_table.attribute_id', false);
@@ -277,19 +274,24 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     public function addHasOptionsFilter()
     {
         $adapter = $this->getConnection();
-        $orWhere = implode(' OR ', array(
-            $adapter->quoteInto('(main_table.frontend_input = ? AND ao.option_id > 0)', 'select'),
-            $adapter->quoteInto('(main_table.frontend_input <> ?)', 'select'),
-            '(main_table.is_user_defined = 0)'
-        ));
+        $orWhere = implode(
+            ' OR ',
+            array(
+                $adapter->quoteInto('(main_table.frontend_input = ? AND ao.option_id > 0)', 'select'),
+                $adapter->quoteInto('(main_table.frontend_input <> ?)', 'select'),
+                '(main_table.is_user_defined = 0)'
+            )
+        );
 
-        $this->getSelect()
-            ->joinLeft(
-                array('ao' => $this->getTable('eav_attribute_option')),
-                'ao.attribute_id = main_table.attribute_id',
-                'option_id')
-            ->group('main_table.attribute_id')
-            ->where($orWhere);
+        $this->getSelect()->joinLeft(
+            array('ao' => $this->getTable('eav_attribute_option')),
+            'ao.attribute_id = main_table.attribute_id',
+            'option_id'
+        )->group(
+            'main_table.attribute_id'
+        )->where(
+            $orWhere
+        );
         return $this;
     }
 
@@ -332,24 +334,24 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
 
             $adapter = $this->getConnection();
             if (count($attributeIds) > 0) {
-                $select = $adapter->select()
-                    ->from(
-                        array('entity' => $this->getTable('eav_entity_attribute')),
-                        array('attribute_id', 'attribute_set_id', 'attribute_group_id', 'sort_order')
-                    )
-                    ->joinLeft(
-                        array('attribute_group' => $this->getTable('eav_attribute_group')),
-                        'entity.attribute_group_id = attribute_group.attribute_group_id',
-                        array('group_sort_order' => 'sort_order')
-                    )
-                    ->where('attribute_id IN (?)', $attributeIds);
+                $select = $adapter->select()->from(
+                    array('entity' => $this->getTable('eav_entity_attribute')),
+                    array('attribute_id', 'attribute_set_id', 'attribute_group_id', 'sort_order')
+                )->joinLeft(
+                    array('attribute_group' => $this->getTable('eav_attribute_group')),
+                    'entity.attribute_group_id = attribute_group.attribute_group_id',
+                    array('group_sort_order' => 'sort_order')
+                )->where(
+                    'attribute_id IN (?)',
+                    $attributeIds
+                );
                 $result = $adapter->fetchAll($select);
 
                 foreach ($result as $row) {
                     $data = array(
-                        'group_id'      => $row['attribute_group_id'],
-                        'group_sort'    => $row['group_sort_order'],
-                        'sort'          => $row['sort_order']
+                        'group_id' => $row['attribute_group_id'],
+                        'group_sort' => $row['group_sort_order'],
+                        'sort' => $row['sort_order']
                     );
                     $attributeToSetInfo[$row['attribute_id']][$row['attribute_set_id']] = $data;
                 }
@@ -373,7 +375,7 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     /**
      * Ad information about attribute sets to collection result data
      *
-     * @return \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+     * @return \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
      */
     protected function _afterLoadData()
     {
@@ -408,9 +410,11 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
      */
     public function addStoreLabel($storeId)
     {
-        $adapter        = $this->getConnection();
-        $joinExpression = $adapter
-            ->quoteInto('al.attribute_id = main_table.attribute_id AND al.store_id = ?', (int) $storeId);
+        $adapter = $this->getConnection();
+        $joinExpression = $adapter->quoteInto(
+            'al.attribute_id = main_table.attribute_id AND al.store_id = ?',
+            (int)$storeId
+        );
         $this->getSelect()->joinLeft(
             array('al' => $this->getTable('eav_attribute_label')),
             $joinExpression,

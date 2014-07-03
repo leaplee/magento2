@@ -20,8 +20,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Customer
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -29,28 +27,35 @@ namespace Magento\Customer\Model\Metadata;
 
 class ElementFactory
 {
-    const OUTPUT_FORMAT_JSON    = 'json';
-    const OUTPUT_FORMAT_TEXT    = 'text';
-    const OUTPUT_FORMAT_HTML    = 'html';
-    const OUTPUT_FORMAT_PDF     = 'pdf';
+    const OUTPUT_FORMAT_JSON = 'json';
+
+    const OUTPUT_FORMAT_TEXT = 'text';
+
+    const OUTPUT_FORMAT_HTML = 'html';
+
+    const OUTPUT_FORMAT_PDF = 'pdf';
+
     const OUTPUT_FORMAT_ONELINE = 'oneline';
-    const OUTPUT_FORMAT_ARRAY   = 'array'; // available only for multiply attributes
+
+    const OUTPUT_FORMAT_ARRAY = 'array';
+
+    // available only for multiply attributes
 
     /**
-     * @var \Magento\ObjectManager
+     * @var \Magento\Framework\ObjectManager
      */
     protected $_objectManager;
 
     /**
-     * @var \Magento\Stdlib\String
+     * @var \Magento\Framework\Stdlib\String
      */
     protected $_string;
 
     /**
-     * @param \Magento\ObjectManager $objectManager
-     * @param \Magento\Stdlib\String $string
+     * @param \Magento\Framework\ObjectManager $objectManager
+     * @param \Magento\Framework\Stdlib\String $string
      */
-    public function __construct(\Magento\ObjectManager $objectManager, \Magento\Stdlib\String $string)
+    public function __construct(\Magento\Framework\ObjectManager $objectManager, \Magento\Framework\Stdlib\String $string)
     {
         $this->_objectManager = $objectManager;
         $this->_string = $string;
@@ -72,12 +77,12 @@ class ElementFactory
         $isAjax = false
     ) {
         $dataModelClass = $attribute->getDataModel();
-        $params = [
+        $params = array(
             'entityTypeCode' => $entityTypeCode,
             'value' => is_null($value) ? false : $value,
             'isAjax' => $isAjax,
             'attribute' => $attribute
-        ];
+        );
         /** TODO fix when Validation is implemented MAGETWO-17341 */
         if ($dataModelClass == 'Magento\Customer\Model\Attribute\Data\Postcode') {
             $dataModelClass = 'Magento\Customer\Model\Metadata\Form\Text';

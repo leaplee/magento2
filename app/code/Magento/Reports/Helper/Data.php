@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Reports
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -29,14 +27,16 @@
  */
 namespace Magento\Reports\Helper;
 
-use Magento\Data\Collection;
-use Magento\Stdlib\DateTime;
+use Magento\Framework\Data\Collection;
+use Magento\Framework\Stdlib\DateTime;
 
-class Data extends \Magento\App\Helper\AbstractHelper
+class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const REPORT_PERIOD_TYPE_DAY    = 'day';
-    const REPORT_PERIOD_TYPE_MONTH  = 'month';
-    const REPORT_PERIOD_TYPE_YEAR   = 'year';
+    const REPORT_PERIOD_TYPE_DAY = 'day';
+
+    const REPORT_PERIOD_TYPE_MONTH = 'month';
+
+    const REPORT_PERIOD_TYPE_YEAR = 'year';
 
     /**
      * @var \Magento\Reports\Model\ItemFactory
@@ -44,13 +44,11 @@ class Data extends \Magento\App\Helper\AbstractHelper
     protected $_itemFactory;
 
     /**
-     * @param \Magento\App\Helper\Context $context
+     * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Reports\Model\ItemFactory $itemFactory
      */
-    public function __construct(
-        \Magento\App\Helper\Context $context,
-        \Magento\Reports\Model\ItemFactory $itemFactory
-    ) {
+    public function __construct(\Magento\Framework\App\Helper\Context $context, \Magento\Reports\Model\ItemFactory $itemFactory)
+    {
         parent::__construct($context);
         $this->_itemFactory = $itemFactory;
     }
@@ -70,25 +68,31 @@ class Data extends \Magento\App\Helper\AbstractHelper
             return $intervals;
         }
 
-        $start = new \Magento\Stdlib\DateTime\Date($from, \Magento\Stdlib\DateTime::DATE_INTERNAL_FORMAT);
+        $start = new \Magento\Framework\Stdlib\DateTime\Date($from, \Magento\Framework\Stdlib\DateTime::DATE_INTERNAL_FORMAT);
 
         if ($period == self::REPORT_PERIOD_TYPE_DAY) {
             $dateStart = $start;
         }
 
         if ($period == self::REPORT_PERIOD_TYPE_MONTH) {
-            $dateStart = new \Magento\Stdlib\DateTime\Date(date("Y-m", $start->getTimestamp()), DateTime::DATE_INTERNAL_FORMAT);
+            $dateStart = new \Magento\Framework\Stdlib\DateTime\Date(
+                date("Y-m", $start->getTimestamp()),
+                DateTime::DATE_INTERNAL_FORMAT
+            );
         }
 
         if ($period == self::REPORT_PERIOD_TYPE_YEAR) {
-            $dateStart = new \Magento\Stdlib\DateTime\Date(date("Y", $start->getTimestamp()), DateTime::DATE_INTERNAL_FORMAT);
+            $dateStart = new \Magento\Framework\Stdlib\DateTime\Date(
+                date("Y", $start->getTimestamp()),
+                DateTime::DATE_INTERNAL_FORMAT
+            );
         }
 
-        $dateEnd = new \Magento\Stdlib\DateTime\Date($to, DateTime::DATE_INTERNAL_FORMAT);
+        $dateEnd = new \Magento\Framework\Stdlib\DateTime\Date($to, DateTime::DATE_INTERNAL_FORMAT);
 
         while ($dateStart->compare($dateEnd) <= 0) {
             switch ($period) {
-                case self::REPORT_PERIOD_TYPE_DAY :
+                case self::REPORT_PERIOD_TYPE_DAY:
                     $t = $dateStart->toString('yyyy-MM-dd');
                     $dateStart->addDay(1);
                     break;
@@ -103,7 +107,7 @@ class Data extends \Magento\App\Helper\AbstractHelper
             }
             $intervals[] = $t;
         }
-        return  $intervals;
+        return $intervals;
     }
 
     /**

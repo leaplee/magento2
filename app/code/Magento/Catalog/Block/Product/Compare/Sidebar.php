@@ -18,23 +18,28 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Catalog\Block\Product\Compare;
 
+use Magento\Catalog\Model\Product\Compare\Item as CompareItem;
+
 /**
  * Catalog Comapare Products Sidebar Block
  *
- * @category   Magento
- * @package    Magento_Catalog
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Sidebar extends \Magento\Catalog\Block\Product\Compare\AbstractCompare
-    implements \Magento\View\Block\IdentityInterface
+class Sidebar extends \Magento\Catalog\Block\Product\Compare\AbstractCompare implements
+    \Magento\Framework\View\Block\IdentityInterface
 {
+    /**
+     * The property is used to define content-scope of block. Can be private or public.
+     *
+     * @var bool
+     */
+     protected $_isScopePrivate = true;
+
     /**
      * Compare Products Collection
      *
@@ -115,13 +120,15 @@ class Sidebar extends \Magento\Catalog\Block\Product\Compare\AbstractCompare
     public function getIdentities()
     {
         $identities = array();
-        foreach($this->getItems() as $item) {
+        foreach ($this->getItems() as $item) {
             $product = $item->getProduct();
-            if ($product instanceof \Magento\Object\IdentityInterface) {
-                $identities[] = $product->getIdentities();
+            if ($product instanceof \Magento\Framework\Object\IdentityInterface) {
+                $identities = array_merge($identities, $product->getIdentities());
             }
         }
-        $identities[] = \Magento\Catalog\Model\Product\Compare\Item::CACHE_TAG . '_' . $this->getCatalogCompareItemId();
+        if ($this->getCatalogCompareItemId()) {
+            $identities[] = CompareItem::CACHE_TAG . '_' . $this->getCatalogCompareItemId();
+        }
         return $identities;
     }
 }

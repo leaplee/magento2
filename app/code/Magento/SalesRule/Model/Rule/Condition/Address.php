@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_SalesRule
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -86,7 +84,7 @@ class Address extends \Magento\Rule\Model\Condition\AbstractCondition
             'postcode' => __('Shipping Postcode'),
             'region' => __('Shipping Region'),
             'region_id' => __('Shipping State/Province'),
-            'country_id' => __('Shipping Country'),
+            'country_id' => __('Shipping Country')
         );
 
         $this->setAttributeOption($attributes);
@@ -114,10 +112,15 @@ class Address extends \Magento\Rule\Model\Condition\AbstractCondition
     public function getInputType()
     {
         switch ($this->getAttribute()) {
-            case 'base_subtotal': case 'weight': case 'total_qty':
+            case 'base_subtotal':
+            case 'weight':
+            case 'total_qty':
                 return 'numeric';
 
-            case 'shipping_method': case 'payment_method': case 'country_id': case 'region_id':
+            case 'shipping_method':
+            case 'payment_method':
+            case 'country_id':
+            case 'region_id':
                 return 'select';
         }
         return 'string';
@@ -131,7 +134,10 @@ class Address extends \Magento\Rule\Model\Condition\AbstractCondition
     public function getValueElementType()
     {
         switch ($this->getAttribute()) {
-            case 'shipping_method': case 'payment_method': case 'country_id': case 'region_id':
+            case 'shipping_method':
+            case 'payment_method':
+            case 'country_id':
+            case 'region_id':
                 return 'select';
         }
         return 'text';
@@ -173,22 +179,21 @@ class Address extends \Magento\Rule\Model\Condition\AbstractCondition
     /**
      * Validate Address Rule Condition
      *
-     * @param \Magento\Object $object
+     * @param \Magento\Framework\Object $object
      * @return bool
      */
-    public function validate(\Magento\Object $object)
+    public function validate(\Magento\Framework\Object $object)
     {
         $address = $object;
         if (!$address instanceof \Magento\Sales\Model\Quote\Address) {
             if ($object->getQuote()->isVirtual()) {
                 $address = $object->getQuote()->getBillingAddress();
-            }
-            else {
+            } else {
                 $address = $object->getQuote()->getShippingAddress();
             }
         }
 
-        if ('payment_method' == $this->getAttribute() && ! $address->hasPaymentMethod()) {
+        if ('payment_method' == $this->getAttribute() && !$address->hasPaymentMethod()) {
             $address->setPaymentMethod($object->getQuote()->getPayment()->getMethod());
         }
 

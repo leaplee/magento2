@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Backend\Block\Widget\Form;
 /**
  * Backend form container block
  *
- * @category    Magento
- * @package     Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Container extends \Magento\Backend\Block\Widget\Container
@@ -71,36 +67,47 @@ class Container extends \Magento\Backend\Block\Widget\Container
     {
         parent::_construct();
 
-        $this->_addButton('back', array(
-            'label'     => __('Back'),
-            'onclick'   => 'setLocation(\'' . $this->getBackUrl() . '\')',
-            'class'     => 'back',
-        ), -1);
-        $this->_addButton('reset', array(
-            'label'     => __('Reset'),
-            'onclick'   => 'setLocation(window.location.href)',
-        ), -1);
+        $this->_addButton(
+            'back',
+            array(
+                'label' => __('Back'),
+                'onclick' => 'setLocation(\'' . $this->getBackUrl() . '\')',
+                'class' => 'back'
+            ),
+            -1
+        );
+        $this->_addButton(
+            'reset',
+            array('label' => __('Reset'), 'onclick' => 'setLocation(window.location.href)', 'class' => 'reset'),
+            -1
+        );
 
         $objId = $this->getRequest()->getParam($this->_objectId);
 
-        if (! empty($objId)) {
-            $this->_addButton('delete', array(
-                'label'     => __('Delete'),
-                'class'     => 'delete',
-                'onclick'   => 'deleteConfirm(\'' . __('Are you sure you want to do this?')
-                    . '\', \'' . $this->getDeleteUrl() . '\')',
-            ));
+        if (!empty($objId)) {
+            $this->_addButton(
+                'delete',
+                array(
+                    'label' => __('Delete'),
+                    'class' => 'delete',
+                    'onclick' => 'deleteConfirm(\'' . __(
+                        'Are you sure you want to do this?'
+                    ) . '\', \'' . $this->getDeleteUrl() . '\')'
+                )
+            );
         }
 
-        $this->_addButton('save', array(
-            'label'     => __('Save'),
-            'class'     => 'save primary',
-            'data_attribute'  => array(
-                'mage-init' => array(
-                    'button' => array('event' => 'save', 'target' => '#edit_form'),
-                ),
+        $this->_addButton(
+            'save',
+            array(
+                'label' => __('Save'),
+                'class' => 'save primary',
+                'data_attribute' => array(
+                    'mage-init' => array('button' => array('event' => 'save', 'target' => '#edit_form'))
+                )
             ),
-        ), 1);
+            1
+        );
     }
 
     /**
@@ -110,8 +117,10 @@ class Container extends \Magento\Backend\Block\Widget\Container
      */
     protected function _prepareLayout()
     {
-        if ($this->_blockGroup && $this->_controller && $this->_mode
-            && !$this->_layout->getChildName($this->_nameInLayout, 'form')
+        if ($this->_blockGroup && $this->_controller && $this->_mode && !$this->_layout->getChildName(
+            $this->_nameInLayout,
+            'form'
+        )
         ) {
             $this->addChild('form', $this->_buildFormClassName());
         }
@@ -125,13 +134,9 @@ class Container extends \Magento\Backend\Block\Widget\Container
      */
     protected function _buildFormClassName()
     {
-        return $this->nameBuilder->buildClassName(array(
-            $this->_blockGroup,
-            'Block',
-            $this->_controller,
-            $this->_mode,
-            'Form'
-        ));
+        return $this->nameBuilder->buildClassName(
+            array($this->_blockGroup, 'Block', $this->_controller, $this->_mode, 'Form')
+        );
     }
 
     /**
@@ -190,7 +195,7 @@ class Container extends \Magento\Backend\Block\Widget\Container
      */
     public function getFormInitScripts()
     {
-        if ( !empty($this->_formInitScripts) && is_array($this->_formInitScripts) ) {
+        if (!empty($this->_formInitScripts) && is_array($this->_formInitScripts)) {
             return '<script type="text/javascript">' . implode("\n", $this->_formInitScripts) . '</script>';
         }
         return '';
@@ -201,7 +206,7 @@ class Container extends \Magento\Backend\Block\Widget\Container
      */
     public function getFormScripts()
     {
-        if ( !empty($this->_formScripts) && is_array($this->_formScripts) ) {
+        if (!empty($this->_formScripts) && is_array($this->_formScripts)) {
             return '<script type="text/javascript">' . implode("\n", $this->_formScripts) . '</script>';
         }
         return '';
@@ -234,7 +239,7 @@ class Container extends \Magento\Backend\Block\Widget\Container
     /**
      * Set data object and pass it to form
      *
-     * @param \Magento\Object $object
+     * @param \Magento\Framework\Object $object
      * @return $this
      */
     public function setDataObject($object)

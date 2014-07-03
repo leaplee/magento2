@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -200,9 +198,15 @@ class Structure implements \Magento\Backend\Model\Config\Structure\SearchInterfa
             foreach ($section['children'] as $group) {
                 if (isset($group['children'])) {
                     $path = $section['id'] . '/' . $group['id'];
-                    $result = array_merge($result, $this->_getGroupFieldPathsByAttribute(
-                        $group['children'], $path, $attributeName, $attributeValue
-                    ));
+                    $result = array_merge(
+                        $result,
+                        $this->_getGroupFieldPathsByAttribute(
+                            $group['children'],
+                            $path,
+                            $attributeName,
+                            $attributeValue
+                        )
+                    );
                 }
             }
         }
@@ -224,7 +228,10 @@ class Structure implements \Magento\Backend\Model\Config\Structure\SearchInterfa
         foreach ($fields as $field) {
             if (isset($field['children'])) {
                 $result += $this->_getGroupFieldPathsByAttribute(
-                    $field['children'], $parentPath . '/' . $field['id'], $attributeName, $attributeValue
+                    $field['children'],
+                    $parentPath . '/' . $field['id'],
+                    $attributeName,
+                    $attributeValue
                 );
             } else if (isset($field[$attributeName]) && $field[$attributeName] == $attributeValue) {
                 $result[] = $parentPath . '/' . $field['id'];

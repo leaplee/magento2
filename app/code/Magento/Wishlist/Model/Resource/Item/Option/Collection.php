@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Wishlist
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@
 /**
  * Wishlist item option collection
  *
- * @category    Magento
- * @package     Magento_Wishlist
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Wishlist\Model\Resource\Item\Option;
@@ -37,14 +33,14 @@ namespace Magento\Wishlist\Model\Resource\Item\Option;
 use Magento\Catalog\Model\Product;
 use Magento\Wishlist\Model\Item;
 
-class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+class Collection extends \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
 {
     /**
      * Array of option ids grouped by item id
      *
      * @var array
      */
-    protected $_optionsByItem    = array();
+    protected $_optionsByItem = array();
 
     /**
      * Array of option ids grouped by product id
@@ -73,9 +69,9 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
         parent::_afterLoad();
 
         foreach ($this as $option) {
-            $optionId   = $option->getId();
-            $itemId     = $option->getWishlistItemId();
-            $productId  = $option->getProductId();
+            $optionId = $option->getId();
+            $itemId = $option->getWishlistItemId();
+            $productId = $option->getProductId();
             if (isset($this->_optionsByItem[$itemId])) {
                 $this->_optionsByItem[$itemId][] = $optionId;
             } else {

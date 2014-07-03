@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -36,7 +34,7 @@ class Discount extends AbstractTotal
         $invoice->setDiscountAmount(0);
         $invoice->setBaseDiscountAmount(0);
 
-        $totalDiscountAmount     = 0;
+        $totalDiscountAmount = 0;
         $baseTotalDiscountAmount = 0;
 
         /**
@@ -52,20 +50,21 @@ class Discount extends AbstractTotal
         }
 
         if ($addShippingDiscount) {
-            $totalDiscountAmount     = $totalDiscountAmount + $invoice->getOrder()->getShippingDiscountAmount();
-            $baseTotalDiscountAmount = $baseTotalDiscountAmount + $invoice->getOrder()->getBaseShippingDiscountAmount();
+            $totalDiscountAmount = $totalDiscountAmount + $invoice->getOrder()->getShippingDiscountAmount();
+            $baseTotalDiscountAmount = $baseTotalDiscountAmount +
+                $invoice->getOrder()->getBaseShippingDiscountAmount();
         }
 
         /** @var $item \Magento\Sales\Model\Order\Invoice\Item */
         foreach ($invoice->getAllItems() as $item) {
             $orderItem = $item->getOrderItem();
             if ($orderItem->isDummy()) {
-                 continue;
+                continue;
             }
 
-            $orderItemDiscount      = (float) $orderItem->getDiscountAmount();
-            $baseOrderItemDiscount  = (float) $orderItem->getBaseDiscountAmount();
-            $orderItemQty       = $orderItem->getQtyOrdered();
+            $orderItemDiscount = (double)$orderItem->getDiscountAmount();
+            $baseOrderItemDiscount = (double)$orderItem->getBaseDiscountAmount();
+            $orderItemQty = $orderItem->getQtyOrdered();
 
             if ($orderItemDiscount && $orderItemQty) {
                 /**

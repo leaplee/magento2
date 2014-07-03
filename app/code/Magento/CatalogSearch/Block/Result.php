@@ -18,20 +18,18 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_CatalogSearch
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\CatalogSearch\Block;
 
 use Magento\Catalog\Block\Product\ListProduct;
-use Magento\Catalog\Model\Layer as ModelLayer;
+use Magento\Catalog\Model\Layer\Search as ModelLayer;
 use Magento\CatalogSearch\Helper\Data;
 use Magento\CatalogSearch\Model\Query;
 use Magento\CatalogSearch\Model\Resource\Fulltext\Collection;
-use Magento\View\Element\Template;
-use Magento\View\Element\Template\Context;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 
 /**
  * Product search result block
@@ -99,14 +97,17 @@ class Result extends Template
         // add Home breadcrumb
         $breadcrumbs = $this->getLayout()->getBlock('breadcrumbs');
         if ($breadcrumbs) {
-            $breadcrumbs->addCrumb('home', array(
-                'label' => __('Home'),
-                'title' => __('Go to Home Page'),
-                'link'  => $this->_storeManager->getStore()->getBaseUrl(),
-            ))->addCrumb('search', array(
-                'label' => $title,
-                'title' => $title
-            ));
+            $breadcrumbs->addCrumb(
+                'home',
+                array(
+                    'label' => __('Home'),
+                    'title' => __('Go to Home Page'),
+                    'link' => $this->_storeManager->getStore()->getBaseUrl()
+                )
+            )->addCrumb(
+                'search',
+                array('label' => $title, 'title' => $title)
+            );
         }
 
         return parent::_prepareLayout();
@@ -143,14 +144,15 @@ class Result extends Template
         /* @var $category \Magento\Catalog\Model\Category */
         $availableOrders = $category->getAvailableSortByOptions();
         unset($availableOrders['position']);
-        $availableOrders = array_merge(array(
-            'relevance' => __('Relevance')
-        ), $availableOrders);
+        $availableOrders = array_merge(array('relevance' => __('Relevance')), $availableOrders);
 
-        $this->getListBlock()
-            ->setAvailableOrders($availableOrders)
-            ->setDefaultDirection('desc')
-            ->setSortBy('relevance');
+        $this->getListBlock()->setAvailableOrders(
+            $availableOrders
+        )->setDefaultDirection(
+            'desc'
+        )->setSortBy(
+            'relevance'
+        );
 
         return $this;
     }
@@ -174,9 +176,9 @@ class Result extends Template
      */
     public function setListCollection()
     {
-//        $this->getListBlock()
-//           ->setCollection($this->_getProductCollection());
-       return $this;
+        //        $this->getListBlock()
+        //           ->setCollection($this->_getProductCollection());
+        return $this;
     }
 
     /**

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Catalog\Model\Resource\Product;
 /**
  * Catalog Product Mass processing resource model
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Action extends \Magento\Catalog\Model\Resource\AbstractResource
@@ -42,11 +38,12 @@ class Action extends \Magento\Catalog\Model\Resource\AbstractResource
     protected function _construct()
     {
         $resource = $this->_resource;
-        $this->setType(\Magento\Catalog\Model\Product::ENTITY)
-            ->setConnection(
-                $resource->getConnection('catalog_read'),
-                $resource->getConnection('catalog_write')
-            );
+        $this->setType(
+            \Magento\Catalog\Model\Product::ENTITY
+        )->setConnection(
+            $resource->getConnection('catalog_read'),
+            $resource->getConnection('catalog_write')
+        );
     }
 
     /**
@@ -60,9 +57,8 @@ class Action extends \Magento\Catalog\Model\Resource\AbstractResource
      */
     public function updateAttributes($entityIds, $attrData, $storeId)
     {
-        $object = new \Magento\Object();
-        $object->setIdFieldName('entity_id')
-            ->setStoreId($storeId);
+        $object = new \Magento\Framework\Object();
+        $object->setIdFieldName('entity_id')->setStoreId($storeId);
 
         $this->_getWriteAdapter()->beginTransaction();
         try {

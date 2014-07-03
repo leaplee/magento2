@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\DesignEditor\Model;
 
 class AreaEmulatorTest extends \PHPUnit_Framework_TestCase
@@ -38,19 +37,16 @@ class AreaEmulatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->_objectManager = $this->getMock('Magento\ObjectManager');
+        $this->_objectManager = $this->getMock('Magento\Framework\ObjectManager');
         $this->_model = new AreaEmulator($this->_objectManager);
     }
 
     public function testEmulateLayoutArea()
     {
         $configuration = array(
-            'Magento\Core\Model\Layout' => array(
+            'Magento\Framework\View\Layout' => array(
                 'arguments' => array(
-                    'area' => array(
-                        \Magento\ObjectManager\Config\Reader\Dom::TYPE_ATTRIBUTE => 'string',
-                        'value' => 'test_area'
-                    )
+                    'area' => 'test_area'
                 )
             )
         );

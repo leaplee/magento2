@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Oauth
  * @copyright  Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,10 +25,8 @@ namespace Magento\Integration\Model\Resource\Oauth\Token;
 
 /**
  * OAuth token resource collection model
- *
- * @author Magento Core Team <core@magentocommerce.com>
  */
-class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+class Collection extends \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
 {
     /**
      * Initialize collection model
@@ -53,10 +49,10 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     {
         $select = $this->getSelect();
         $select->joinLeft(
-                    array('c' => $this->getTable('oauth_consumer')),
-                    'c.entity_id = main_table.consumer_id',
-                    'name'
-                );
+            array('c' => $this->getTable('oauth_consumer')),
+            'c.entity_id = main_table.consumer_id',
+            'name'
+        );
 
         return $this;
     }
@@ -129,7 +125,7 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
      */
     public function addFilterByRevoked($flag)
     {
-        $this->addFilter('main_table.revoked', (int) $flag, 'public');
+        $this->addFilter('main_table.revoked', (int)$flag, 'public');
         return $this;
     }
 }

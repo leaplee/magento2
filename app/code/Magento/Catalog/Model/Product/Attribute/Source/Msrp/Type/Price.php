@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,14 +25,11 @@
 /**
  * Source model for 'msrp_display_actual_price_type' product attribute
  *
- * @category   Magento
- * @package    Magento_Catalog
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Catalog\Model\Product\Attribute\Source\Msrp\Type;
 
-class Price
-    extends \Magento\Catalog\Model\Product\Attribute\Source\Msrp\Type
+class Price extends \Magento\Catalog\Model\Product\Attribute\Source\Msrp\Type
 {
     /**
      * Get value from the store configuration settings
@@ -88,10 +83,7 @@ class Price
     {
         if (!$this->_options) {
             $this->_options = parent::getAllOptions();
-            $this->_options[] = array(
-                'label' => __('Use config'),
-                'value' => self::TYPE_USE_CONFIG
-            );
+            $this->_options[] = array('label' => __('Use config'), 'value' => self::TYPE_USE_CONFIG);
         }
         return $this->_options;
     }
@@ -105,13 +97,9 @@ class Price
     {
         $attributeType = $this->getAttribute()->getBackendType();
         $attributeCode = $this->getAttribute()->getAttributeCode();
-        $column = array(
-            'unsigned'  => false,
-            'default'   => null,
-            'extra'     => null
-        );
+        $column = array('unsigned' => false, 'default' => null, 'extra' => null);
 
-        $column['type']     = $this->_eavResourceHelper->getDdlTypeByColumnType($attributeType);
+        $column['type'] = $this->_eavResourceHelper->getDdlTypeByColumnType($attributeType);
         $column['nullable'] = true;
 
         return array($attributeCode => $column);
@@ -121,11 +109,10 @@ class Price
      * Retrieve select for flat attribute update
      *
      * @param int $store
-     * @return \Magento\DB\Select|null
+     * @return \Magento\Framework\DB\Select|null
      */
     public function getFlatUpdateSelect($store)
     {
-        return $this->_entityAttributeFactory->create()
-            ->getFlatUpdateSelect($this->getAttribute(), $store);
+        return $this->_entityAttributeFactory->create()->getFlatUpdateSelect($this->getAttribute(), $store);
     }
 }

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Oauth
  * @copyright  Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,10 +25,6 @@ namespace Magento\Integration\Model\Oauth\Consumer\Validator;
 
 /**
  * Validate OAuth keys
- *
- * @category   Magento
- * @package    Magento_Oauth
- * @author     Magento Core Team <core@magentocommerce.com>
  */
 class KeyLength extends \Zend_Validate_StringLength
 {
@@ -49,7 +43,7 @@ class KeyLength extends \Zend_Validate_StringLength
     public function __construct($options = array())
     {
         if (!is_array($options)) {
-            $options     = func_get_args();
+            $options = func_get_args();
             if (!isset($options[1])) {
                 $options[1] = 'utf-8';
             }
@@ -57,8 +51,7 @@ class KeyLength extends \Zend_Validate_StringLength
             return;
         } else {
             if (isset($options['length'])) {
-                $options['max'] =
-                $options['min'] = $options['length'];
+                $options['max'] = $options['min'] = $options['length'];
             }
             if (isset($options['name'])) {
                 $this->_name = $options['name'];
@@ -74,10 +67,8 @@ class KeyLength extends \Zend_Validate_StringLength
      */
     protected function _initMessageTemplates()
     {
-        $_messageTemplates[self::TOO_LONG] =
-            __("%name% '%value%' is too long. It must has length %min% symbols.");
-        $_messageTemplates[self::TOO_SHORT] =
-            __("%name% '%value%' is too short. It must has length %min% symbols.");
+        $_messageTemplates[self::TOO_LONG] = __("%name% '%value%' is too long. It must has length %min% symbols.");
+        $_messageTemplates[self::TOO_SHORT] = __("%name% '%value%' is too short. It must has length %min% symbols.");
 
         return $this;
     }
@@ -87,11 +78,7 @@ class KeyLength extends \Zend_Validate_StringLength
      *
      * @var array
      */
-    protected $_messageVariables = array(
-        'min'  => '_min',
-        'max'  => '_max',
-        'name' => '_name'
-    );
+    protected $_messageVariables = array('min' => '_min', 'max' => '_max', 'name' => '_name');
 
     /**
      * Set length

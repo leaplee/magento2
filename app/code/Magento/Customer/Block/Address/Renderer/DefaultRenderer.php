@@ -25,7 +25,7 @@ namespace Magento\Customer\Block\Address\Renderer;
 
 use Magento\Customer\Model\Address\AbstractAddress;
 use Magento\Customer\Model\Metadata\ElementFactory;
-use Magento\View\Element\AbstractBlock;
+use Magento\Framework\View\Element\AbstractBlock;
 
 /**
  * Address format renderer default
@@ -35,7 +35,7 @@ class DefaultRenderer extends AbstractBlock implements RendererInterface
     /**
      * Format type object
      *
-     * @var \Magento\Object
+     * @var \Magento\Framework\Object
      */
     protected $_type;
 
@@ -64,7 +64,7 @@ class DefaultRenderer extends AbstractBlock implements RendererInterface
     /**
      * Constructor
      *
-     * @param \Magento\View\Element\Context $context
+     * @param \Magento\Framework\View\Element\Context $context
      * @param ElementFactory $elementFactory
      * @param \Magento\Directory\Model\CountryFactory $countryFactory ,
      * @param \Magento\Customer\Model\Address\Converter $addressConverter
@@ -72,12 +72,12 @@ class DefaultRenderer extends AbstractBlock implements RendererInterface
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Context $context,
+        \Magento\Framework\View\Element\Context $context,
         ElementFactory $elementFactory,
         \Magento\Directory\Model\CountryFactory $countryFactory,
         \Magento\Customer\Model\Address\Converter $addressConverter,
         \Magento\Customer\Service\V1\CustomerMetadataServiceInterface $metadataService,
-        array $data = []
+        array $data = array()
     ) {
         $this->_elementFactory = $elementFactory;
         $this->_addressConverter = $addressConverter;
@@ -90,7 +90,7 @@ class DefaultRenderer extends AbstractBlock implements RendererInterface
     /**
      * Retrieve format type object
      *
-     * @return \Magento\Object
+     * @return \Magento\Framework\Object
      */
     public function getType()
     {
@@ -100,10 +100,10 @@ class DefaultRenderer extends AbstractBlock implements RendererInterface
     /**
      * Retrieve format type object
      *
-     * @param  \Magento\Object $type
+     * @param  \Magento\Framework\Object $type
      * @return $this
      */
-    public function setType(\Magento\Object $type)
+    public function setType(\Magento\Framework\Object $type)
     {
         $this->_type = $type;
         return $this;
@@ -116,9 +116,11 @@ class DefaultRenderer extends AbstractBlock implements RendererInterface
      */
     public function getFormat(AbstractAddress $address = null)
     {
-        $countryFormat = is_null($address)
-            ? false
-            : $address->getCountryModel()->getFormat($this->getType()->getCode());
+        $countryFormat = is_null(
+            $address
+        ) ? false : $address->getCountryModel()->getFormat(
+            $this->getType()->getCode()
+        );
         $format = $countryFormat ? $countryFormat->getFormat() : $this->getType()->getDefaultFormat();
         return $format;
     }
@@ -132,10 +134,7 @@ class DefaultRenderer extends AbstractBlock implements RendererInterface
     public function render(AbstractAddress $address, $format = null)
     {
         $address = $this->_addressConverter->createAddressFromModel($address, 0, 0);
-        return $this->renderArray(
-            \Magento\Customer\Service\V1\Data\AddressConverter::toFlatArray($address),
-            $format
-        );
+        return $this->renderArray(\Magento\Customer\Service\V1\Data\AddressConverter::toFlatArray($address), $format);
     }
 
     /**
@@ -183,11 +182,10 @@ class DefaultRenderer extends AbstractBlock implements RendererInterface
                 continue;
             }
             $attributeCode = $attributeMetadata->getAttributeCode();
-            if ($attributeCode == 'country_id'
-                && isset($addressAttributes['country_id'])) {
-                $data['country'] = $this->_countryFactory->create()
-                    ->loadByCode($addressAttributes['country_id'])
-                    ->getName();
+            if ($attributeCode == 'country_id' && isset($addressAttributes['country_id'])) {
+                $data['country'] = $this->_countryFactory->create()->loadByCode(
+                    $addressAttributes['country_id']
+                )->getName();
             } elseif ($attributeCode == 'region' && isset($addressAttributes['region'])) {
                 $data['region'] = __($addressAttributes['region']);
             } elseif (isset($addressAttributes[$attributeCode])) {

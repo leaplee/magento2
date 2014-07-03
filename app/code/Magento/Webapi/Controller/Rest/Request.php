@@ -50,14 +50,14 @@ class Request extends \Magento\Webapi\Controller\Request
     /**
      * Initialize dependencies
      *
-     * @param \Magento\App\AreaList $areaList
-     * @param \Magento\Config\ScopeInterface $configScope
+     * @param \Magento\Framework\App\AreaList $areaList
+     * @param \Magento\Framework\Config\ScopeInterface $configScope
      * @param \Magento\Webapi\Controller\Rest\Request\Deserializer\Factory $deserializerFactory
      * @param null|string $uri
      */
     public function __construct(
-        \Magento\App\AreaList $areaList,
-        \Magento\Config\ScopeInterface $configScope,
+        \Magento\Framework\App\AreaList $areaList,
+        \Magento\Framework\Config\ScopeInterface $configScope,
         \Magento\Webapi\Controller\Rest\Request\Deserializer\Factory $deserializerFactory,
         $uri = null
     ) {
@@ -96,7 +96,8 @@ class Request extends \Magento\Webapi\Controller\Request
             if (!preg_match('~^([0-9a-z*+\-]+)(?:/([0-9a-z*+\-\.]+))?$~i', $mimeType)) {
                 continue;
             }
-            $quality = '1.0'; // default value for quality
+            $quality = '1.0';
+            // default value for quality
 
             if ($typeWithQ) {
                 $qAndValue = explode('=', $typeWithQ[0]);
@@ -123,7 +124,7 @@ class Request extends \Magento\Webapi\Controller\Request
     public function getBodyParams()
     {
         if (null == $this->_bodyParams) {
-            $this->_bodyParams = $this->_getDeserializer()->deserialize((string)$this->getRawBody());
+            $this->_bodyParams = (array)$this->_getDeserializer()->deserialize((string)$this->getRawBody());
         }
         return $this->_bodyParams;
     }
@@ -176,8 +177,8 @@ class Request extends \Magento\Webapi\Controller\Request
         $requestBody = array();
 
         $httpMethod = $this->getHttpMethod();
-        if ($httpMethod == \Magento\Webapi\Model\Rest\Config::HTTP_METHOD_POST
-            || $httpMethod == \Magento\Webapi\Model\Rest\Config::HTTP_METHOD_PUT
+        if ($httpMethod == \Magento\Webapi\Model\Rest\Config::HTTP_METHOD_POST ||
+            $httpMethod == \Magento\Webapi\Model\Rest\Config::HTTP_METHOD_PUT
         ) {
             $requestBody = $this->getBodyParams();
         }

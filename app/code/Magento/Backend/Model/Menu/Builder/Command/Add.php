@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -35,12 +33,7 @@ class Add extends \Magento\Backend\Model\Menu\Builder\AbstractCommand
      *
      * @var string[]
      */
-    protected $_requiredParams = array(
-        "id",
-        "title",
-        "module",
-        "resource"
-    );
+    protected $_requiredParams = array("id", "title", "module", "resource");
 
     /**
      * Add command as last in the list of callbacks

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Sales\Block\Adminhtml\Order\Create\Sidebar;
 /**
  * Adminhtml sales order create sidebar recently view block
  *
- * @category   Magento
- * @package    Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Pviewed extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\AbstractSidebar
@@ -108,10 +104,13 @@ class Pviewed extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\Abstra
                 $stores[] = $store->getId();
             }
 
-            $collection = $this->_eventFactory->create()
-                ->getCollection()
-                ->addStoreFilter($stores)
-                ->addRecentlyFiler(\Magento\Reports\Model\Event::EVENT_PRODUCT_VIEW, $this->getCustomerId(), 0);
+            $collection = $this->_eventFactory->create()->getCollection()->addStoreFilter(
+                $stores
+            )->addRecentlyFiler(
+                \Magento\Reports\Model\Event::EVENT_PRODUCT_VIEW,
+                $this->getCustomerId(),
+                0
+            );
             $productIds = array();
             foreach ($collection as $event) {
                 $productIds[] = $event->getObjectId();
@@ -119,15 +118,19 @@ class Pviewed extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\Abstra
 
             $productCollection = null;
             if ($productIds) {
-                $productCollection = $this->_productFactory->create()
-                    ->getCollection()
-                    ->setStoreId($this->getQuote()->getStoreId())
-                    ->addStoreFilter($this->getQuote()->getStoreId())
-                    ->addAttributeToSelect('name')
-                    ->addAttributeToSelect('price')
-                    ->addAttributeToSelect('small_image')
-                    ->addIdFilter($productIds)
-                    ->load();
+                $productCollection = $this->_productFactory->create()->getCollection()->setStoreId(
+                    $this->getQuote()->getStoreId()
+                )->addStoreFilter(
+                    $this->getQuote()->getStoreId()
+                )->addAttributeToSelect(
+                    'name'
+                )->addAttributeToSelect(
+                    'price'
+                )->addAttributeToSelect(
+                    'small_image'
+                )->addIdFilter(
+                    $productIds
+                )->load();
             }
             $this->setData('item_collection', $productCollection);
         }
@@ -147,7 +150,7 @@ class Pviewed extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\Abstra
     /**
      * Retrieve identifier of block item
      *
-     * @param \Magento\Object $item
+     * @param \Magento\Framework\Object $item
      * @return int
      */
     public function getIdentifierId($item)

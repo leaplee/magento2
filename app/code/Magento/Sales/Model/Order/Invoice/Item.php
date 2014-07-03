@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -92,7 +90,7 @@ namespace Magento\Sales\Model\Order\Invoice;
  * @method float getBaseHiddenTaxAmount()
  * @method \Magento\Sales\Model\Order\Invoice\Item setBaseHiddenTaxAmount(float $value)
  */
-class Item extends \Magento\Core\Model\AbstractModel
+class Item extends \Magento\Framework\Model\AbstractModel
 {
     /**
      * @var string
@@ -120,24 +118,22 @@ class Item extends \Magento\Core\Model\AbstractModel
     protected $_orderItemFactory;
 
     /**
-     * @param \Magento\Model\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
      * @param \Magento\Sales\Model\Order\ItemFactory $orderItemFactory
-     * @param \Magento\Core\Model\Resource\AbstractResource $resource
-     * @param \Magento\Data\Collection\Db $resourceCollection
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\Db $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Magento\Model\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
         \Magento\Sales\Model\Order\ItemFactory $orderItemFactory,
-        \Magento\Core\Model\Resource\AbstractResource $resource = null,
-        \Magento\Data\Collection\Db $resourceCollection = null,
+        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\Db $resourceCollection = null,
         array $data = array()
     ) {
-        parent::__construct(
-            $context, $registry, $resource, $resourceCollection, $data
-        );
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->_orderItemFactory = $orderItemFactory;
     }
 
@@ -208,12 +204,12 @@ class Item extends \Magento\Core\Model\AbstractModel
      *
      * @param float $qty
      * @return $this
-     * @throws \Magento\Core\Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     public function setQty($qty)
     {
         if ($this->getOrderItem()->getIsQtyDecimal()) {
-            $qty = (float)$qty;
+            $qty = (double)$qty;
         } else {
             $qty = (int)$qty;
         }
@@ -226,7 +222,7 @@ class Item extends \Magento\Core\Model\AbstractModel
         if ($qty <= $qtyToInvoice || $this->getOrderItem()->isDummy()) {
             $this->setData('qty', $qty);
         } else {
-            throw new \Magento\Core\Exception(
+            throw new \Magento\Framework\Model\Exception(
                 __('We found an invalid quantity to invoice item "%1".', $this->getName())
             );
         }
@@ -241,18 +237,18 @@ class Item extends \Magento\Core\Model\AbstractModel
     public function register()
     {
         $orderItem = $this->getOrderItem();
-        $orderItem->setQtyInvoiced($orderItem->getQtyInvoiced()+$this->getQty());
+        $orderItem->setQtyInvoiced($orderItem->getQtyInvoiced() + $this->getQty());
 
-        $orderItem->setTaxInvoiced($orderItem->getTaxInvoiced()+$this->getTaxAmount());
-        $orderItem->setBaseTaxInvoiced($orderItem->getBaseTaxInvoiced()+$this->getBaseTaxAmount());
-        $orderItem->setHiddenTaxInvoiced($orderItem->getHiddenTaxInvoiced()+$this->getHiddenTaxAmount());
-        $orderItem->setBaseHiddenTaxInvoiced($orderItem->getBaseHiddenTaxInvoiced()+$this->getBaseHiddenTaxAmount());
+        $orderItem->setTaxInvoiced($orderItem->getTaxInvoiced() + $this->getTaxAmount());
+        $orderItem->setBaseTaxInvoiced($orderItem->getBaseTaxInvoiced() + $this->getBaseTaxAmount());
+        $orderItem->setHiddenTaxInvoiced($orderItem->getHiddenTaxInvoiced() + $this->getHiddenTaxAmount());
+        $orderItem->setBaseHiddenTaxInvoiced($orderItem->getBaseHiddenTaxInvoiced() + $this->getBaseHiddenTaxAmount());
 
-        $orderItem->setDiscountInvoiced($orderItem->getDiscountInvoiced()+$this->getDiscountAmount());
-        $orderItem->setBaseDiscountInvoiced($orderItem->getBaseDiscountInvoiced()+$this->getBaseDiscountAmount());
+        $orderItem->setDiscountInvoiced($orderItem->getDiscountInvoiced() + $this->getDiscountAmount());
+        $orderItem->setBaseDiscountInvoiced($orderItem->getBaseDiscountInvoiced() + $this->getBaseDiscountAmount());
 
-        $orderItem->setRowInvoiced($orderItem->getRowInvoiced()+$this->getRowTotal());
-        $orderItem->setBaseRowInvoiced($orderItem->getBaseRowInvoiced()+$this->getBaseRowTotal());
+        $orderItem->setRowInvoiced($orderItem->getRowInvoiced() + $this->getRowTotal());
+        $orderItem->setBaseRowInvoiced($orderItem->getBaseRowInvoiced() + $this->getBaseRowTotal());
         return $this;
     }
 
@@ -264,19 +260,19 @@ class Item extends \Magento\Core\Model\AbstractModel
     public function cancel()
     {
         $orderItem = $this->getOrderItem();
-        $orderItem->setQtyInvoiced($orderItem->getQtyInvoiced()-$this->getQty());
+        $orderItem->setQtyInvoiced($orderItem->getQtyInvoiced() - $this->getQty());
 
-        $orderItem->setTaxInvoiced($orderItem->getTaxInvoiced()-$this->getTaxAmount());
-        $orderItem->setBaseTaxInvoiced($orderItem->getBaseTaxInvoiced()-$this->getBaseTaxAmount());
-        $orderItem->setHiddenTaxInvoiced($orderItem->getHiddenTaxInvoiced()-$this->getHiddenTaxAmount());
-        $orderItem->setBaseHiddenTaxInvoiced($orderItem->getBaseHiddenTaxInvoiced()-$this->getBaseHiddenTaxAmount());
+        $orderItem->setTaxInvoiced($orderItem->getTaxInvoiced() - $this->getTaxAmount());
+        $orderItem->setBaseTaxInvoiced($orderItem->getBaseTaxInvoiced() - $this->getBaseTaxAmount());
+        $orderItem->setHiddenTaxInvoiced($orderItem->getHiddenTaxInvoiced() - $this->getHiddenTaxAmount());
+        $orderItem->setBaseHiddenTaxInvoiced($orderItem->getBaseHiddenTaxInvoiced() - $this->getBaseHiddenTaxAmount());
 
 
-        $orderItem->setDiscountInvoiced($orderItem->getDiscountInvoiced()-$this->getDiscountAmount());
-        $orderItem->setBaseDiscountInvoiced($orderItem->getBaseDiscountInvoiced()-$this->getBaseDiscountAmount());
+        $orderItem->setDiscountInvoiced($orderItem->getDiscountInvoiced() - $this->getDiscountAmount());
+        $orderItem->setBaseDiscountInvoiced($orderItem->getBaseDiscountInvoiced() - $this->getBaseDiscountAmount());
 
-        $orderItem->setRowInvoiced($orderItem->getRowInvoiced()-$this->getRowTotal());
-        $orderItem->setBaseRowInvoiced($orderItem->getBaseRowInvoiced()-$this->getBaseRowTotal());
+        $orderItem->setRowInvoiced($orderItem->getRowInvoiced() - $this->getRowTotal());
+        $orderItem->setBaseRowInvoiced($orderItem->getBaseRowInvoiced() - $this->getBaseRowTotal());
         return $this;
     }
 
@@ -287,13 +283,13 @@ class Item extends \Magento\Core\Model\AbstractModel
      */
     public function calcRowTotal()
     {
-        $invoice        = $this->getInvoice();
-        $orderItem      = $this->getOrderItem();
-        $orderItemQty   = $orderItem->getQtyOrdered();
+        $invoice = $this->getInvoice();
+        $orderItem = $this->getOrderItem();
+        $orderItemQty = $orderItem->getQtyOrdered();
 
-        $rowTotal            = $orderItem->getRowTotal() - $orderItem->getRowInvoiced();
-        $baseRowTotal        = $orderItem->getBaseRowTotal() - $orderItem->getBaseRowInvoiced();
-        $rowTotalInclTax     = $orderItem->getRowTotalInclTax();
+        $rowTotal = $orderItem->getRowTotal() - $orderItem->getRowInvoiced();
+        $baseRowTotal = $orderItem->getBaseRowTotal() - $orderItem->getBaseRowInvoiced();
+        $rowTotalInclTax = $orderItem->getRowTotalInclTax();
         $baseRowTotalInclTax = $orderItem->getBaseRowTotalInclTax();
 
         if (!$this->isLast()) {
@@ -323,7 +319,7 @@ class Item extends \Magento\Core\Model\AbstractModel
      */
     public function isLast()
     {
-        if ((string)(float)$this->getQty() == (string)(float)$this->getOrderItem()->getQtyToInvoice()) {
+        if ((string)(double)$this->getQty() == (string)(double)$this->getOrderItem()->getQtyToInvoice()) {
             return true;
         }
         return false;
@@ -352,7 +348,7 @@ class Item extends \Magento\Core\Model\AbstractModel
      */
     protected function _afterSave()
     {
-        if (null ==! $this->_orderItem) {
+        if (null == !$this->_orderItem) {
             $this->_orderItem->save();
         }
 

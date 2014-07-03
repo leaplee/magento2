@@ -18,12 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Cms
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Cms\Model;
 
 /**
@@ -44,7 +41,7 @@ namespace Magento\Cms\Model;
  * @method int getIsActive()
  * @method \Magento\Cms\Model\Block setIsActive(int $value)
  */
-class Block extends \Magento\Core\Model\AbstractModel implements \Magento\Object\IdentityInterface
+class Block extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\Object\IdentityInterface
 {
     /**
      * CMS block cache tag
@@ -74,8 +71,8 @@ class Block extends \Magento\Core\Model\AbstractModel implements \Magento\Object
     /**
      * Prevent blocks recursion
      *
-     * @return \Magento\Core\Model\AbstractModel
-     * @throws \Magento\Core\Exception
+     * @return \Magento\Framework\Model\AbstractModel
+     * @throws \Magento\Framework\Model\Exception
      */
     protected function _beforeSave()
     {
@@ -83,7 +80,7 @@ class Block extends \Magento\Core\Model\AbstractModel implements \Magento\Object
         if (false == strstr($this->getContent(), $needle)) {
             return parent::_beforeSave();
         }
-        throw new \Magento\Core\Exception(
+        throw new \Magento\Framework\Model\Exception(
             __('Make sure that static block content does not reference the block itself.')
         );
     }

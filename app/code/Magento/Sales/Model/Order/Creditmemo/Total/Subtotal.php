@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -35,9 +33,9 @@ class Subtotal extends AbstractTotal
      */
     public function collect(\Magento\Sales\Model\Order\Creditmemo $creditmemo)
     {
-        $subtotal       = 0;
-        $baseSubtotal   = 0;
-        $subtotalInclTax= 0;
+        $subtotal = 0;
+        $baseSubtotal = 0;
+        $subtotalInclTax = 0;
         $baseSubtotalInclTax = 0;
 
         foreach ($creditmemo->getAllItems() as $item) {
@@ -47,9 +45,9 @@ class Subtotal extends AbstractTotal
 
             $item->calcRowTotal();
 
-            $subtotal       += $item->getRowTotal();
-            $baseSubtotal   += $item->getBaseRowTotal();
-            $subtotalInclTax+= $item->getRowTotalInclTax();
+            $subtotal += $item->getRowTotal();
+            $baseSubtotal += $item->getBaseRowTotal();
+            $subtotalInclTax += $item->getRowTotalInclTax();
             $baseSubtotalInclTax += $item->getBaseRowTotalInclTax();
         }
 

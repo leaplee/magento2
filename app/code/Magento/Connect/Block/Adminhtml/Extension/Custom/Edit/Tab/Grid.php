@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Connect
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,8 +25,6 @@
 /**
  * Convert profile edit tab
  *
- * @category    Magento
- * @package     Magento_Connect
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Connect\Block\Adminhtml\Extension\Custom\Edit\Tab;
@@ -102,18 +98,18 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
      */
     protected function _prepareColumns()
     {
-        $this->addColumn('folder', array(
-            'header'  => __('Folder'),
-            'index'   => 'folder',
-            'width'   => 100,
-            'type'    => 'options',
-            'options' => $this->getCollection()->collectFolders()
-        ));
+        $this->addColumn(
+            'folder',
+            array(
+                'header' => __('Folder'),
+                'index' => 'folder',
+                'width' => 100,
+                'type' => 'options',
+                'options' => $this->getCollection()->collectFolders()
+            )
+        );
 
-        $this->addColumn('package', array(
-            'header' => __('Package'),
-            'index'  => 'package',
-        ));
+        $this->addColumn('package', array('header' => __('Package'), 'index' => 'package'));
 
         return parent::_prepareColumns();
     }
@@ -140,6 +136,9 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
      */
     public function getRowUrl($row)
     {
-        return $this->getUrl('adminhtml/*/load', array('id' => strtr(base64_encode($row->getFilenameId()), '+/=', '-_,')));
+        return $this->getUrl(
+            'adminhtml/*/load',
+            array('id' => strtr(base64_encode($row->getFilenameId()), '+/=', '-_,'))
+        );
     }
 }

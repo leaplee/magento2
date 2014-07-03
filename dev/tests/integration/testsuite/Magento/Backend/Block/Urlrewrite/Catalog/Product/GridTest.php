@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Backend\Block\Urlrewrite\Catalog\Product;
 
 /**
@@ -39,19 +35,24 @@ class GridTest extends \PHPUnit_Framework_TestCase
     public function testPrepareGrid()
     {
         /** @var $gridBlock \Magento\Backend\Block\Urlrewrite\Catalog\Product\Grid */
-        $gridBlock = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get('Magento\View\LayoutInterface')
-            ->createBlock('Magento\Backend\Block\Urlrewrite\Catalog\Product\Grid');
+        $gridBlock = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Framework\View\LayoutInterface'
+        )->createBlock(
+            'Magento\Backend\Block\Urlrewrite\Catalog\Product\Grid'
+        );
         $gridBlock->toHtml();
 
         foreach (array('entity_id', 'name', 'sku', 'status') as $key) {
-            $this->assertInstanceOf('Magento\Backend\Block\Widget\Grid\Column', $gridBlock->getColumn($key),
-                'Column with key "' . $key . '" is invalid');
+            $this->assertInstanceOf(
+                'Magento\Backend\Block\Widget\Grid\Column',
+                $gridBlock->getColumn($key),
+                'Column with key "' . $key . '" is invalid'
+            );
         }
 
-        $this->assertStringStartsWith('http://localhost/index.php', $gridBlock->getGridUrl(),
-            'Grid URL is invalid');
+        $this->assertStringStartsWith('http://localhost/index.php', $gridBlock->getGridUrl(), 'Grid URL is invalid');
 
-        $row = new \Magento\Object(array('id' => 1));
+        $row = new \Magento\Framework\Object(array('id' => 1));
         $this->assertStringStartsWith(
             'http://localhost/index.php/backend/admin/index/edit/product/1',
             $gridBlock->getRowUrl($row),

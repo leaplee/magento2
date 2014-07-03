@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Widget
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,15 +26,12 @@
 /**
  * Preconfigured widget
  *
- * @category    Magento
- * @package     Magento_Widget
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Widget\Model\Resource;
 
-class Widget extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Widget extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
-
     /**
      * Define main table
      *
@@ -56,9 +51,11 @@ class Widget extends \Magento\Core\Model\Resource\Db\AbstractDb
     public function loadPreconfiguredWidget($widgetId)
     {
         $readAdapter = $this->_getReadAdapter();
-        $select = $readAdapter->select()
-            ->from($this->getMainTable())
-            ->where($this->getIdFieldName() . '=:' . $this->getIdFieldName());
+        $select = $readAdapter->select()->from(
+            $this->getMainTable()
+        )->where(
+            $this->getIdFieldName() . '=:' . $this->getIdFieldName()
+        );
         $bind = array($this->getIdFieldName() => $widgetId);
         $widget = $readAdapter->fetchRow($select, $bind);
         if (is_array($widget)) {

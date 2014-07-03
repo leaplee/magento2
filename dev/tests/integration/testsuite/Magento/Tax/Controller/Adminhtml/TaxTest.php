@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Tax
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Tax\Controller\Adminhtml;
 
 /**
@@ -46,15 +42,22 @@ class TaxTest extends \Magento\Backend\Utility\Controller
         $this->dispatch('backend/tax/tax/ajaxSave');
 
         $jsonBody = $this->getResponse()->getBody();
-        $result = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get('Magento\Core\Helper\Data')
-            ->jsonDecode($jsonBody);
+        $result = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Core\Helper\Data'
+        )->jsonDecode(
+            $jsonBody
+        );
 
         $this->assertArrayHasKey('class_id', $result);
 
         $classId = $result['class_id'];
         /** @var $rate \Magento\Tax\Model\ClassModel */
-        $class = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Tax\Model\ClassModel')->load($classId, 'class_id');
+        $class = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Tax\Model\ClassModel'
+        )->load(
+            $classId,
+            'class_id'
+        );
         $this->assertEquals($expectedData['class_name'], $class->getClassName());
     }
 
@@ -65,32 +68,17 @@ class TaxTest extends \Magento\Backend\Utility\Controller
     {
         return array(
             array(
-                array(
-                    'class_type' => 'CUSTOMER',
-                    'class_name' => 'Class Name'
-                ),
-                array(
-                    'class_name' => 'Class Name'
-                )
+                array('class_type' => 'CUSTOMER', 'class_name' => 'Class Name'),
+                array('class_name' => 'Class Name')
             ),
             array(
-                array(
-                    'class_type' => 'PRODUCT',
-                    'class_name' => '11111<22222'
-                ),
-                array(
-                    'class_name' => '11111&lt;22222'
-                )
+                array('class_type' => 'PRODUCT', 'class_name' => '11111<22222'),
+                array('class_name' => '11111&lt;22222')
             ),
             array(
-                array(
-                    'class_type' => 'CUSTOMER',
-                    'class_name' => '   12<>sa&df    '
-                ),
-                array(
-                    'class_name' => '12&lt;&gt;sa&amp;df'
-                )
-            ),
+                array('class_type' => 'CUSTOMER', 'class_name' => '   12<>sa&df    '),
+                array('class_name' => '12&lt;&gt;sa&amp;df')
+            )
         );
     }
 }

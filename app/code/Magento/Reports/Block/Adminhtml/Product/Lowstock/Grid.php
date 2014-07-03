@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Reports
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -75,14 +73,20 @@ class Grid extends \Magento\Backend\Block\Widget\Grid
         }
 
         /** @var $collection \Magento\Reports\Model\Resource\Product\Lowstock\Collection  */
-        $collection = $this->_lowstocksFactory->create()
-            ->addAttributeToSelect('*')
-            ->setStoreId($storeId)
-            ->filterByIsQtyProductTypes()
-            ->joinInventoryItem('qty')
-            ->useManageStockFilter($storeId)
-            ->useNotifyStockQtyFilter($storeId)
-            ->setOrder('qty', \Magento\Data\Collection::SORT_ORDER_ASC);
+        $collection = $this->_lowstocksFactory->create()->addAttributeToSelect(
+            '*'
+        )->setStoreId(
+            $storeId
+        )->filterByIsQtyProductTypes()->joinInventoryItem(
+            'qty'
+        )->useManageStockFilter(
+            $storeId
+        )->useNotifyStockQtyFilter(
+            $storeId
+        )->setOrder(
+            'qty',
+            \Magento\Framework\Data\Collection::SORT_ORDER_ASC
+        );
 
         if ($storeId) {
             $collection->addStoreFilter($storeId);

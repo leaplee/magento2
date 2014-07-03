@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Backend\Block\Widget\View;
 /**
  * Magento_Backend view container block
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  * @deprecated is not used in code
  */
@@ -57,18 +53,23 @@ class Container extends \Magento\Backend\Block\Widget\Container
     {
         parent::_construct();
 
-        $this->_addButton('back', array(
-            'label'     => __('Back'),
-            'onclick'   => 'window.location.href=\'' . $this->getUrl('*/*/') . '\'',
-            'class'     => 'back',
-        ));
+        $this->_addButton(
+            'back',
+            array(
+                'label' => __('Back'),
+                'onclick' => 'window.location.href=\'' . $this->getUrl('*/*/') . '\'',
+                'class' => 'back'
+            )
+        );
 
-        $this->_addButton('edit', array(
-            'label'     => __('Edit'),
-            'class'     => 'edit',
-            'onclick'   => 'window.location.href=\'' . $this->getEditUrl() . '\'',
-        ));
-
+        $this->_addButton(
+            'edit',
+            array(
+                'label' => __('Edit'),
+                'class' => 'edit',
+                'onclick' => 'window.location.href=\'' . $this->getEditUrl() . '\''
+            )
+        );
     }
 
     /**
@@ -76,10 +77,11 @@ class Container extends \Magento\Backend\Block\Widget\Container
      */
     protected function _prepareLayout()
     {
-        $blockName = $this->_blockGroup
-            . '\\Block\\'
-            . str_replace(' ', '\\', ucwords(str_replace('\\', ' ', $this->_controller)))
-            . '\\View\\Plane';
+        $blockName = $this->_blockGroup . '\\Block\\' . str_replace(
+            ' ',
+            '\\',
+            ucwords(str_replace('\\', ' ', $this->_controller))
+        ) . '\\View\\Plane';
 
         $this->setChild('plane', $this->getLayout()->createBlock($blockName));
 
@@ -101,5 +103,4 @@ class Container extends \Magento\Backend\Block\Widget\Container
     {
         return $this->getChildHtml('plane');
     }
-
 }

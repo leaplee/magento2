@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Backend\Block\Widget;
 /**
  * Magento_Backend accordion widget
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Accordion extends \Magento\Backend\Block\Widget
@@ -59,16 +55,18 @@ class Accordion extends \Magento\Backend\Block\Widget
      */
     public function addItem($itemId, $config)
     {
-        $this->_items[$itemId] = $this->getLayout()
-            ->createBlock(
-                'Magento\Backend\Block\Widget\Accordion\Item',
-                $this->getNameInLayout() . '-' . $itemId
-            )
-            ->setData($config)
-            ->setAccordion($this)
-            ->setId($itemId);
-        if (isset($config['content']) && $config['content'] instanceof \Magento\View\Element\AbstractBlock) {
-            $this->_items[$itemId]->setChild($itemId.'_content', $config['content']);
+        $this->_items[$itemId] = $this->getLayout()->createBlock(
+            'Magento\Backend\Block\Widget\Accordion\Item',
+            $this->getNameInLayout() . '-' . $itemId
+        )->setData(
+            $config
+        )->setAccordion(
+            $this
+        )->setId(
+            $itemId
+        );
+        if (isset($config['content']) && $config['content'] instanceof \Magento\Framework\View\Element\AbstractBlock) {
+            $this->_items[$itemId]->setChild($itemId . '_content', $config['content']);
         }
 
         $this->setChild($itemId, $this->_items[$itemId]);

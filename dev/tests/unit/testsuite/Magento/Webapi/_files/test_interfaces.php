@@ -21,8 +21,7 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
-namespace Magento\Module\Service;
+namespace Magento\Framework\Module\Service;
 
 /**
  * The list of test interfaces.
@@ -31,18 +30,15 @@ interface FooV1Interface
 {
     public function someMethod();
 }
-
 interface BarV1Interface
 {
     public function someMethod();
 }
-
 interface FooBarV1Interface
 {
     public function someMethod();
 }
-
-namespace Magento\Module\Service\Foo;
+namespace Magento\Framework\Module\Service\Foo;
 
 interface BarV1Interface
 {

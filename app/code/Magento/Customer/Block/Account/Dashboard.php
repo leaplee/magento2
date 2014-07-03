@@ -29,7 +29,7 @@ use Magento\Customer\Service\V1\CustomerAddressServiceInterface;
 /**
  * Customer dashboard block
  */
-class Dashboard extends \Magento\View\Element\Template
+class Dashboard extends \Magento\Framework\View\Element\Template
 {
     /**
      * @var \Magento\Newsletter\Model\Subscriber
@@ -59,7 +59,7 @@ class Dashboard extends \Magento\View\Element\Template
     /**
      * Constructor
      *
-     * @param \Magento\View\Element\Template\Context $context
+     * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory
      * @param CustomerAccountServiceInterface $customerService
@@ -67,7 +67,7 @@ class Dashboard extends \Magento\View\Element\Template
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Template\Context $context,
+        \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
         CustomerAccountServiceInterface $customerAccountService,
@@ -99,7 +99,7 @@ class Dashboard extends \Magento\View\Element\Template
      */
     public function getAccountUrl()
     {
-        return $this->_urlBuilder->getUrl('customer/account/edit', ['_secure' => true]);
+        return $this->_urlBuilder->getUrl('customer/account/edit', array('_secure' => true));
     }
 
     /**
@@ -109,7 +109,7 @@ class Dashboard extends \Magento\View\Element\Template
      */
     public function getAddressesUrl()
     {
-        return $this->_urlBuilder->getUrl('customer/address/index', ['_secure' => true]);
+        return $this->_urlBuilder->getUrl('customer/address/index', array('_secure' => true));
     }
 
     /**
@@ -120,7 +120,10 @@ class Dashboard extends \Magento\View\Element\Template
      */
     public function getAddressEditUrl($address)
     {
-        return $this->_urlBuilder->getUrl('customer/address/edit', ['_secure' => true, 'id' => $address->getId()]);
+        return $this->_urlBuilder->getUrl(
+            'customer/address/edit',
+            array('_secure' => true, 'id' => $address->getId())
+        );
     }
 
     /**
@@ -130,7 +133,7 @@ class Dashboard extends \Magento\View\Element\Template
      */
     public function getOrdersUrl()
     {
-        return $this->_urlBuilder->getUrl('customer/order/index', ['_secure' => true]);
+        return $this->_urlBuilder->getUrl('customer/order/index', array('_secure' => true));
     }
 
     /**
@@ -140,7 +143,7 @@ class Dashboard extends \Magento\View\Element\Template
      */
     public function getReviewsUrl()
     {
-        return $this->_urlBuilder->getUrl('review/customer/index', ['_secure' => true]);
+        return $this->_urlBuilder->getUrl('review/customer/index', array('_secure' => true));
     }
 
     /**
@@ -150,7 +153,7 @@ class Dashboard extends \Magento\View\Element\Template
      */
     public function getWishlistUrl()
     {
-        return $this->_urlBuilder->getUrl('customer/wishlist/index', ['_secure' => true]);
+        return $this->_urlBuilder->getUrl('customer/wishlist/index', array('_secure' => true));
     }
 
     /**
@@ -162,7 +165,7 @@ class Dashboard extends \Magento\View\Element\Template
     {
         if (is_null($this->_subscription)) {
             $this->_subscription =
-                $this->_createSubscriber()->loadByCustomer($this->_customerSession->getCustomerId());
+                $this->_createSubscriber()->loadByCustomerId($this->_customerSession->getCustomerId());
         }
 
         return $this->_subscription;
@@ -199,7 +202,7 @@ class Dashboard extends \Magento\View\Element\Template
      */
     public function getPrimaryAddresses()
     {
-        $addresses = [];
+        $addresses = array();
         $customerId = $this->getCustomer()->getId();
 
         if ($defaultBilling = $this->_addressService->getDefaultBillingAddress($customerId)) {
@@ -216,7 +219,7 @@ class Dashboard extends \Magento\View\Element\Template
             }
         }
 
-        return (empty($addresses)) ? false : $addresses;
+        return empty($addresses) ? false : $addresses;
     }
 
     /**

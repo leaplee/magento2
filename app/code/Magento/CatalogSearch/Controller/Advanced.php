@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_CatalogSearch
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,20 +25,17 @@
 /**
  * Catalog Search Controller
  *
- * @category   Magento
- * @package    Magento_CatalogSearch
  * @module     Catalog
  */
 namespace Magento\CatalogSearch\Controller;
 
-use Magento\App\Action\Context;
+use Magento\Framework\App\Action\Context;
 use Magento\CatalogSearch\Model\Advanced as ModelAdvanced;
-use Magento\Session\Generic;
-use Magento\UrlFactory;
+use Magento\Framework\Session\Generic;
+use Magento\Framework\UrlFactory;
 
-class Advanced extends \Magento\App\Action\Action
+class Advanced extends \Magento\Framework\App\Action\Action
 {
-
     /**
      * Url factory
      *
@@ -97,16 +92,16 @@ class Advanced extends \Magento\App\Action\Action
      */
     public function resultAction()
     {
-        $this->_view->loadLayout();
         try {
             $this->_catalogSearchAdvanced->addFilters($this->getRequest()->getQuery());
-        } catch (\Magento\Core\Exception $e) {
+        } catch (\Magento\Framework\Model\Exception $e) {
             $this->messageManager->addError($e->getMessage());
             $defaultUrl = $this->_urlFactory->create()
-                ->setQueryParams($this->getRequest()->getQuery())
+                ->addQueryParams($this->getRequest()->getQuery())
                 ->getUrl('*/*/');
             $this->getResponse()->setRedirect($this->_redirect->error($defaultUrl));
         }
+        $this->_view->loadLayout();
         $this->_view->renderLayout();
     }
 }

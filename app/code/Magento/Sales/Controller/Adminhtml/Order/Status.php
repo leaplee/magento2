@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Sales\Controller\Adminhtml\Order;
 /**
  * Order status management controller
  *
- * @category    Magento
- * @package     Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Status extends \Magento\Backend\App\Action
@@ -37,18 +33,16 @@ class Status extends \Magento\Backend\App\Action
     /**
      * Core registry
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Registry $coreRegistry
+     * @param \Magento\Framework\Registry $coreRegistry
      */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Registry $coreRegistry
-    ) {
+    public function __construct(\Magento\Backend\App\Action\Context $context, \Magento\Framework\Registry $coreRegistry)
+    {
         $this->_coreRegistry = $coreRegistry;
         parent::__construct($context);
     }
@@ -91,8 +85,7 @@ class Status extends \Magento\Backend\App\Action
     {
         $data = $this->_getSession()->getFormData(true);
         if ($data) {
-            $status = $this->_objectManager->create('Magento\Sales\Model\Order\Status')
-                ->setData($data);
+            $status = $this->_objectManager->create('Magento\Sales\Model\Order\Status')->setData($data);
             $this->_coreRegistry->register('current_status', $status);
         }
         $this->_title->add(__('Order Status'));
@@ -118,9 +111,7 @@ class Status extends \Magento\Backend\App\Action
             $this->_setActiveMenu('Magento_Sales::system_order_statuses');
             $this->_view->renderLayout();
         } else {
-            $this->messageManager->addError(
-                __('We can\'t find this order status.')
-            );
+            $this->messageManager->addError(__('We can\'t find this order status.'));
             $this->_redirect('sales/');
         }
     }
@@ -139,8 +130,8 @@ class Status extends \Magento\Backend\App\Action
             $statusCode = $this->getRequest()->getParam('status');
 
             //filter tags in labels/status
-            /** @var $filterManager \Magento\Filter\FilterManager */
-            $filterManager = $this->_objectManager->get('Magento\Filter\FilterManager');
+            /** @var $filterManager \Magento\Framework\Filter\FilterManager */
+            $filterManager = $this->_objectManager->get('Magento\Framework\Filter\FilterManager');
             if ($isNew) {
                 $statusCode = $data['status'] = $filterManager->stripTags($data['status']);
             }
@@ -149,26 +140,23 @@ class Status extends \Magento\Backend\App\Action
                 $label = $filterManager->stripTags($label);
             }
 
-            $status = $this->_objectManager->create('Magento\Sales\Model\Order\Status')
-                    ->load($statusCode);
+            $status = $this->_objectManager->create('Magento\Sales\Model\Order\Status')->load($statusCode);
             // check if status exist
             if ($isNew && $status->getStatus()) {
-                $this->messageManager->addError(
-                    __('We found another order status with the same order status code.')
-                );
+                $this->messageManager->addError(__('We found another order status with the same order status code.'));
                 $this->_getSession()->setFormData($data);
                 $this->_redirect('sales/*/new');
                 return;
             }
 
-            $status->setData($data) ->setStatus($statusCode);
+            $status->setData($data)->setStatus($statusCode);
 
             try {
                 $status->save();
                 $this->messageManager->addSuccess(__('You have saved the order status.'));
                 $this->_redirect('sales/*/');
                 return;
-            } catch (\Magento\Core\Exception $e) {
+            } catch (\Magento\Framework\Model\Exception $e) {
                 $this->messageManager->addError($e->getMessage());
             } catch (\Exception $e) {
                 $this->messageManager->addException(
@@ -210,16 +198,17 @@ class Status extends \Magento\Backend\App\Action
     {
         $data = $this->getRequest()->getPost();
         if ($data) {
-            $state  = $this->getRequest()->getParam('state');
+            $state = $this->getRequest()->getParam('state');
             $isDefault = $this->getRequest()->getParam('is_default');
+            $visibleOnFront = $this->getRequest()->getParam('visible_on_front');
             $status = $this->_initStatus();
             if ($status && $status->getStatus()) {
                 try {
-                    $status->assignState($state, $isDefault);
+                    $status->assignState($state, $isDefault, $visibleOnFront);
                     $this->messageManager->addSuccess(__('You have assigned the order status.'));
                     $this->_redirect('sales/*/');
                     return;
-                } catch (\Magento\Core\Exception $e) {
+                } catch (\Magento\Framework\Model\Exception $e) {
                     $this->messageManager->addError($e->getMessage());
                 } catch (\Exception $e) {
                     $this->messageManager->addException(
@@ -241,13 +230,13 @@ class Status extends \Magento\Backend\App\Action
      */
     public function unassignAction()
     {
-        $state  = $this->getRequest()->getParam('state');
+        $state = $this->getRequest()->getParam('state');
         $status = $this->_initStatus();
         if ($status) {
             try {
                 $status->unassignState($state);
                 $this->messageManager->addSuccess(__('You have unassigned the order status.'));
-            } catch (\Magento\Core\Exception $e) {
+            } catch (\Magento\Framework\Model\Exception $e) {
                 $this->messageManager->addError($e->getMessage());
             } catch (\Exception $e) {
                 $this->messageManager->addException(

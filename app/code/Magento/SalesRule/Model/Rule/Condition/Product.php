@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_SalesRule
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\SalesRule\Model\Rule\Condition;
 /**
  * Product rule condition data model
  *
- * @category Magento
- * @package Magento_SalesRule
  * @author Magento Core Team <core@magentocommerce.com>
  */
 class Product extends \Magento\Rule\Model\Condition\Product\AbstractProduct
@@ -46,7 +42,7 @@ class Product extends \Magento\Rule\Model\Condition\Product\AbstractProduct
      * @param \Magento\Catalog\Model\Product $product
      * @param \Magento\Catalog\Model\Resource\Product $productResource
      * @param \Magento\Eav\Model\Resource\Entity\Attribute\Set\Collection $attrSetCollection
-     * @param \Magento\Locale\FormatInterface $localeFormat
+     * @param \Magento\Framework\Locale\FormatInterface $localeFormat
      * @param \Magento\Catalog\Model\ProductFactory $productFactory
      * @param array $data
      */
@@ -57,12 +53,19 @@ class Product extends \Magento\Rule\Model\Condition\Product\AbstractProduct
         \Magento\Catalog\Model\Product $product,
         \Magento\Catalog\Model\Resource\Product $productResource,
         \Magento\Eav\Model\Resource\Entity\Attribute\Set\Collection $attrSetCollection,
-        \Magento\Locale\FormatInterface $localeFormat,
+        \Magento\Framework\Locale\FormatInterface $localeFormat,
         \Magento\Catalog\Model\ProductFactory $productFactory,
         array $data = array()
     ) {
         parent::__construct(
-            $context, $backendData, $config, $product, $productResource, $attrSetCollection, $localeFormat, $data
+            $context,
+            $backendData,
+            $config,
+            $product,
+            $productResource,
+            $attrSetCollection,
+            $localeFormat,
+            $data
         );
         $this->_productFactory = $productFactory;
     }
@@ -84,21 +87,25 @@ class Product extends \Magento\Rule\Model\Condition\Product\AbstractProduct
     /**
      * Validate Product Rule Condition
      *
-     * @param \Magento\Object $object
+     * @param \Magento\Framework\Object $object
      * @return bool
      */
-    public function validate(\Magento\Object $object)
+    public function validate(\Magento\Framework\Object $object)
     {
         //@todo reimplement this method when is fixed MAGETWO-5713
         /** @var \Magento\Catalog\Model\Product $product */
         $product = $object->getProduct();
-        if (!($product instanceof \Magento\Catalog\Model\Product)) {
+        if (!$product instanceof \Magento\Catalog\Model\Product) {
             $product = $this->_productFactory->create()->load($object->getProductId());
         }
 
-        $product->setQuoteItemQty($object->getQty())
-            ->setQuoteItemPrice($object->getPrice()) // possible bug: need to use $object->getBasePrice()
-            ->setQuoteItemRowTotal($object->getBaseRowTotal());
+        $product->setQuoteItemQty(
+            $object->getQty()
+        )->setQuoteItemPrice(
+            $object->getPrice() // possible bug: need to use $object->getBasePrice()
+        )->setQuoteItemRowTotal(
+            $object->getBaseRowTotal()
+        );
 
         return parent::validate($product);
     }

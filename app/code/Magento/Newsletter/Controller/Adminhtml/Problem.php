@@ -18,12 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Newsletter
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Newsletter\Controller\Adminhtml;
 
 /**
@@ -62,14 +59,13 @@ class Problem extends \Magento\Backend\App\Action
     public function gridAction()
     {
         if ($this->getRequest()->getParam('_unsubscribe')) {
-            $problems = (array) $this->getRequest()->getParam('problem', array());
+            $problems = (array)$this->getRequest()->getParam('problem', array());
             if (count($problems) > 0) {
                 $collection = $this->_objectManager->create('Magento\Newsletter\Model\Resource\Problem\Collection');
-                $collection
-                    ->addSubscriberInfo()
-                    ->addFieldToFilter($collection->getResource()->getIdFieldName(),
-                                       array('in' => $problems))
-                    ->load();
+                $collection->addSubscriberInfo()->addFieldToFilter(
+                    $collection->getResource()->getIdFieldName(),
+                    array('in' => $problems)
+                )->load();
 
                 $collection->walk('unsubscribe');
             }
@@ -78,7 +74,7 @@ class Problem extends \Magento\Backend\App\Action
         }
 
         if ($this->getRequest()->getParam('_delete')) {
-            $problems = (array) $this->getRequest()->getParam('problem', array());
+            $problems = (array)$this->getRequest()->getParam('problem', array());
             if (count($problems) > 0) {
                 $collection = $this->_objectManager->create('Magento\Newsletter\Model\Resource\Problem\Collection');
                 $collection->addFieldToFilter(

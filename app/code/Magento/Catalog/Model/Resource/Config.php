@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,11 +26,9 @@ namespace Magento\Catalog\Model\Resource;
 /**
  * Catalog Config Resource Model
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Config extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Config extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
      * catalog_product entity type id
@@ -46,7 +42,7 @@ class Config extends \Magento\Core\Model\Resource\Db\AbstractDb
      *
      * @var int
      */
-    protected $_storeId          = null;
+    protected $_storeId = null;
 
     /**
      * Eav config
@@ -58,18 +54,18 @@ class Config extends \Magento\Core\Model\Resource\Db\AbstractDb
     /**
      * Store manager
      *
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
     /**
-     * @param \Magento\App\Resource $resource
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\App\Resource $resource
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Eav\Model\Config $eavConfig
      */
     public function __construct(
-        \Magento\App\Resource $resource,
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\App\Resource $resource,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Eav\Model\Config $eavConfig
     ) {
         $this->_storeManager = $storeManager;
@@ -136,19 +132,22 @@ class Config extends \Magento\Core\Model\Resource\Db\AbstractDb
         $adapter = $this->_getReadAdapter();
         $storeLabelExpr = $adapter->getCheckSql('al.value IS NOT NULL', 'al.value', 'main_table.frontend_label');
 
-        $select  = $adapter->select()
-            ->from(array('main_table' => $this->getTable('eav_attribute')))
-            ->join(
-                array('additional_table' => $this->getTable('catalog_eav_attribute')),
-                'main_table.attribute_id = additional_table.attribute_id'
-            )
-            ->joinLeft(
-                array('al' => $this->getTable('eav_attribute_label')),
-                'al.attribute_id = main_table.attribute_id AND al.store_id = ' . (int)$this->getStoreId(),
-                array('store_label' => $storeLabelExpr)
-            )
-            ->where('main_table.entity_type_id = ?', (int)$this->getEntityTypeId())
-            ->where('additional_table.used_in_product_listing = ?', 1);
+        $select = $adapter->select()->from(
+            array('main_table' => $this->getTable('eav_attribute'))
+        )->join(
+            array('additional_table' => $this->getTable('catalog_eav_attribute')),
+            'main_table.attribute_id = additional_table.attribute_id'
+        )->joinLeft(
+            array('al' => $this->getTable('eav_attribute_label')),
+            'al.attribute_id = main_table.attribute_id AND al.store_id = ' . (int)$this->getStoreId(),
+            array('store_label' => $storeLabelExpr)
+        )->where(
+            'main_table.entity_type_id = ?',
+            (int)$this->getEntityTypeId()
+        )->where(
+            'additional_table.used_in_product_listing = ?',
+            1
+        );
 
         return $adapter->fetchAll($select);
     }
@@ -161,21 +160,24 @@ class Config extends \Magento\Core\Model\Resource\Db\AbstractDb
     public function getAttributesUsedForSortBy()
     {
         $adapter = $this->_getReadAdapter();
-        $storeLabelExpr = $adapter->getCheckSql('al.value IS NULL', 'main_table.frontend_label','al.value');
-        $select = $adapter->select()
-            ->from(array('main_table' => $this->getTable('eav_attribute')))
-            ->join(
-                array('additional_table' => $this->getTable('catalog_eav_attribute')),
-                'main_table.attribute_id = additional_table.attribute_id',
-                array()
-            )
-            ->joinLeft(
-                array('al' => $this->getTable('eav_attribute_label')),
-                'al.attribute_id = main_table.attribute_id AND al.store_id = ' . (int)$this->getStoreId(),
-                array('store_label' => $storeLabelExpr)
-            )
-            ->where('main_table.entity_type_id = ?', (int)$this->getEntityTypeId())
-            ->where('additional_table.used_for_sort_by = ?', 1);
+        $storeLabelExpr = $adapter->getCheckSql('al.value IS NULL', 'main_table.frontend_label', 'al.value');
+        $select = $adapter->select()->from(
+            array('main_table' => $this->getTable('eav_attribute'))
+        )->join(
+            array('additional_table' => $this->getTable('catalog_eav_attribute')),
+            'main_table.attribute_id = additional_table.attribute_id',
+            array()
+        )->joinLeft(
+            array('al' => $this->getTable('eav_attribute_label')),
+            'al.attribute_id = main_table.attribute_id AND al.store_id = ' . (int)$this->getStoreId(),
+            array('store_label' => $storeLabelExpr)
+        )->where(
+            'main_table.entity_type_id = ?',
+            (int)$this->getEntityTypeId()
+        )->where(
+            'additional_table.used_for_sort_by = ?',
+            1
+        );
 
         return $adapter->fetchAll($select);
     }

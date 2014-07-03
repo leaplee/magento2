@@ -21,12 +21,11 @@
  * @copyright Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Multishipping\Model\Payment\Method\Specification;
 
 use Magento\Payment\Model\Method\Specification\AbstractSpecification;
 use Magento\Payment\Model\Config as PaymentConfig;
-use Magento\Core\Model\Store\ConfigInterface as StoreConfig;
+use Magento\Framework\App\Config\ScopeConfigInterface as StoreConfig;
 
 /**
  * 3D secure specification
@@ -42,7 +41,9 @@ class Is3DSecure extends AbstractSpecification
      * 3D Secure card validation store config paths
      */
     const PATH_PAYMENT_3DSECURE = 'payment/%s/enable3ds';
+
     const PATH_PAYMENT_CENTINEL = 'payment/%s/centinel';
+
     /**#@-*/
 
     /**
@@ -50,18 +51,18 @@ class Is3DSecure extends AbstractSpecification
      *
      * @var StoreConfig
      */
-    protected $storeConfig;
+    protected $scopeConfig;
 
     /**
      * Construct
      *
      * @param PaymentConfig $paymentConfig
-     * @param StoreConfig $storeConfig
+     * @param StoreConfig $scopeConfig
      */
-    public function __construct(PaymentConfig $paymentConfig, StoreConfig $storeConfig)
+    public function __construct(PaymentConfig $paymentConfig, StoreConfig $scopeConfig)
     {
         parent::__construct($paymentConfig);
-        $this->storeConfig = $storeConfig;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -69,8 +70,9 @@ class Is3DSecure extends AbstractSpecification
      */
     public function isSatisfiedBy($paymentMethod)
     {
-        $is3DSecureSupported = isset($this->methodsInfo[$paymentMethod][self::FLAG_ALLOW_MULTIPLE_WITH_3DSECURE])
-            && $this->methodsInfo[$paymentMethod][self::FLAG_ALLOW_MULTIPLE_WITH_3DSECURE];
+        $is3DSecureSupported = isset(
+            $this->methodsInfo[$paymentMethod][self::FLAG_ALLOW_MULTIPLE_WITH_3DSECURE]
+        ) && $this->methodsInfo[$paymentMethod][self::FLAG_ALLOW_MULTIPLE_WITH_3DSECURE];
         return $is3DSecureSupported || !$this->is3DSecureEnabled($paymentMethod);
     }
 
@@ -82,7 +84,10 @@ class Is3DSecure extends AbstractSpecification
      */
     protected function is3DSecureEnabled($paymentMethod)
     {
-        return $this->storeConfig->getConfigFlag(sprintf(self::PATH_PAYMENT_3DSECURE, $paymentMethod))
-            || $this->storeConfig->getConfigFlag(sprintf(self::PATH_PAYMENT_CENTINEL, $paymentMethod));
+        return $this->scopeConfig->isSetFlag(
+            sprintf(self::PATH_PAYMENT_3DSECURE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $paymentMethod)
+        ) || $this->scopeConfig->isSetFlag(
+            sprintf(self::PATH_PAYMENT_CENTINEL, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $paymentMethod)
+        );
     }
 }

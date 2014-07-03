@@ -18,12 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Review
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Review\Block\Customer;
 
 use Magento\Review\Model\Resource\Review\Product\Collection;
@@ -31,7 +28,7 @@ use Magento\Review\Model\Resource\Review\Product\Collection;
 /**
  * Recent Customer Reviews Block
  */
-class Recent extends \Magento\View\Element\Template
+class Recent extends \Magento\Framework\View\Element\Template
 {
     /**
      * Customer list template name
@@ -55,27 +52,26 @@ class Recent extends \Magento\View\Element\Template
     protected $_collectionFactory;
 
     /**
-     * Customer session model
-     * @var \Magento\Customer\Model\Session
+     * @var \Magento\Customer\Helper\Session\CurrentCustomer
      */
-    protected $_customerSession;
+    protected $currentCustomer;
 
     /**
-     * @param \Magento\View\Element\Template\Context $context
+     * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Review\Model\Resource\Review\Product\CollectionFactory $collectionFactory
-     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Template\Context $context,
+        \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Review\Model\Resource\Review\Product\CollectionFactory $collectionFactory,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
         array $data = array()
     ) {
         $this->_collectionFactory = $collectionFactory;
-        $this->_customerSession = $customerSession;
         parent::__construct($context, $data);
         $this->_isScopePrivate = true;
+        $this->currentCustomer = $currentCustomer;
     }
 
     /**
@@ -90,12 +86,10 @@ class Recent extends \Magento\View\Element\Template
      */
     public function truncateString($value, $length = 80, $etc = '...', &$remainder = '', $breakWords = true)
     {
-        return $this->filterManager->truncate($value, array(
-            'length' => $length,
-            'etc' => $etc,
-            'remainder' => $remainder,
-            'breakWords' => $breakWords
-        ));
+        return $this->filterManager->truncate(
+            $value,
+            array('length' => $length, 'etc' => $etc, 'remainder' => $remainder, 'breakWords' => $breakWords)
+        );
     }
 
     /**
@@ -107,7 +101,7 @@ class Recent extends \Magento\View\Element\Template
         $this->_collection = $this->_collectionFactory->create();
         $this->_collection
             ->addStoreFilter($this->_storeManager->getStore()->getId())
-            ->addCustomerFilter($this->_customerSession->getCustomerId())
+            ->addCustomerFilter($this->currentCustomer->getCustomerId())
             ->setDateOrder()
             ->setPageSize(5)
             ->load()
@@ -175,7 +169,7 @@ class Recent extends \Magento\View\Element\Template
      */
     public function dateFormat($date)
     {
-        return $this->formatDate($date, \Magento\Stdlib\DateTime\TimezoneInterface::FORMAT_TYPE_SHORT);
+        return $this->formatDate($date, \Magento\Framework\Stdlib\DateTime\TimezoneInterface::FORMAT_TYPE_SHORT);
     }
 
     /**

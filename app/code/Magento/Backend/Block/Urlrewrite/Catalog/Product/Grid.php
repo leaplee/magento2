@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Backend\Block\Urlrewrite\Catalog\Product;
 /**
  * Products grid for URL rewrites editing
  *
- * @category   Magento
- * @package    Magento_Adminhtml
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Grid extends \Magento\Catalog\Block\Adminhtml\Product\Grid
@@ -51,33 +47,21 @@ class Grid extends \Magento\Catalog\Block\Adminhtml\Product\Grid
      */
     protected function _prepareColumns()
     {
-        $this->addColumn('entity_id',
-            array(
-                'header'=> __('ID'),
-                'width' => 50,
-                'index' => 'entity_id',
-        ));
+        $this->addColumn('entity_id', array('header' => __('ID'), 'width' => 50, 'index' => 'entity_id'));
 
-        $this->addColumn('name',
-            array(
-                'header'=> __('Name'),
-                'index' => 'name',
-        ));
+        $this->addColumn('name', array('header' => __('Name'), 'index' => 'name'));
 
-        $this->addColumn('sku',
+        $this->addColumn('sku', array('header' => __('SKU'), 'width' => 80, 'index' => 'sku'));
+        $this->addColumn(
+            'status',
             array(
-                'header'=> __('SKU'),
-                'width' => 80,
-                'index' => 'sku',
-        ));
-        $this->addColumn('status',
-            array(
-                'header'=> __('Status'),
+                'header' => __('Status'),
                 'width' => 50,
                 'index' => 'status',
-                'type'  => 'options',
-                'options' => $this->_status->getOptionArray(),
-        ));
+                'type' => 'options',
+                'options' => $this->_status->getOptionArray()
+            )
+        );
         return $this;
     }
 
@@ -94,7 +78,7 @@ class Grid extends \Magento\Catalog\Block\Adminhtml\Product\Grid
     /**
      * Return row url for js event handlers
      *
-     * @param \Magento\Catalog\Model\Product|\Magento\Object $row
+     * @param \Magento\Catalog\Model\Product|\Magento\Framework\Object $row
      * @return string
      */
     public function getRowUrl($row)

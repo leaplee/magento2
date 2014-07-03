@@ -18,12 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Product\Compare;
 
 use Magento\Catalog\Model\Resource\Product\Compare\Item\Collection;
@@ -33,7 +30,7 @@ use Magento\Catalog\Model\Resource\Product\Compare\Item\Collection;
  *
  * @SuppressWarnings(PHPMD.LongVariable)
  */
-class ListCompare extends \Magento\Object
+class ListCompare extends \Magento\Framework\Object
 {
     /**
      * Log visitor
@@ -173,7 +170,7 @@ class ListCompare extends \Magento\Object
     {
         $item->addVisitorId($this->_logVisitor->getId());
         if ($this->_customerSession->isLoggedIn()) {
-            $item->addCustomerData($this->_customerSession->getCustomer());
+            $item->setCustomerId($this->_customerSession->getCustomerId());
         }
 
         return $this;
@@ -188,7 +185,6 @@ class ListCompare extends \Magento\Object
      */
     public function hasItems($customerId, $visitorId)
     {
-        return $this->_catalogProductCompareItem
-            ->getCount($customerId, $visitorId);
+        return (bool)$this->_catalogProductCompareItem->getCount($customerId, $visitorId);
     }
 }

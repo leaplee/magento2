@@ -18,12 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Ogone
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Ogone\Model;
+
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Config model
@@ -33,34 +33,34 @@ class Config extends \Magento\Payment\Model\Config
     const OGONE_PAYMENT_PATH = 'payment/ogone/';
 
     /**
-     * @var \Magento\UrlInterface
+     * @var \Magento\Framework\UrlInterface
      */
     protected $_urlBuilder;
 
     /**
-     * @var \Magento\Encryption\EncryptorInterface
+     * @var \Magento\Framework\Encryption\EncryptorInterface
      */
     protected $_encryptor;
 
     /**
-     * @param \Magento\Core\Model\Store\Config $coreStoreConfig
-     * @param \Magento\App\ConfigInterface $coreConfig
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Payment\Model\Method\Factory $paymentMethodFactory
-     * @param \Magento\Locale\ListsInterface $localeLists
-     * @param \Magento\Config\DataInterface $dataStorage
-     * @param \Magento\UrlInterface $urlBuilder
-     * @param \Magento\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Framework\Locale\ListsInterface $localeLists
+     * @param \Magento\Framework\Config\DataInterface $dataStorage
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      */
     public function __construct(
-        \Magento\Core\Model\Store\Config $coreStoreConfig,
-        \Magento\App\ConfigInterface $coreConfig,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Factory $paymentMethodFactory,
-        \Magento\Locale\ListsInterface $localeLists,
-        \Magento\Config\DataInterface $dataStorage,
-        \Magento\UrlInterface $urlBuilder,
-        \Magento\Encryption\EncryptorInterface $encryptor
+        \Magento\Framework\Locale\ListsInterface $localeLists,
+        \Magento\Framework\Config\DataInterface $dataStorage,
+        \Magento\Framework\Stdlib\DateTime\DateTime $date,
+        \Magento\Framework\UrlInterface $urlBuilder,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor
     ) {
-        parent::__construct($coreStoreConfig, $coreConfig, $paymentMethodFactory, $localeLists, $dataStorage);
+        parent::__construct($scopeConfig, $paymentMethodFactory, $localeLists, $dataStorage, $date);
         $this->_urlBuilder = $urlBuilder;
         $this->_encryptor = $encryptor;
     }
@@ -72,10 +72,14 @@ class Config extends \Magento\Payment\Model\Config
      * @param int|null $storeId
      * @return bool|null|string
      */
-    public function getConfigData($path, $storeId=null)
+    public function getConfigData($path, $storeId = null)
     {
         if (!empty($path)) {
-            return $this->_coreStoreConfig->getConfig(self::OGONE_PAYMENT_PATH . $path, $storeId);
+            return $this->_scopeConfig->getValue(
+                self::OGONE_PAYMENT_PATH . $path,
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
         }
         return false;
     }
@@ -86,9 +90,9 @@ class Config extends \Magento\Payment\Model\Config
      * @param int|null $storeId
      * @return string
      */
-    public function getShaInCode($storeId=null)
+    public function getShaInCode($storeId = null)
     {
-        return $this->_encryptor->decrypt($this->getConfigData('secret_key_in', $storeId));
+        return $this->getConfigData('secret_key_in', $storeId);
     }
 
     /**
@@ -96,9 +100,9 @@ class Config extends \Magento\Payment\Model\Config
      * @param int|null $storeId
      * @return string
      */
-    public function getShaOutCode($storeId=null)
+    public function getShaOutCode($storeId = null)
     {
-        return $this->_encryptor->decrypt($this->getConfigData('secret_key_out', $storeId));
+        return $this->getConfigData('secret_key_out', $storeId);
     }
 
     /**
@@ -107,7 +111,7 @@ class Config extends \Magento\Payment\Model\Config
      * @param int|null $storeId
      * @return string
      */
-    public function getGatewayPath($storeId=null)
+    public function getGatewayPath($storeId = null)
     {
         return $this->getConfigData('ogone_gateway', $storeId);
     }
@@ -118,7 +122,7 @@ class Config extends \Magento\Payment\Model\Config
      * @param int|null $storeId
      * @return string
      */
-    public function getPSPID($storeId=null)
+    public function getPSPID($storeId = null)
     {
         return $this->getConfigData('pspid', $storeId);
     }

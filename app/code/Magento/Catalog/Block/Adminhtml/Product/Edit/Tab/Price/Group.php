@@ -18,24 +18,17 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+namespace Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Price;
 
+use Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Price\Group\AbstractGroup;
 
 /**
  * Adminhtml group price item renderer
- *
- * @category   Magento
- * @package    Magento_Catalog
- * @author     Magento Core Team <core@magentocommerce.com>
  */
-namespace Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Price;
-
-class Group
-    extends \Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Price\Group\AbstractGroup
+class Group extends AbstractGroup
 {
     /**
      * @var string
@@ -81,16 +74,18 @@ class Group
      */
     protected function _prepareLayout()
     {
-        $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')
-            ->setData(array(
+        $button = $this->getLayout()->createBlock(
+            'Magento\Backend\Block\Widget\Button'
+        )->setData(
+            array(
                 'label' => __('Add Group Price'),
                 'onclick' => 'return groupPriceControl.addItem()',
                 'class' => 'add'
-            ));
+            )
+        );
         $button->setName('add_group_price_item_button');
 
         $this->setChild('add_button', $button);
         return parent::_prepareLayout();
     }
-
 }

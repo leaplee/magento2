@@ -20,9 +20,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    tests
- * @package     static
- * @subpackage  Integrity
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -64,7 +61,7 @@ class CircularDependencyTest extends \PHPUnit_Framework_TestCase
             preg_match('#/([^/]+?/[^/]+?)/etc/module\.xml$#', $configFile, $moduleName);
             $moduleName = str_replace('/', '_', $moduleName[1]);
             $config = simplexml_load_file($configFile);
-            $result = $config->xpath("/config/module/depends/module") ? : array();
+            $result = $config->xpath("/config/module/depends/module") ?: array();
             while (list(, $node) = each($result)) {
                 /** @var \SimpleXMLElement $node */
                 $this->moduleDependencies[$moduleName][] = (string)$node['name'];

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Captcha
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,7 +28,7 @@ namespace Magento\Captcha\Model\Resource;
  *
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Log extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Log extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
      * Type Remote Address
@@ -45,24 +43,24 @@ class Log extends \Magento\Core\Model\Resource\Db\AbstractDb
     /**
      * Core Date
      *
-     * @var \Magento\Stdlib\DateTime\DateTime
+     * @var \Magento\Framework\Stdlib\DateTime\DateTime
      */
     protected $_coreDate;
 
     /**
-     * @var \Magento\HTTP\PhpEnvironment\RemoteAddress
+     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
      */
     protected $_remoteAddress;
 
     /**
-     * @param \Magento\App\Resource $resource
-     * @param \Magento\Stdlib\DateTime\DateTime $coreDate
-     * @param \Magento\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
+     * @param \Magento\Framework\App\Resource $resource
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $coreDate
+     * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
      */
     public function __construct(
-        \Magento\App\Resource $resource,
-        \Magento\Stdlib\DateTime\DateTime $coreDate,
-        \Magento\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
+        \Magento\Framework\App\Resource $resource,
+        \Magento\Framework\Stdlib\DateTime\DateTime $coreDate,
+        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
     ) {
         $this->_coreDate = $coreDate;
         $this->_remoteAddress = $remoteAddress;
@@ -91,8 +89,10 @@ class Log extends \Magento\Core\Model\Resource\Db\AbstractDb
             $this->_getWriteAdapter()->insertOnDuplicate(
                 $this->getMainTable(),
                 array(
-                     'type' => self::TYPE_LOGIN, 'value' => $login, 'count' => 1,
-                     'updated_at' => $this->_coreDate->gmtDate()
+                    'type' => self::TYPE_LOGIN,
+                    'value' => $login,
+                    'count' => 1,
+                    'updated_at' => $this->_coreDate->gmtDate()
                 ),
                 array('count' => new \Zend_Db_Expr('count+1'), 'updated_at')
             );
@@ -102,8 +102,10 @@ class Log extends \Magento\Core\Model\Resource\Db\AbstractDb
             $this->_getWriteAdapter()->insertOnDuplicate(
                 $this->getMainTable(),
                 array(
-                     'type' => self::TYPE_REMOTE_ADDRESS, 'value' => $ip, 'count' => 1,
-                     'updated_at' => $this->_coreDate->gmtDate()
+                    'type' => self::TYPE_REMOTE_ADDRESS,
+                    'value' => $ip,
+                    'count' => 1,
+                    'updated_at' => $this->_coreDate->gmtDate()
                 ),
                 array('count' => new \Zend_Db_Expr('count+1'), 'updated_at')
             );
@@ -128,7 +130,8 @@ class Log extends \Magento\Core\Model\Resource\Db\AbstractDb
         $ip = $this->_remoteAddress->getRemoteAddress();
         if ($ip != null) {
             $this->_getWriteAdapter()->delete(
-                $this->getMainTable(), array('type = ?' => self::TYPE_REMOTE_ADDRESS, 'value = ?' => $ip)
+                $this->getMainTable(),
+                array('type = ?' => self::TYPE_REMOTE_ADDRESS, 'value = ?' => $ip)
             );
         }
 
@@ -147,8 +150,16 @@ class Log extends \Magento\Core\Model\Resource\Db\AbstractDb
             return 0;
         }
         $read = $this->_getReadAdapter();
-        $select = $read->select()->from($this->getMainTable(), 'count')->where('type = ?', self::TYPE_REMOTE_ADDRESS)
-            ->where('value = ?', $ip);
+        $select = $read->select()->from(
+            $this->getMainTable(),
+            'count'
+        )->where(
+            'type = ?',
+            self::TYPE_REMOTE_ADDRESS
+        )->where(
+            'value = ?',
+            $ip
+        );
         return $read->fetchOne($select);
     }
 
@@ -164,8 +175,16 @@ class Log extends \Magento\Core\Model\Resource\Db\AbstractDb
             return 0;
         }
         $read = $this->_getReadAdapter();
-        $select = $read->select()->from($this->getMainTable(), 'count')->where('type = ?', self::TYPE_LOGIN)
-            ->where('value = ?', $login);
+        $select = $read->select()->from(
+            $this->getMainTable(),
+            'count'
+        )->where(
+            'type = ?',
+            self::TYPE_LOGIN
+        )->where(
+            'value = ?',
+            $login
+        );
         return $read->fetchOne($select);
     }
 
@@ -178,7 +197,7 @@ class Log extends \Magento\Core\Model\Resource\Db\AbstractDb
     {
         $this->_getWriteAdapter()->delete(
             $this->getMainTable(),
-            array('updated_at < ?' => $this->_coreDate->gmtDate(null, time() - 60*30))
+            array('updated_at < ?' => $this->_coreDate->gmtDate(null, time() - 60 * 30))
         );
     }
 }

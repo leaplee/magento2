@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -33,18 +31,18 @@ class Create extends \Magento\Backend\Block\Widget\Form\Container
     /**
      * Core registry
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Registry $registry
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\Registry $registry,
         array $data = array()
     ) {
         $this->_coreRegistry = $registry;
@@ -85,9 +83,13 @@ class Create extends \Magento\Backend\Block\Widget\Form\Container
      */
     public function getHeaderText()
     {
-        return ($this->getInvoice()->getOrder()->getForcedShipmentWithInvoice())
-            ? __('New Invoice and Shipment for Order #%1', $this->getInvoice()->getOrder()->getRealOrderId())
-            : __('New Invoice for Order #%1', $this->getInvoice()->getOrder()->getRealOrderId());
+        return $this->getInvoice()->getOrder()->getForcedShipmentWithInvoice() ? __(
+            'New Invoice and Shipment for Order #%1',
+            $this->getInvoice()->getOrder()->getRealOrderId()
+        ) : __(
+            'New Invoice for Order #%1',
+            $this->getInvoice()->getOrder()->getRealOrderId()
+        );
     }
 
     /**

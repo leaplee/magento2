@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\GroupedProduct\Model\Product\Type;
 
 class GroupedTest extends \PHPUnit_Framework_TestCase
@@ -36,13 +32,14 @@ class GroupedTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->_productType = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->get('Magento\Catalog\Model\Product\Type');
+        $this->_productType = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Catalog\Model\Product\Type'
+        );
     }
 
     public function testFactory()
     {
-        $product = new \Magento\Object;
+        $product = new \Magento\Framework\Object();
         $product->setTypeId(\Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE);
         $type = $this->_productType->factory($product);
         $this->assertInstanceOf('\Magento\GroupedProduct\Model\Product\Type\Grouped', $type);

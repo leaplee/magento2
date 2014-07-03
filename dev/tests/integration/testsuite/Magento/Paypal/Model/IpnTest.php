@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Paypal
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Paypal\Model;
 
 /**
@@ -33,7 +29,7 @@ namespace Magento\Paypal\Model;
 class IpnTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Magento\ObjectManager
+     * @var \Magento\Framework\ObjectManager
      */
     protected $_objectManager;
 
@@ -74,15 +70,13 @@ class IpnTest extends \PHPUnit_Framework_TestCase
      */
     protected function _processIpnRequestCurrency($currencyCode)
     {
-        $ipnData = require(__DIR__ . '/../_files/ipn.php');
+        $ipnData = require __DIR__ . '/../_files/ipn.php';
         $ipnData['mc_currency'] = $currencyCode;
 
         /** @var  $ipnFactory \Magento\Paypal\Model\IpnFactory */
         $ipnFactory = $this->_objectManager->create('Magento\Paypal\Model\IpnFactory');
 
-        $model = $ipnFactory->create(
-            array('data' => $ipnData, 'curlFactory' => $this->_createMockedHttpAdapter())
-        );
+        $model = $ipnFactory->create(array('data' => $ipnData, 'curlFactory' => $this->_createMockedHttpAdapter()));
         $model->processIpnRequest();
 
         $order = $this->_objectManager->create('Magento\Sales\Model\Order');
@@ -115,34 +109,24 @@ class IpnTest extends \PHPUnit_Framework_TestCase
      */
     public static function currencyProvider()
     {
-        return array(
-            array('USD'),
-            array('EUR'),
-        );
+        return array(array('USD'), array('EUR'));
     }
 
     /**
      * Mocked HTTP adapter to get VERIFIED PayPal IPN postback result
      *
-     * @return \Magento\HTTP\Adapter\Curl
+     * @return \Magento\Framework\HTTP\Adapter\Curl
      */
     protected function _createMockedHttpAdapter()
     {
-        $factory = $this->getMock('Magento\HTTP\Adapter\CurlFactory', array('create'), array(), '', false);
-        $adapter = $this->getMock('Magento\HTTP\Adapter\Curl', array('read', 'write'), array(), '', false);
+        $factory = $this->getMock('Magento\Framework\HTTP\Adapter\CurlFactory', array('create'), array(), '', false);
+        $adapter = $this->getMock('Magento\Framework\HTTP\Adapter\Curl', array('read', 'write'), array(), '', false);
 
-        $adapter->expects($this->once())
-            ->method('read')
-            ->with()
-            ->will($this->returnValue("\nVERIFIED"));
+        $adapter->expects($this->once())->method('read')->with()->will($this->returnValue("\nVERIFIED"));
 
-        $adapter->expects($this->once())
-            ->method('write');
+        $adapter->expects($this->once())->method('write');
 
-        $factory->expects($this->once())
-            ->method('create')
-            ->with()
-            ->will($this->returnValue($adapter));
+        $factory->expects($this->once())->method('create')->with()->will($this->returnValue($adapter));
         return $factory;
     }
 }

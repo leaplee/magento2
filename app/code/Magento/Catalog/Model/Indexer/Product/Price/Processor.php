@@ -18,12 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Indexer\Product\Price;
 
 class Processor
@@ -39,12 +36,12 @@ class Processor
     protected $_indexer;
 
     /**
-     * @param \Magento\Indexer\Model\IndexerInterface $indexer
+     * @param \Magento\Indexer\Model\IndexerFactory $indexerFactory
      */
     public function __construct(
-       \Magento\Indexer\Model\IndexerInterface $indexer
+        \Magento\Indexer\Model\IndexerFactory $indexerFactory
     ) {
-        $this->_indexer = $indexer;
+        $this->_indexer = $indexerFactory->create();
     }
 
     /**

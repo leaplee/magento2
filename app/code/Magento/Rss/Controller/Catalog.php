@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Rss
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,22 +26,22 @@ namespace Magento\Rss\Controller;
 /**
  * RSS Controller for Catalog feeds
  */
-class Catalog extends \Magento\App\Action\Action
+class Catalog extends \Magento\Framework\App\Action\Action
 {
     /**
-     * @var \Magento\Core\Model\Store\Config
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_storeConfig;
+    protected $_scopeConfig;
 
     /**
-     * @param \Magento\App\Action\Context $context
-     * @param \Magento\Core\Model\Store\Config $storeConfig
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \Magento\App\Action\Context $context,
-        \Magento\Core\Model\Store\Config $storeConfig
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
-        $this->_storeConfig = $storeConfig;
+        $this->_scopeConfig = $scopeConfig;
         parent::__construct($context);
     }
 
@@ -76,7 +74,7 @@ class Catalog extends \Magento\App\Action\Action
      */
     public function categoryAction()
     {
-         $this->_genericAction('category');
+        $this->_genericAction('category');
     }
 
     /**
@@ -102,7 +100,7 @@ class Catalog extends \Magento\App\Action\Action
      */
     protected function _isEnabled($code)
     {
-        return $this->_storeConfig->getConfigFlag("rss/catalog/{$code}");
+        return $this->_scopeConfig->isSetFlag("rss/catalog/{$code}", \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
     /**

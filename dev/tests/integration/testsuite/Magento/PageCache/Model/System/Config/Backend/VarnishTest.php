@@ -18,9 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_PageCache
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -34,23 +31,25 @@ class VarnishTest extends \PHPUnit_Framework_TestCase
     protected $_model;
 
     /**
-     * @var \Magento\App\ConfigInterface
+     * @var \Magento\Framework\App\Config\MutableScopeConfigInterface
      */
     protected $_config;
 
     protected function setUp()
     {
-        $this->_config = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\App\ConfigInterface');
+        $this->_config = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Framework\App\Config\MutableScopeConfigInterface'
+        );
         $data = array(
             'access_list' => 'localhost',
             'backend_host' => 'localhost',
             'backend_port' => 8080,
-            'ttl' => 120,
+            'ttl' => 120
         );
         $this->_config->setValue('system/full_page_cache/default', $data);
-        $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\PageCache\Model\System\Config\Backend\Varnish');
+        $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\PageCache\Model\System\Config\Backend\Varnish'
+        );
     }
 
     /**
@@ -83,11 +82,10 @@ class VarnishTest extends \PHPUnit_Framework_TestCase
             array('localhost', 'backend_host', 'localhost', false),
             array(8081, 'backend_port', 8081, false),
             array(125, 'ttl', 125, false),
-
             array('localhost', 'access_list', 'localhost', true),
             array('', 'backend_host', 'localhost', true),
             array(0, 'backend_port', 8080, true),
-            array(0, 'ttl', 120, true),
+            array(0, 'ttl', 120, true)
         );
     }
 
@@ -118,7 +116,7 @@ class VarnishTest extends \PHPUnit_Framework_TestCase
             array('access_list', 'localhost', true),
             array('backend_host', 'localhost', true),
             array('backend_port', 8080, true),
-            array('ttl', 120, true),
+            array('ttl', 120, true)
         );
     }
 }

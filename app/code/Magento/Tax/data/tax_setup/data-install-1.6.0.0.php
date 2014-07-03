@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Tax
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,14 +28,14 @@ $installer = $this;
  */
 $data = array(
     array(
-        'class_id'     => 2,
-        'class_name'   => 'Taxable Goods',
-        'class_type'   => \Magento\Tax\Model\ClassModel::TAX_CLASS_TYPE_PRODUCT
+        'class_id' => 2,
+        'class_name' => 'Taxable Goods',
+        'class_type' => \Magento\Tax\Model\ClassModel::TAX_CLASS_TYPE_PRODUCT
     ),
     array(
-        'class_id'     => 3,
-        'class_name'   => 'Retail Customer',
-        'class_type'   => \Magento\Tax\Model\ClassModel::TAX_CLASS_TYPE_CUSTOMER
+        'class_id' => 3,
+        'class_name' => 'Retail Customer',
+        'class_type' => \Magento\Tax\Model\ClassModel::TAX_CLASS_TYPE_CUSTOMER
     )
 );
 foreach ($data as $row) {
@@ -49,20 +47,20 @@ foreach ($data as $row) {
  */
 $data = array(
     array(
-        'tax_calculation_rate_id'   => 1,
-        'tax_country_id'            => 'US',
-        'tax_region_id'             => 12,
-        'tax_postcode'              => '*',
-        'code'                      => 'US-CA-*-Rate 1',
-        'rate'                      => '8.2500'
+        'tax_calculation_rate_id' => 1,
+        'tax_country_id' => 'US',
+        'tax_region_id' => 12,
+        'tax_postcode' => '*',
+        'code' => 'US-CA-*-Rate 1',
+        'rate' => '8.2500'
     ),
     array(
-        'tax_calculation_rate_id'   => 2,
-        'tax_country_id'            => 'US',
-        'tax_region_id'             => 43,
-        'tax_postcode'              => '*',
-        'code'                      => 'US-NY-*-Rate 1',
-        'rate'                      => '8.3750'
+        'tax_calculation_rate_id' => 2,
+        'tax_country_id' => 'US',
+        'tax_region_id' => 43,
+        'tax_postcode' => '*',
+        'code' => 'US-NY-*-Rate 1',
+        'rate' => '8.3750'
     )
 );
 foreach ($data as $row) {

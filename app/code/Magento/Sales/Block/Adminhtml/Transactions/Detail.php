@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Sales\Block\Adminhtml\Transactions;
 /**
  * Adminhtml transaction detail
  *
- * @category   Magento
- * @package    Magento_Sales
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Detail extends \Magento\Backend\Block\Widget\Container
@@ -44,18 +40,18 @@ class Detail extends \Magento\Backend\Block\Widget\Container
     /**
      * Core registry
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Registry $registry
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\Registry $registry,
         array $data = array()
     ) {
         $this->_coreRegistry = $registry;
@@ -76,21 +72,21 @@ class Detail extends \Magento\Backend\Block\Widget\Container
             return;
         }
 
-        $backUrl = ($this->_txn->getOrderUrl()) ? $this->_txn->getOrderUrl() : $this->getUrl('sales/*/');
-        $this->_addButton('back', array(
-            'label'   => __('Back'),
-            'onclick' => "setLocation('{$backUrl}')",
-            'class'   => 'back'
-        ));
+        $backUrl = $this->_txn->getOrderUrl() ? $this->_txn->getOrderUrl() : $this->getUrl('sales/*/');
+        $this->_addButton(
+            'back',
+            array('label' => __('Back'), 'onclick' => "setLocation('{$backUrl}')", 'class' => 'back')
+        );
 
-        if ($this->_authorization->isAllowed('Magento_Sales::transactions_fetch')
-            && $this->_txn->getOrderPaymentObject()->getMethodInstance()->canFetchTransactionInfo()) {
-            $fetchUrl = $this->getUrl('sales/*/fetch' , array('_current' => true));
-            $this->_addButton('fetch', array(
-                'label'   => __('Fetch'),
-                'onclick' => "setLocation('{$fetchUrl}')",
-                'class'   => 'button'
-            ));
+        if ($this->_authorization->isAllowed(
+            'Magento_Sales::transactions_fetch'
+        ) && $this->_txn->getOrderPaymentObject()->getMethodInstance()->canFetchTransactionInfo()
+        ) {
+            $fetchUrl = $this->getUrl('sales/*/fetch', array('_current' => true));
+            $this->_addButton(
+                'fetch',
+                array('label' => __('Fetch'), 'onclick' => "setLocation('{$fetchUrl}')", 'class' => 'button')
+            );
         }
     }
 
@@ -101,7 +97,15 @@ class Detail extends \Magento\Backend\Block\Widget\Container
      */
     public function getHeaderText()
     {
-        return __("Transaction # %1 | %2", $this->_txn->getTxnId(), $this->formatDate($this->_txn->getCreatedAt(), \Magento\Stdlib\DateTime\TimezoneInterface::FORMAT_TYPE_MEDIUM, true));
+        return __(
+            "Transaction # %1 | %2",
+            $this->_txn->getTxnId(),
+            $this->formatDate(
+                $this->_txn->getCreatedAt(),
+                \Magento\Framework\Stdlib\DateTime\TimezoneInterface::FORMAT_TYPE_MEDIUM,
+                true
+            )
+        );
     }
 
     /**
@@ -117,9 +121,7 @@ class Detail extends \Magento\Backend\Block\Widget\Container
             $this->escapeHtml($this->getUrl('sales/transactions/view', array('txn_id' => $this->_txn->getParentId())))
         );
 
-        $this->setParentTxnIdHtml(
-            $this->escapeHtml($this->_txn->getParentTxnId())
-        );
+        $this->setParentTxnIdHtml($this->escapeHtml($this->_txn->getParentTxnId()));
 
         $this->setOrderIncrementIdHtml($this->escapeHtml($this->_txn->getOrder()->getIncrementId()));
 
@@ -129,13 +131,17 @@ class Detail extends \Magento\Backend\Block\Widget\Container
             $this->escapeHtml($this->getUrl('sales/order/view', array('order_id' => $this->_txn->getOrderId())))
         );
 
-        $this->setIsClosedHtml(
-            ($this->_txn->getIsClosed()) ? __('Yes') : __('No')
-        );
+        $this->setIsClosedHtml($this->_txn->getIsClosed() ? __('Yes') : __('No'));
 
-        $createdAt = (strtotime($this->_txn->getCreatedAt()))
-            ? $this->formatDate($this->_txn->getCreatedAt(), \Magento\Stdlib\DateTime\TimezoneInterface::FORMAT_TYPE_MEDIUM, true)
-            : __('N/A');
+        $createdAt = strtotime(
+            $this->_txn->getCreatedAt()
+        ) ? $this->formatDate(
+            $this->_txn->getCreatedAt(),
+            \Magento\Framework\Stdlib\DateTime\TimezoneInterface::FORMAT_TYPE_MEDIUM,
+            true
+        ) : __(
+            'N/A'
+        );
         $this->setCreatedAtHtml($this->escapeHtml($createdAt));
 
         return parent::_toHtml();

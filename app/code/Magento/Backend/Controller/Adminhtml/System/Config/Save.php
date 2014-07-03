@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,8 +28,6 @@ use Magento\Backend\Controller\Adminhtml\System\AbstractConfig;
 /**
  * System Configuration Save Controller
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author     Magento Core Team <core@magentocommerce.com>
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
@@ -45,12 +41,12 @@ class Save extends AbstractConfig
     protected $_configFactory;
 
     /**
-     * @var \Magento\Cache\FrontendInterface
+     * @var \Magento\Framework\Cache\FrontendInterface
      */
     protected $_cache;
 
     /**
-     * @var \Magento\Stdlib\String
+     * @var \Magento\Framework\Stdlib\String
      */
     protected $string;
 
@@ -58,15 +54,15 @@ class Save extends AbstractConfig
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Backend\Model\Config\Structure $configStructure
      * @param \Magento\Backend\Model\Config\Factory $configFactory
-     * @param \Magento\Cache\FrontendInterface $cache
-     * @param \Magento\Stdlib\String $string
+     * @param \Magento\Framework\Cache\FrontendInterface $cache
+     * @param \Magento\Framework\Stdlib\String $string
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Backend\Model\Config\Structure $configStructure,
         \Magento\Backend\Model\Config\Factory $configFactory,
-        \Magento\Cache\FrontendInterface $cache,
-        \Magento\Stdlib\String $string
+        \Magento\Framework\Cache\FrontendInterface $cache,
+        \Magento\Framework\Stdlib\String $string
     ) {
         parent::__construct($context, $configStructure);
         $this->_configFactory = $configFactory;
@@ -90,7 +86,7 @@ class Save extends AbstractConfig
             $this->_saveSection();
             $section = $this->getRequest()->getParam('section');
             $website = $this->getRequest()->getParam('website');
-            $store   = $this->getRequest()->getParam('store');
+            $store = $this->getRequest()->getParam('store');
 
             $configData = array(
                 'section' => $section,
@@ -102,10 +98,8 @@ class Save extends AbstractConfig
             $configModel = $this->_configFactory->create(array('data' => $configData));
             $configModel->save();
 
-            $this->messageManager->addSuccess(
-                __('You saved the configuration.')
-            );
-        } catch (\Magento\Core\Exception $e) {
+            $this->messageManager->addSuccess(__('You saved the configuration.'));
+        } catch (\Magento\Framework\Model\Exception $e) {
             $messages = explode("\n", $e->getMessage());
             foreach ($messages as $message) {
                 $this->messageManager->addError($message);
@@ -187,11 +181,9 @@ class Save extends AbstractConfig
      */
     protected function _saveSection()
     {
-        $method = '_save' . $this->string->upperCaseWords(
-            $this->getRequest()->getParam('section'), '_', ''
-        );
+        $method = '_save' . $this->string->upperCaseWords($this->getRequest()->getParam('section'), '_', '');
         if (method_exists($this, $method)) {
-            $this->$method();
+            $this->{$method}();
         }
     }
 

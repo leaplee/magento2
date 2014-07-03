@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Customer
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -48,7 +46,7 @@ class Carts extends \Magento\Backend\Block\Template
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Customer\Model\Config\Share $shareConfig,
         \Magento\Customer\Service\V1\Data\CustomerBuilder $customerBuilder,
-        array $data = []
+        array $data = array()
     ) {
         $this->_shareConfig = $shareConfig;
         $this->_customerBuilder = $customerBuilder;
@@ -69,7 +67,7 @@ class Carts extends \Magento\Backend\Block\Template
             $block = $this->getLayout()->createBlock(
                 'Magento\Customer\Block\Adminhtml\Edit\Tab\Cart',
                 $blockName,
-                ['data' => ['website_id' => $websiteId]]
+                array('data' => array('website_id' => $websiteId))
             );
             if ($isShared) {
                 $websiteName = $this->_storeManager->getWebsite($websiteId)->getName();
@@ -87,7 +85,7 @@ class Carts extends \Magento\Backend\Block\Template
      */
     protected function _toHtml()
     {
-        $this->_eventManager->dispatch('adminhtml_block_html_before', ['block' => $this]);
+        $this->_eventManager->dispatch('adminhtml_block_html_before', array('block' => $this));
         return $this->getChildHtml();
     }
 
@@ -96,7 +94,8 @@ class Carts extends \Magento\Backend\Block\Template
      */
     protected function _getCustomer()
     {
-        return $this->_customerBuilder
-            ->populateWithArray($this->_backendSession->getCustomerData()['account'])->create();
+        return $this->_customerBuilder->populateWithArray(
+            $this->_backendSession->getCustomerData()['account']
+        )->create();
     }
 }

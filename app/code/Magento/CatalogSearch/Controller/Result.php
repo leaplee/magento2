@@ -18,17 +18,15 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_CatalogSearch
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\CatalogSearch\Controller;
 
-use Magento\App\Action\Action;
-use Magento\App\Action\Context;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
 use Magento\Catalog\Model\Session;
-use Magento\Core\Model\StoreManagerInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Catalog Search Controller
@@ -52,11 +50,8 @@ class Result extends Action
      * @param Session $catalogSession
      * @param StoreManagerInterface $storeManager
      */
-    public function __construct(
-        Context $context,
-        Session $catalogSession,
-        StoreManagerInterface $storeManager
-    ) {
+    public function __construct(Context $context, Session $catalogSession, StoreManagerInterface $storeManager)
+    {
         $this->_storeManager = $storeManager;
         $this->_catalogSession = $catalogSession;
         parent::__construct($context);
@@ -76,9 +71,7 @@ class Result extends Action
 
         if ($query->getQueryText() != '') {
             if ($this->_objectManager->get('Magento\CatalogSearch\Helper\Data')->isMinQueryLength()) {
-                $query->setId(0)
-                    ->setIsActive(1)
-                    ->setIsProcessed(1);
+                $query->setId(0)->setIsActive(1)->setIsProcessed(1);
             } else {
                 if ($query->getId()) {
                     $query->setPopularity($query->getPopularity() + 1);

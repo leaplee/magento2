@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Tax
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,13 +26,11 @@
 /**
  * Tax rate resource model
  *
- * @category    Magento
- * @package     Magento_Tax
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Tax\Model\Resource\Calculation;
 
-class Rate extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Rate extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
      * Resource initialization
@@ -53,10 +49,7 @@ class Rate extends \Magento\Core\Model\Resource\Db\AbstractDb
      */
     protected function _initUniqueFields()
     {
-        $this->_uniqueFields = array(array(
-            'field' => array('code'),
-            'title' => __('Code'),
-        ));
+        $this->_uniqueFields = array(array('field' => array('code'), 'title' => __('Code')));
         return $this;
     }
 
@@ -80,9 +73,13 @@ class Rate extends \Magento\Core\Model\Resource\Db\AbstractDb
     public function isInRule($rateId)
     {
         $adapter = $this->_getReadAdapter();
-        $select  = $adapter->select()
-            ->from($this->getTable('tax_calculation'), array('tax_calculation_rate_id'))
-            ->where('tax_calculation_rate_id = ?', $rateId);
+        $select = $adapter->select()->from(
+            $this->getTable('tax_calculation'),
+            array('tax_calculation_rate_id')
+        )->where(
+            'tax_calculation_rate_id = ?',
+            $rateId
+        );
         return $adapter->fetchCol($select);
     }
 }

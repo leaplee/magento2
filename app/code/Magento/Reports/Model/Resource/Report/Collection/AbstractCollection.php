@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Reports
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,62 +26,60 @@
 /**
  * Report collection abstract model
  *
- * @category    Magento
- * @package     Magento_Reports
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Reports\Model\Resource\Report\Collection;
 
-class AbstractCollection extends \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+class AbstractCollection extends \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
 {
     /**
      * From date
      *
      * @var string
      */
-    protected $_from               = null;
+    protected $_from = null;
 
     /**
      * To date
      *
      * @var string
      */
-    protected $_to                 = null;
+    protected $_to = null;
 
     /**
      * Period
      *
      * @var string
      */
-    protected $_period             = null;
+    protected $_period = null;
 
     /**
      * Store ids
      *
      * @var int|array
      */
-    protected $_storesIds          = 0;
+    protected $_storesIds = 0;
 
     /**
      * Is totals
      *
      * @var bool
      */
-    protected $_isTotals           = false;
+    protected $_isTotals = false;
 
     /**
      * Is subtotals
      *
      * @var bool
      */
-    protected $_isSubTotals        = false;
+    protected $_isSubTotals = false;
 
     /**
      * Aggregated columns
      *
      * @var array
      */
-    protected $_aggregatedColumns  = array();
+    protected $_aggregatedColumns = array();
 
     /**
      * Set array of columns that should be aggregated
@@ -117,7 +113,7 @@ class AbstractCollection extends \Magento\Core\Model\Resource\Db\Collection\Abst
     public function setDateRange($from = null, $to = null)
     {
         $this->_from = $from;
-        $this->_to   = $to;
+        $this->_to = $to;
         return $this;
     }
 
@@ -172,7 +168,7 @@ class AbstractCollection extends \Magento\Core\Model\Resource\Db\Collection\Abst
     protected function _applyStoresFilterToSelect(\Zend_Db_Select $select)
     {
         $nullCheck = false;
-        $storeIds  = $this->_storesIds;
+        $storeIds = $this->_storesIds;
 
         if (!is_array($storeIds)) {
             $storeIds = array($storeIds);

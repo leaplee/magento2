@@ -21,8 +21,8 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\CatalogInventory\Model\Quote\Item\QuantityValidator\Initializer;
+
 use Magento\CatalogInventory\Model\Quote\Item\QuantityValidator\QuoteItemQtyList;
 
 class Option
@@ -47,9 +47,9 @@ class Option
      * @param \Magento\Sales\Model\Quote\Item $quoteItem
      * @param int $qty
      *
-     * @return \Magento\Object
+     * @return \Magento\Framework\Object
      *
-     * @throws \Magento\Core\Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     public function initialize(
         \Magento\Sales\Model\Quote\Item\Option $option,
@@ -64,7 +64,7 @@ class Option
         $stockItem = $option->getProduct()->getStockItem();
 
         if (!$stockItem instanceof \Magento\CatalogInventory\Model\Stock\Item) {
-            throw new \Magento\Core\Exception(__('The stock item for Product in option is not valid.'));
+            throw new \Magento\Framework\Model\Exception(__('The stock item for Product in option is not valid.'));
         }
 
         /**
@@ -79,6 +79,7 @@ class Option
         $qtyForCheck = $this->quoteItemQtyList->getQty(
             $option->getProduct()->getId(),
             $quoteItem->getId(),
+            $quoteItem->getQuoteId(),
             $increaseOptionQty
         );
 
@@ -109,4 +110,4 @@ class Option
 
         return $result;
     }
-} 
+}

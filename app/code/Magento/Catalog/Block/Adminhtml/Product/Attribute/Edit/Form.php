@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,15 +25,12 @@
 /**
  * Product attribute add/edit form block
  *
- * @category   Magento
- * @package    Magento_Catalog
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-
 namespace Magento\Catalog\Block\Adminhtml\Product\Attribute\Edit;
 
 use Magento\Backend\Block\Widget\Form\Generic;
-use Magento\Data\Form as DataForm;
+use Magento\Framework\Data\Form as DataForm;
 
 class Form extends Generic
 {
@@ -45,16 +40,11 @@ class Form extends Generic
     protected function _prepareForm()
     {
         /** @var DataForm $form */
-        $form = $this->_formFactory->create(array(
-            'data' => array(
-                'id' => 'edit_form',
-                'action' => $this->getData('action'),
-                'method' => 'post',
-            ))
+        $form = $this->_formFactory->create(
+            array('data' => array('id' => 'edit_form', 'action' => $this->getData('action'), 'method' => 'post'))
         );
         $form->setUseContainer(true);
         $this->setForm($form);
         return parent::_prepareForm();
     }
-
 }

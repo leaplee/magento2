@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Catalog\Model\Resource\Product\Link\Product;
 /**
  * Catalog product linked products collection
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Collection extends \Magento\Catalog\Model\Resource\Product\Collection
@@ -67,7 +63,7 @@ class Collection extends \Magento\Catalog\Model\Resource\Product\Collection
      *
      * @var bool
      */
-    protected $_hasLinkFilter  = false;
+    protected $_hasLinkFilter = false;
 
     /**
      * Declare link model and initialize type attributes join
@@ -116,6 +112,7 @@ class Collection extends \Magento\Catalog\Model\Resource\Product\Collection
         $this->_product = $product;
         if ($product && $product->getId()) {
             $this->_hasLinkFilter = true;
+            $this->setStore($product->getStore());
         }
         return $this;
     }
@@ -210,7 +207,7 @@ class Collection extends \Magento\Catalog\Model\Resource\Product\Collection
      */
     protected function _joinLinks()
     {
-        $select  = $this->getSelect();
+        $select = $this->getSelect();
         $adapter = $select->getAdapter();
 
         $joinCondition = array(
@@ -230,8 +227,8 @@ class Collection extends \Magento\Catalog\Model\Resource\Product\Collection
         } else if ($this->_isStrongMode) {
             $this->addFieldToFilter('entity_id', array('eq' => -1));
         }
-        if($this->_hasLinkFilter) {
-            $select->$joinType(
+        if ($this->_hasLinkFilter) {
+            $select->{$joinType}(
                 array('links' => $this->getTable('catalog_product_link')),
                 implode(' AND ', $joinCondition),
                 array('link_id')
@@ -263,13 +260,13 @@ class Collection extends \Magento\Catalog\Model\Resource\Product\Collection
      */
     public function setAttributeSetIdOrder($dir = self::SORT_ORDER_ASC)
     {
-        $this->getSelect()
-            ->joinLeft(
-                array('set' => $this->getTable('eav_attribute_set')),
-                'e.attribute_set_id = set.attribute_set_id',
-                array('attribute_set_name')
-            )
-            ->order('set.attribute_set_name ' . $dir);
+        $this->getSelect()->joinLeft(
+            array('set' => $this->getTable('eav_attribute_set')),
+            'e.attribute_set_id = set.attribute_set_id',
+            array('attribute_set_name')
+        )->order(
+            'set.attribute_set_name ' . $dir
+        );
         return $this;
     }
 

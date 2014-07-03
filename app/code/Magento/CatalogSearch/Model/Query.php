@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_CatalogSearch
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -29,13 +27,13 @@ use Magento\CatalogSearch\Model\Resource\Query\Collection as QueryCollection;
 use Magento\CatalogSearch\Model\Resource\Query\CollectionFactory as QueryCollectionFactory;
 use Magento\CatalogSearch\Model\Resource\Search\Collection;
 use Magento\CatalogSearch\Model\Resource\Search\CollectionFactory;
-use Magento\Core\Model\AbstractModel;
-use Magento\Model\Context;
-use Magento\Registry;
-use Magento\Core\Model\Resource\AbstractResource;
-use Magento\Core\Model\Store\Config;
-use Magento\Core\Model\StoreManagerInterface;
-use Magento\Data\Collection\Db;
+use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Registry;
+use Magento\Framework\Model\Resource\AbstractResource;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Data\Collection\Db;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 
 /**
@@ -61,10 +59,6 @@ use Magento\Eav\Model\Entity\Collection\AbstractCollection;
  * @method \Magento\CatalogSearch\Model\Query setIsProcessed(int $value)
  * @method string getUpdatedAt()
  * @method \Magento\CatalogSearch\Model\Query setUpdatedAt(string $value)
- *
- * @category    Magento
- * @package     Magento_CatalogSearch
- * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Query extends AbstractModel
 {
@@ -82,17 +76,20 @@ class Query extends AbstractModel
      */
     protected $_eventObject = 'catalogsearch_query';
 
-    const CACHE_TAG                     = 'SEARCH_QUERY';
-    const XML_PATH_MIN_QUERY_LENGTH     = 'catalog/search/min_query_length';
-    const XML_PATH_MAX_QUERY_LENGTH     = 'catalog/search/max_query_length';
-    const XML_PATH_MAX_QUERY_WORDS      = 'catalog/search/max_query_words';
+    const CACHE_TAG = 'SEARCH_QUERY';
+
+    const XML_PATH_MIN_QUERY_LENGTH = 'catalog/search/min_query_length';
+
+    const XML_PATH_MAX_QUERY_LENGTH = 'catalog/search/max_query_length';
+
+    const XML_PATH_MAX_QUERY_WORDS = 'catalog/search/max_query_words';
 
     /**
      * Core store config
      *
-     * @var Config
+     * @var ScopeConfigInterface
      */
-    protected $_coreStoreConfig;
+    protected $_scopeConfig;
 
     /**
      * Store manager
@@ -118,23 +115,23 @@ class Query extends AbstractModel
     /**
      * Construct
      *
-     * @param Context $context
+     * @param \Magento\Framework\Model\Context $context
      * @param Registry $registry
      * @param QueryCollectionFactory $queryCollectionFactory
      * @param CollectionFactory $searchCollectionFactory
      * @param StoreManagerInterface $storeManager
-     * @param Config $coreStoreConfig
-     * @param AbstractResource $resource
+     * @param Config $scopeConfig
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
      * @param Db $resourceCollection
      * @param array $data
      */
     public function __construct(
-        Context $context,
+        \Magento\Framework\Model\Context $context,
         Registry $registry,
         QueryCollectionFactory $queryCollectionFactory,
         CollectionFactory $searchCollectionFactory,
         StoreManagerInterface $storeManager,
-        Config $coreStoreConfig,
+        ScopeConfigInterface $scopeConfig,
         AbstractResource $resource = null,
         Db $resourceCollection = null,
         array $data = array()
@@ -142,7 +139,7 @@ class Query extends AbstractModel
         $this->_queryCollectionFactory = $queryCollectionFactory;
         $this->_searchCollectionFactory = $searchCollectionFactory;
         $this->_storeManager = $storeManager;
-        $this->_coreStoreConfig = $coreStoreConfig;
+        $this->_scopeConfig = $scopeConfig;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
     }
 
@@ -182,10 +179,7 @@ class Query extends AbstractModel
                 $text = $this->getQueryText();
             }
 
-            $collection->addSearchFilter($text)
-                ->addStoreFilter()
-                ->addMinimalPrice()
-                ->addTaxPercents();
+            $collection->addSearchFilter($text)->addStoreFilter()->addMinimalPrice()->addTaxPercents();
             $this->setData('result_collection', $collection);
         }
         return $collection;
@@ -200,9 +194,11 @@ class Query extends AbstractModel
     {
         $collection = $this->getData('suggest_collection');
         if (is_null($collection)) {
-            $collection = $this->_queryCollectionFactory->create()
-                ->setStoreId($this->getStoreId())
-                ->setQueryFilter($this->getQueryText());
+            $collection = $this->_queryCollectionFactory->create()->setStoreId(
+                $this->getStoreId()
+            )->setQueryFilter(
+                $this->getQueryText()
+            );
             $this->setData('suggest_collection', $collection);
         }
         return $collection;
@@ -254,7 +250,7 @@ class Query extends AbstractModel
      */
     public function getStoreId()
     {
-        if (!$storeId = $this->getData('store_id')) {
+        if (!($storeId = $this->getData('store_id'))) {
             $storeId = $this->_storeManager->getStore()->getId();
         }
         return $storeId;
@@ -284,7 +280,11 @@ class Query extends AbstractModel
      */
     public function getMinQueryLength()
     {
-        return $this->_coreStoreConfig->getConfig(self::XML_PATH_MIN_QUERY_LENGTH, $this->getStoreId());
+        return $this->_scopeConfig->getValue(
+            self::XML_PATH_MIN_QUERY_LENGTH,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStoreId()
+        );
     }
 
     /**
@@ -294,7 +294,11 @@ class Query extends AbstractModel
      */
     public function getMaxQueryLength()
     {
-        return $this->_coreStoreConfig->getConfig(self::XML_PATH_MAX_QUERY_LENGTH, $this->getStoreId());
+        return $this->_scopeConfig->getValue(
+            self::XML_PATH_MAX_QUERY_LENGTH,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStoreId()
+        );
     }
 
     /**
@@ -304,6 +308,10 @@ class Query extends AbstractModel
      */
     public function getMaxQueryWords()
     {
-        return $this->_coreStoreConfig->getConfig(self::XML_PATH_MAX_QUERY_WORDS, $this->getStoreId());
+        return $this->_scopeConfig->getValue(
+            self::XML_PATH_MAX_QUERY_WORDS,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStoreId()
+        );
     }
 }

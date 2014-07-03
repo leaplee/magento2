@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Webapi\Model\Config\ClassReflector;
 
 use Zend\Code\Reflection\ClassReflection;
@@ -31,9 +30,6 @@ use Zend\Code\Reflection\ClassReflection;
  */
 class TypeProcessor
 {
-    /** @var \Magento\Webapi\Helper\Data */
-    protected $_helper;
-
     /**
      * Array of types data.
      * <pre>array(
@@ -66,16 +62,6 @@ class TypeProcessor
      * @var array
      */
     protected $_typeToClassMap = array();
-
-    /**
-     * Construct type processor.
-     *
-     * @param \Magento\Webapi\Helper\Data $helper
-     */
-    public function __construct(\Magento\Webapi\Helper\Data $helper)
-    {
-        $this->_helper = $helper;
-    }
 
     /**
      * Retrieve processed types data.
@@ -191,9 +177,10 @@ class TypeProcessor
         $isGetter = (strpos($methodReflection->getName(), 'get') === 0)
             || (strpos($methodReflection->getName(), 'is') === 0)
             || (strpos($methodReflection->getName(), 'has') === 0);
-        if ($isGetter) {
+        /** Field will not be added to WSDL if getter has params */
+        if ($isGetter && !$methodReflection->getNumberOfParameters()) {
             $returnMetadata = $this->getGetterReturnType($methodReflection);
-            $fieldName = $this->_helper->dataObjectGetterNameToFieldName($methodReflection->getName());
+            $fieldName = $this->dataObjectGetterNameToFieldName($methodReflection->getName());
             $this->_types[$typeName]['parameters'][$fieldName] = array(
                 'type' => $this->process($returnMetadata['type']),
                 'required' => $returnMetadata['isRequired'],
@@ -221,6 +208,29 @@ class TypeProcessor
         $description .= ltrim($longDescription);
 
         return $description;
+    }
+
+    /**
+     * Convert Data Object getter name into field name.
+     *
+     * @param string $getterName
+     * @return string
+     */
+    public function dataObjectGetterNameToFieldName($getterName)
+    {
+        if ((strpos($getterName, 'get') === 0)) {
+            /** Remove 'get' prefix and make the first letter lower case */
+            $fieldName = substr($getterName, strlen('get'));
+        } elseif ((strpos($getterName, 'is') === 0)) {
+            /** Remove 'is' prefix and make the first letter lower case */
+            $fieldName = substr($getterName, strlen('is'));
+        } elseif ((strpos($getterName, 'has') === 0)) {
+            /** Remove 'has' prefix and make the first letter lower case */
+            $fieldName = substr($getterName, strlen('has'));
+        } else {
+            $fieldName = $getterName;
+        }
+        return lcfirst($fieldName);
     }
 
     /**
@@ -254,7 +264,7 @@ class TypeProcessor
          * \Magento\Webapi\Service\Entity\SimpleData instead of \Magento\Webapi\Service\Entity\SimpleData[]
          */
         $escapedReturnType = str_replace('\\', '\\\\', $returnType);
-        if (preg_match("/.*\@return\s+({$escapedReturnType}\[\]).*/i", $methodDocBlock->getContents(), $matches)) {
+        if (preg_match("/.*\\@return\\s+({$escapedReturnType}\\[\\]).*/i", $methodDocBlock->getContents(), $matches)) {
             $returnType = $matches[1];
         }
         $isRequired = preg_match("/.*\@return\s+\S+\|null.*/i", $methodDocBlock->getContents(), $matches)
@@ -338,8 +348,8 @@ class TypeProcessor
      *
      * Example:
      * <pre>
-     *  Magento_Customer_Service_CustomerData => CustomerData
-     *  Magento_Catalog_Service_ProductData => CatalogProductData
+     *  \Magento\Customer\Service\V1\Data\Customer => CustomerV1DataCustomer
+     *  \Magento\Catalog\Service\V2\Data\Product => CatalogV2DataProduct
      * </pre>
      *
      * @param string $class

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,8 +25,6 @@
 /**
  * Category edit general tab
  *
- * @category   Magento
- * @package    Magento_Catalog
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Catalog\Block\Adminhtml\Category\Tab;
@@ -66,41 +62,32 @@ class General extends \Magento\Catalog\Block\Adminhtml\Form
     public function _prepareLayout()
     {
         parent::_prepareLayout();
-        /** @var \Magento\Data\Form $form */
+        /** @var \Magento\Framework\Data\Form $form */
         $form = $this->_formFactory->create();
         $form->setHtmlIdPrefix('_general');
         $form->setDataObject($this->getCategory());
 
-        $fieldset = $form->addFieldset('base_fieldset', array('legend'=>__('General Information')));
+        $fieldset = $form->addFieldset('base_fieldset', array('legend' => __('General Information')));
 
         if (!$this->getCategory()->getId()) {
-//            $fieldset->addField('path', 'select', array(
-//                'name'  => 'path',
-//                'label' => __('Parent Category'),
-//                'value' => base64_decode($this->getRequest()->getParam('parent')),
-//                'values'=> $this->_getParentCategoryOptions(),
-//                //'required' => true,
-//                //'class' => 'required-entry'
-//                ),
-//                'name'
-//            );
+            //            $fieldset->addField('path', 'select', array(
+            //                'name'  => 'path',
+            //                'label' => __('Parent Category'),
+            //                'value' => base64_decode($this->getRequest()->getParam('parent')),
+            //                'values'=> $this->_getParentCategoryOptions(),
+            //                //'required' => true,
+            //                //'class' => 'required-entry'
+            //                ),
+            //                'name'
+            //            );
             $parentId = $this->getRequest()->getParam('parent');
             if (!$parentId) {
                 $parentId = \Magento\Catalog\Model\Category::TREE_ROOT_ID;
             }
-            $fieldset->addField('path', 'hidden', array(
-                'name'  => 'path',
-                'value' => $parentId
-            ));
+            $fieldset->addField('path', 'hidden', array('name' => 'path', 'value' => $parentId));
         } else {
-            $fieldset->addField('id', 'hidden', array(
-                'name'  => 'id',
-                'value' => $this->getCategory()->getId()
-            ));
-            $fieldset->addField('path', 'hidden', array(
-                'name'  => 'path',
-                'value' => $this->getCategory()->getPath()
-            ));
+            $fieldset->addField('id', 'hidden', array('name' => 'id', 'value' => $this->getCategory()->getId()));
+            $fieldset->addField('path', 'hidden', array('name' => 'path', 'value' => $this->getCategory()->getPath()));
         }
 
         $this->_setFieldset($this->getCategory()->getAttributes(true), $fieldset);
@@ -108,10 +95,11 @@ class General extends \Magento\Catalog\Block\Adminhtml\Form
         if ($this->getCategory()->getId()) {
             if ($this->getCategory()->getLevel() == 1) {
                 $fieldset->removeField('url_key');
-                $fieldset->addField('url_key', 'hidden', array(
-                    'name'  => 'url_key',
-                    'value' => $this->getCategory()->getUrlKey()
-                ));
+                $fieldset->addField(
+                    'url_key',
+                    'hidden',
+                    array('name' => 'url_key', 'value' => $this->getCategory()->getUrlKey())
+                );
             }
         }
 
@@ -134,7 +122,7 @@ class General extends \Magento\Catalog\Block\Adminhtml\Form
      * @param array &$options
      * @return array
      */
-    protected function _getParentCategoryOptions($node=null, &$options=array())
+    protected function _getParentCategoryOptions($node = null, &$options = array())
     {
         if (is_null($node)) {
             $node = $this->getRoot();
@@ -142,8 +130,8 @@ class General extends \Magento\Catalog\Block\Adminhtml\Form
 
         if ($node) {
             $options[] = array(
-               'value' => $node->getPathId(),
-               'label' => str_repeat('&nbsp;', max(0, 3*($node->getLevel()))) . $this->escapeHtml($node->getName()),
+                'value' => $node->getPathId(),
+                'label' => str_repeat('&nbsp;', max(0, 3 * $node->getLevel())) . $this->escapeHtml($node->getName())
             );
 
             foreach ($node->getChildren() as $child) {
@@ -152,6 +140,4 @@ class General extends \Magento\Catalog\Block\Adminhtml\Form
         }
         return $options;
     }
-
 }
-

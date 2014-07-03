@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Customer\Service\V1\Data\Eav;
 
 use Magento\Customer\Service\V1\Data\Eav\Option;
@@ -35,7 +34,9 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorAndGetters()
     {
-        $optionBuilder = (new OptionBuilder())->setLabel(self::LABEL)->setValue(self::VALUE);
+        $helper = new \Magento\TestFramework\Helper\ObjectManager($this);
+        $optionBuilder = $helper->getObject('\Magento\Customer\Service\V1\Data\Eav\OptionBuilder')
+            ->setLabel(self::LABEL)->setValue(self::VALUE);
         $option = new Option($optionBuilder);
         $this->assertSame(self::LABEL, $option->getLabel());
         $this->assertSame(self::VALUE, $option->getValue());

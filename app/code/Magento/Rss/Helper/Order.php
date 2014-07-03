@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Rss
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,12 +28,12 @@ namespace Magento\Rss\Helper;
  *
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Order extends \Magento\App\Helper\AbstractHelper
+class Order extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
-     * @var \Magento\Core\Model\Store\Config
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_storeConfig;
+    protected $_scopeConfig;
 
     /**
      * @var \Magento\Sales\Model\OrderFactory
@@ -43,16 +41,16 @@ class Order extends \Magento\App\Helper\AbstractHelper
     protected $_orderFactory;
 
     /**
-     * @param \Magento\App\Helper\Context $context
-     * @param \Magento\Core\Model\Store\Config $storeConfig
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
      */
     public function __construct(
-        \Magento\App\Helper\Context $context,
-        \Magento\Core\Model\Store\Config $storeConfig,
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Sales\Model\OrderFactory $orderFactory
     ) {
-        $this->_storeConfig = $storeConfig;
+        $this->_scopeConfig = $scopeConfig;
         $this->_orderFactory = $orderFactory;
         parent::__construct($context);
     }
@@ -64,7 +62,7 @@ class Order extends \Magento\App\Helper\AbstractHelper
      */
     public function isStatusNotificationAllow()
     {
-        if ($this->_storeConfig->getConfig('rss/order/status_notified')) {
+        if ($this->_scopeConfig->getValue('rss/order/status_notified', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
             return true;
         }
         return false;
@@ -78,7 +76,8 @@ class Order extends \Magento\App\Helper\AbstractHelper
      */
     public function getStatusHistoryRssUrl($order)
     {
-        return $this->_getUrl('rss/order/status',
+        return $this->_getUrl(
+            'rss/order/status',
             array('_secure' => true, '_query' => array('data' => $this->getStatusUrlKey($order)))
         );
     }
@@ -97,7 +96,6 @@ class Order extends \Magento\App\Helper\AbstractHelper
             'customer_id' => $order->getCustomerId()
         );
         return base64_encode(json_encode($data));
-
     }
 
     /**
@@ -109,8 +107,15 @@ class Order extends \Magento\App\Helper\AbstractHelper
     public function getOrderByStatusUrlKey($key)
     {
         $data = json_decode(base64_decode($key), true);
-        if (!is_array($data) || !isset($data['order_id']) || !isset($data['increment_id'])
-            || !isset($data['customer_id'])
+        if (!is_array(
+            $data
+        ) || !isset(
+            $data['order_id']
+        ) || !isset(
+            $data['increment_id']
+        ) || !isset(
+            $data['customer_id']
+        )
         ) {
             return null;
         }
@@ -118,9 +123,9 @@ class Order extends \Magento\App\Helper\AbstractHelper
         /** @var $order \Magento\Sales\Model\Order */
         $order = $this->_orderFactory->create();
         $order->load($data['order_id']);
-        if ($order->getId()
-            && $order->getIncrementId() == $data['increment_id']
-            && $order->getCustomerId() == $data['customer_id']
+        if ($order->getId() &&
+            $order->getIncrementId() == $data['increment_id'] &&
+            $order->getCustomerId() == $data['customer_id']
         ) {
             return $order;
         }

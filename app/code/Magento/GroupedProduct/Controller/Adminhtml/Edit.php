@@ -21,13 +21,12 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\GroupedProduct\Controller\Adminhtml;
 
 class Edit extends \Magento\Backend\App\AbstractAction
 {
     /**
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $registry;
 
@@ -37,21 +36,21 @@ class Edit extends \Magento\Backend\App\AbstractAction
     protected $factory;
 
     /**
-     * @var \Magento\Logger
+     * @var \Magento\Framework\Logger
      */
     protected $logger;
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Registry $registry
      * @param \Magento\Catalog\Model\ProductFactory $factory
-     * @param \Magento\Logger $logger
+     * @param \Magento\Framework\Logger $logger
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\Registry $registry,
         \Magento\Catalog\Model\ProductFactory $factory,
-        \Magento\Logger $logger
+        \Magento\Framework\Logger $logger
     ) {
         $this->registry = $registry;
         $this->factory = $factory;
@@ -76,7 +75,7 @@ class Edit extends \Magento\Backend\App\AbstractAction
      */
     public function popupAction()
     {
-        $productId  = (int)$this->getRequest()->getParam('id');
+        $productId = (int)$this->getRequest()->getParam('id');
 
         /** @var $product \Magento\Catalog\Model\Product */
         $product = $this->factory->create();

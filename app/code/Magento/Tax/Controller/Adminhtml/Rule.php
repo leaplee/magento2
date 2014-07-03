@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Tax
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,8 +25,6 @@
 /**
  * Tax rule controller
  *
- * @category   Magento
- * @package    Magento_Tax
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Tax\Controller\Adminhtml;
@@ -40,23 +36,23 @@ class Rule extends \Magento\Backend\App\Action
     /**
      * Core registry
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Registry $coreRegistry
+     * @param \Magento\Framework\Registry $coreRegistry
      */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Registry $coreRegistry
-    ) {
+    public function __construct(\Magento\Backend\App\Action\Context $context, \Magento\Framework\Registry $coreRegistry)
+    {
         $this->_coreRegistry = $coreRegistry;
         parent::__construct($context);
     }
 
     /**
+     * Index action
+     *
      * @return $this
      */
     public function indexAction()
@@ -69,6 +65,8 @@ class Rule extends \Magento\Backend\App\Action
     }
 
     /**
+     * Redirects to edit action
+     *
      * @return void
      */
     public function newAction()
@@ -77,14 +75,16 @@ class Rule extends \Magento\Backend\App\Action
     }
 
     /**
+     * Edit action
+     *
      * @return void
      */
     public function editAction()
     {
         $this->_title->add(__('Tax Rules'));
 
-        $taxRuleId  = $this->getRequest()->getParam('rule');
-        $ruleModel  = $this->_objectManager->create('Magento\Tax\Model\Calculation\Rule');
+        $taxRuleId = $this->getRequest()->getParam('rule');
+        $ruleModel = $this->_objectManager->create('Magento\Tax\Model\Calculation\Rule');
         if ($taxRuleId) {
             $ruleModel->load($taxRuleId);
             if (!$ruleModel->getId()) {
@@ -104,12 +104,16 @@ class Rule extends \Magento\Backend\App\Action
 
         $this->_coreRegistry->register('tax_rule', $ruleModel);
 
-        $this->_initAction()
-            ->_addBreadcrumb($taxRuleId ? __('Edit Rule') :  __('New Rule'), $taxRuleId ?  __('Edit Rule') :  __('New Rule'));
+        $this->_initAction()->_addBreadcrumb(
+            $taxRuleId ? __('Edit Rule') : __('New Rule'),
+            $taxRuleId ? __('Edit Rule') : __('New Rule')
+        );
         $this->_view->renderLayout();
     }
 
     /**
+     * Save action
+     *
      * @return void
      */
     public function saveAction()
@@ -119,6 +123,7 @@ class Rule extends \Magento\Backend\App\Action
 
             $ruleModel = $this->_objectManager->get('Magento\Tax\Model\Calculation\Rule');
             $ruleModel->setData($postData);
+            $ruleModel->setCalculateSubtotal($this->getRequest()->getParam('calculate_subtotal', 0));
 
             try {
                 $ruleModel->save();
@@ -132,7 +137,7 @@ class Rule extends \Magento\Backend\App\Action
 
                 $this->_redirect('tax/*/');
                 return;
-            } catch (\Magento\Core\Exception $e) {
+            } catch (\Magento\Framework\Model\Exception $e) {
                 $this->messageManager->addError($e->getMessage());
             } catch (\Exception $e) {
                 $this->messageManager->addError(__('Something went wrong saving this tax rule.'));
@@ -146,13 +151,14 @@ class Rule extends \Magento\Backend\App\Action
     }
 
     /**
+     * Delete action
+     *
      * @return void
      */
     public function deleteAction()
     {
         $ruleId = (int)$this->getRequest()->getParam('rule');
-        $ruleModel = $this->_objectManager->get('Magento\Tax\Model\Calculation\Rule')
-            ->load($ruleId);
+        $ruleModel = $this->_objectManager->get('Magento\Tax\Model\Calculation\Rule')->load($ruleId);
         if (!$ruleModel->getId()) {
             $this->messageManager->addError(__('This rule no longer exists'));
             $this->_redirect('tax/*/');
@@ -166,7 +172,7 @@ class Rule extends \Magento\Backend\App\Action
             $this->_redirect('tax/*/');
 
             return;
-        } catch (\Magento\Core\Exception $e) {
+        } catch (\Magento\Framework\Model\Exception $e) {
             $this->messageManager->addError($e->getMessage());
         } catch (\Exception $e) {
             $this->messageManager->addError(__('Something went wrong deleting this tax rule.'));
@@ -183,13 +189,21 @@ class Rule extends \Magento\Backend\App\Action
     protected function _initAction()
     {
         $this->_view->loadLayout();
-        $this->_setActiveMenu('Magento_Tax::sales_tax_rules')
-            ->_addBreadcrumb(__('Tax'), __('Tax'))
-            ->_addBreadcrumb(__('Tax Rules'), __('Tax Rules'));
+        $this->_setActiveMenu(
+            'Magento_Tax::sales_tax_rules'
+        )->_addBreadcrumb(
+            __('Tax'),
+            __('Tax')
+        )->_addBreadcrumb(
+            __('Tax Rules'),
+            __('Tax Rules')
+        );
         return $this;
     }
 
     /**
+     * Check if sales rule is allowed
+     *
      * @return bool
      */
     protected function _isAllowed()

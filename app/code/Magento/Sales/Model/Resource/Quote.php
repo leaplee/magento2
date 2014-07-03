@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -36,13 +34,13 @@ class Quote extends AbstractResource
     protected $_config;
 
     /**
-     * @param \Magento\App\Resource $resource
-     * @param \Magento\Stdlib\DateTime $dateTime
+     * @param \Magento\Framework\App\Resource $resource
+     * @param \Magento\Framework\Stdlib\DateTime $dateTime
      * @param \Magento\Eav\Model\Config $config
      */
     public function __construct(
-        \Magento\App\Resource $resource,
-        \Magento\Stdlib\DateTime $dateTime,
+        \Magento\Framework\App\Resource $resource,
+        \Magento\Framework\Stdlib\DateTime $dateTime,
         \Magento\Eav\Model\Config $config
     ) {
         parent::__construct($resource, $dateTime);
@@ -64,12 +62,12 @@ class Quote extends AbstractResource
      *
      * @param string $field
      * @param mixed $value
-     * @param \Magento\Core\Model\AbstractModel $object
-     * @return \Magento\DB\Select
+     * @param \Magento\Framework\Model\AbstractModel $object
+     * @return \Magento\Framework\DB\Select
      */
     protected function _getLoadSelect($field, $value, $object)
     {
-        $select   = parent::_getLoadSelect($field, $value, $object);
+        $select = parent::_getLoadSelect($field, $value, $object);
         $storeIds = $object->getSharedStoreIds();
         if ($storeIds) {
             $select->where('store_id IN (?)', $storeIds);
@@ -93,12 +91,20 @@ class Quote extends AbstractResource
     public function loadByCustomerId($quote, $customerId)
     {
         $adapter = $this->_getReadAdapter();
-        $select  = $this->_getLoadSelect('customer_id', $customerId, $quote)
-            ->where('is_active = ?', 1)
-            ->order('updated_at ' . \Magento\DB\Select::SQL_DESC)
-            ->limit(1);
+        $select = $this->_getLoadSelect(
+            'customer_id',
+            $customerId,
+            $quote
+        )->where(
+            'is_active = ?',
+            1
+        )->order(
+            'updated_at ' . \Magento\Framework\DB\Select::SQL_DESC
+        )->limit(
+            1
+        );
 
-        $data    = $adapter->fetchRow($select);
+        $data = $adapter->fetchRow($select);
 
         if ($data) {
             $quote->setData($data);
@@ -119,10 +125,9 @@ class Quote extends AbstractResource
     public function loadActive($quote, $quoteId)
     {
         $adapter = $this->_getReadAdapter();
-        $select  = $this->_getLoadSelect('entity_id', $quoteId, $quote)
-            ->where('is_active = ?', 1);
+        $select = $this->_getLoadSelect('entity_id', $quoteId, $quote)->where('is_active = ?', 1);
 
-        $data    = $adapter->fetchRow($select);
+        $data = $adapter->fetchRow($select);
         if ($data) {
             $quote->setData($data);
         }
@@ -165,8 +170,7 @@ class Quote extends AbstractResource
     public function getReservedOrderId($quote)
     {
         $storeId = (int)$quote->getStoreId();
-        return $this->_config->getEntityType(\Magento\Sales\Model\Order::ENTITY)
-            ->fetchNewIncrementId($storeId);
+        return $this->_config->getEntityType(\Magento\Sales\Model\Order::ENTITY)->fetchNewIncrementId($storeId);
     }
 
     /**
@@ -177,11 +181,10 @@ class Quote extends AbstractResource
      */
     public function isOrderIncrementIdUsed($orderIncrementId)
     {
-        $adapter   = $this->_getReadAdapter();
-        $bind      = array(':increment_id' => $orderIncrementId);
-        $select    = $adapter->select();
-        $select->from($this->getTable('sales_flat_order'), 'entity_id')
-            ->where('increment_id = :increment_id');
+        $adapter = $this->_getReadAdapter();
+        $bind = array(':increment_id' => $orderIncrementId);
+        $select = $adapter->select();
+        $select->from($this->getTable('sales_flat_order'), 'entity_id')->where('increment_id = :increment_id');
         $entity_id = $adapter->fetchOne($select, $bind);
         if ($entity_id > 0) {
             return true;
@@ -198,12 +201,17 @@ class Quote extends AbstractResource
     public function markQuotesRecollectOnCatalogRules()
     {
         $tableQuote = $this->getTable('sales_flat_quote');
-        $subSelect = $this->_getReadAdapter()
-            ->select()
-            ->from(array('t2' => $this->getTable('sales_flat_quote_item')), array('entity_id' => 'quote_id'))
-            ->from(array('t3' => $this->getTable('catalogrule_product_price')), array())
-            ->where('t2.product_id = t3.product_id')
-            ->group('quote_id');
+        $subSelect = $this->_getReadAdapter()->select()->from(
+            array('t2' => $this->getTable('sales_flat_quote_item')),
+            array('entity_id' => 'quote_id')
+        )->from(
+            array('t3' => $this->getTable('catalogrule_product_price')),
+            array()
+        )->where(
+            't2.product_id = t3.product_id'
+        )->group(
+            'quote_id'
+        );
 
         $select = $this->_getReadAdapter()->select()->join(
             array('t2' => $subSelect),
@@ -230,21 +238,27 @@ class Quote extends AbstractResource
         if (!$productId) {
             return $this;
         }
-        $adapter   = $this->_getWriteAdapter();
+        $adapter = $this->_getWriteAdapter();
         $subSelect = $adapter->select();
 
-        $subSelect->from(false, array(
-            'items_qty'   => new \Zend_Db_Expr(
-                $adapter->quoteIdentifier('q.items_qty') . ' - ' . $adapter->quoteIdentifier('qi.qty')),
-            'items_count' => new \Zend_Db_Expr($adapter->quoteIdentifier('q.items_count') . ' - 1')
-        ))
-        ->join(
+        $subSelect->from(
+            false,
+            array(
+                'items_qty' => new \Zend_Db_Expr(
+                    $adapter->quoteIdentifier('q.items_qty') . ' - ' . $adapter->quoteIdentifier('qi.qty')
+                ),
+                'items_count' => new \Zend_Db_Expr($adapter->quoteIdentifier('q.items_count') . ' - 1')
+            )
+        )->join(
             array('qi' => $this->getTable('sales_flat_quote_item')),
-            implode(' AND ', array(
-                'q.entity_id = qi.quote_id',
-                'qi.parent_item_id IS NULL',
-                $adapter->quoteInto('qi.product_id = ?', $productId)
-            )),
+            implode(
+                ' AND ',
+                array(
+                    'q.entity_id = qi.quote_id',
+                    'qi.parent_item_id IS NULL',
+                    $adapter->quoteInto('qi.product_id = ?', $productId)
+                )
+            ),
             array()
         );
 
@@ -265,11 +279,15 @@ class Quote extends AbstractResource
     {
         $tableQuote = $this->getTable('sales_flat_quote');
         $tableItem = $this->getTable('sales_flat_quote_item');
-        $subSelect = $this->_getReadAdapter()
-            ->select()
-            ->from($tableItem, array('entity_id' => 'quote_id'))
-            ->where('product_id IN ( ? )', $productIds)
-            ->group('quote_id');
+        $subSelect = $this->_getReadAdapter()->select()->from(
+            $tableItem,
+            array('entity_id' => 'quote_id')
+        )->where(
+            'product_id IN ( ? )',
+            $productIds
+        )->group(
+            'quote_id'
+        );
 
         $select = $this->_getReadAdapter()->select()->join(
             array('t2' => $subSelect),
@@ -282,4 +300,3 @@ class Quote extends AbstractResource
         return $this;
     }
 }
-

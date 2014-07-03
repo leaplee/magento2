@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Authorizenet
- * @subpackage  unit_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Authorizenet\Model\Authorizenet;
 
 class CardsTest extends \PHPUnit_Framework_TestCase
@@ -45,29 +41,33 @@ class CardsTest extends \PHPUnit_Framework_TestCase
      * @param string $cardId
      * @param array $cardsData
      * @param array $additionalInfo
-     * @param \Magento\Object $expectedResult
+     * @param \Magento\Framework\Object $expectedResult
      */
     public function testSetPayment($cardId, $cardsData, $additionalInfo, $expectedResult)
     {
-        $paymentsMock = $this->getMockBuilder('\Magento\Payment\Model\Info')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $paymentsMock = $this->getMockBuilder('\Magento\Payment\Model\Info')->disableOriginalConstructor()->getMock();
 
-        $paymentsMock->expects($this->at(0))
-            ->method('getAdditionalInformation')
-            ->with('authorize_cards')
-            ->will($this->returnValue(array($cardId => $cardsData)));
+        $paymentsMock->expects(
+            $this->at(0)
+        )->method(
+            'getAdditionalInformation'
+        )->with(
+            'authorize_cards'
+        )->will(
+            $this->returnValue(array($cardId => $cardsData))
+        );
 
-        $paymentsMock->expects($this->at(1))
-            ->method('getAdditionalInformation')
-            ->will($this->returnValue($additionalInfo));
+        $paymentsMock->expects(
+            $this->at(1)
+        )->method(
+            'getAdditionalInformation'
+        )->will(
+            $this->returnValue($additionalInfo)
+        );
 
         $this->_object->setPayment($paymentsMock);
 
-        $this->assertEquals(
-            $this->_object->getCard($cardId),
-            $expectedResult
-        );
+        $this->assertEquals($this->_object->getCard($cardId), $expectedResult);
     }
 
     /**
@@ -77,31 +77,32 @@ class CardsTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                'cardId', array('key' => 'value'), array('key' => 'value'),
-                new \Magento\Object(
+                'cardId',
+                array('key' => 'value'),
+                array('key' => 'value'),
+                new \Magento\Framework\Object(
                     array(
                         'key' => 'value',
                         'additional_information' => array('key' => 'value')
                     )
-                ),
+                )
             ),
             array(
-                'cardId', array('key' => 'value'), array('key2' => 'value2'),
-                new \Magento\Object(
+                'cardId',
+                array('key' => 'value'),
+                array('key2' => 'value2'),
+                new \Magento\Framework\Object(
                     array(
                         'key' => 'value',
                         'additional_information' => array('key2' => 'value2')
                     )
-                ),
+                )
             ),
             array(
-                'cardId', array('key' => 'value'), array(),
-                new \Magento\Object(
-                    array(
-                        'key' => 'value',
-                        'additional_information' => array()
-                    )
-                ),
+                'cardId',
+                array('key' => 'value'),
+                array(),
+                new \Magento\Framework\Object(array('key' => 'value', 'additional_information' => array()))
             )
         );
     }

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Wishlist
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,13 +26,11 @@
 /**
  * Wishlist item model resource
  *
- * @category    Magento
- * @package     Magento_Wishlist
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Wishlist\Model\Resource;
 
-class Item extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Item extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
      * Initialize connection and define main table
@@ -59,15 +55,12 @@ class Item extends \Magento\Core\Model\Resource\Db\AbstractDb
     {
         $adapter = $this->_getReadAdapter();
         $storeWhere = $adapter->quoteInto('store_id IN (?)', $sharedStores);
-        $select  = $adapter->select()
-            ->from($this->getMainTable())
-            ->where('wishlist_id=:wishlist_id AND '
-                . 'product_id=:product_id AND '
-                . $storeWhere);
-        $bind = array(
-            'wishlist_id' => $wishlistId,
-            'product_id'  => $productId
+        $select = $adapter->select()->from(
+            $this->getMainTable()
+        )->where(
+            'wishlist_id=:wishlist_id AND ' . 'product_id=:product_id AND ' . $storeWhere
         );
+        $bind = array('wishlist_id' => $wishlistId, 'product_id' => $productId);
         $data = $adapter->fetchRow($select, $bind);
         if ($data) {
             $object->setData($data);

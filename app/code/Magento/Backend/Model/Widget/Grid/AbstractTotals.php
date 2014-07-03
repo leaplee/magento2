@@ -18,15 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Backend\Model\Widget\Grid;
 
-abstract class AbstractTotals
-    implements \Magento\Backend\Model\Widget\Grid\TotalsInterface
+abstract class AbstractTotals implements \Magento\Backend\Model\Widget\Grid\TotalsInterface
 {
     /**
      * List of columns should be proceed with expression
@@ -49,7 +46,7 @@ abstract class AbstractTotals
     /**
      * Factory model
      *
-     * @var \Magento\Object\Factory
+     * @var \Magento\Framework\Object\Factory
      */
     protected $_factory;
 
@@ -61,10 +58,10 @@ abstract class AbstractTotals
     protected $_parser;
 
     /**
-     * @param \Magento\Object\Factory $factory
+     * @param \Magento\Framework\Object\Factory $factory
      * @param \Magento\Backend\Model\Widget\Grid\Parser $parser
      */
-    public function __construct(\Magento\Object\Factory $factory, \Magento\Backend\Model\Widget\Grid\Parser $parser)
+    public function __construct(\Magento\Framework\Object\Factory $factory, \Magento\Backend\Model\Widget\Grid\Parser $parser)
     {
         $this->_factory = $factory;
         $this->_parser = $parser;
@@ -74,7 +71,7 @@ abstract class AbstractTotals
      * Count collection column sum based on column index
      *
      * @param string $index
-     * @param \Magento\Data\Collection $collection
+     * @param \Magento\Framework\Data\Collection $collection
      * @return float|int
      * @abstract
      */
@@ -84,7 +81,7 @@ abstract class AbstractTotals
      * Count collection column average based on column index
      *
      * @param string $index
-     * @param \Magento\Data\Collection $collection
+     * @param \Magento\Framework\Data\Collection $collection
      * @return float|int
      * @abstract
      */
@@ -95,7 +92,7 @@ abstract class AbstractTotals
      *
      * @param string $index
      * @param string $expr
-     * @param \Magento\Data\Collection $collection
+     * @param \Magento\Framework\Data\Collection $collection
      * @return float|int
      */
     protected function _count($index, $expr, $collection)
@@ -120,7 +117,7 @@ abstract class AbstractTotals
      * Return counted expression accorded parsed string
      *
      * @param string $expr
-     * @param \Magento\Data\Collection $collection
+     * @param \Magento\Framework\Data\Collection $collection
      * @return float|int
      */
     protected function _countExpr($expr, $collection)
@@ -187,7 +184,7 @@ abstract class AbstractTotals
                 $result = $firstOperand * $secondOperand;
                 break;
             case '/':
-                $result = ($secondOperand) ? $firstOperand / $secondOperand : $secondOperand;
+                $result = $secondOperand ? $firstOperand / $secondOperand : $secondOperand;
                 break;
         }
         return $result;
@@ -197,7 +194,7 @@ abstract class AbstractTotals
      * Check operand is numeric or has already counted
      *
      * @param string $operand
-     * @param \Magento\Data\Collection $collection
+     * @param \Magento\Framework\Data\Collection $collection
      * @return float|int
      */
     protected function _checkOperand($operand, $collection)
@@ -240,8 +237,8 @@ abstract class AbstractTotals
     /**
      * Count totals for all columns set
      *
-     * @param \Magento\Data\Collection $collection
-     * @return \Magento\Object
+     * @param \Magento\Framework\Data\Collection $collection
+     * @return \Magento\Framework\Object
      */
     public function countTotals($collection)
     {
@@ -255,13 +252,12 @@ abstract class AbstractTotals
     /**
      * Get totals as object
      *
-     * @return \Magento\Object
+     * @return \Magento\Framework\Object
      */
     public function getTotals()
     {
         return $this->_factory->create($this->_totals);
     }
-
 
     /**
      * Reset totals and columns set

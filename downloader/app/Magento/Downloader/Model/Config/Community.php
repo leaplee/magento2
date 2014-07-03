@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Connect
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,11 +26,10 @@ namespace Magento\Downloader\Model\Config;
 /**
  * Class config
  *
- * @category   Magento
- * @package    Magento_Connect
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Community extends \Magento\Downloader\Model\Config\AbstractConfig implements \Magento\Downloader\Model\Config\ConfigInterface
+class Community extends \Magento\Downloader\Model\Config\AbstractConfig implements
+    \Magento\Downloader\Model\Config\ConfigInterface
 {
     /**
      * Initialization
@@ -47,7 +44,7 @@ class Community extends \Magento\Downloader\Model\Config\AbstractConfig implemen
     /**
      * Set data for Settings View
      *
-     * @param \Magento\Connect\Config $config
+     * @param \Magento\Framework\Connect\Config $config
      * @param \Magento\Downloader\View $view
      * @return void
      */
@@ -58,7 +55,7 @@ class Community extends \Magento\Downloader\Model\Config\AbstractConfig implemen
 
     /**
      * Set data for Settings View
-     * @param \Magento\Connect\Config $config
+     * @param \Magento\Framework\Connect\Config $config
      * @param \Magento\Downloader\View $view
      * @return void
      */
@@ -81,7 +78,8 @@ class Community extends \Magento\Downloader\Model\Config\AbstractConfig implemen
      *
      * @return string Root channel URI
      */
-    public function getRootChannelUri(){
+    public function getRootChannelUri()
+    {
         if (!$this->get('root_channel_uri')) {
             $this->set('root_channel_uri', 'connect20.magentocommerce.com/community');
         }
@@ -91,7 +89,7 @@ class Community extends \Magento\Downloader\Model\Config\AbstractConfig implemen
     /**
      * Set config data from POST
      *
-     * @param \Magento\Connect\Config $config Config object
+     * @param \Magento\Framework\Connect\Config $config Config object
      * @param array $post post data
      * @return void
      */
@@ -110,4 +108,3 @@ class Community extends \Magento\Downloader\Model\Config\AbstractConfig implemen
     {
     }
 }
-?>

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Directory
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -29,7 +27,7 @@
  */
 namespace Magento\Directory\Model\Resource\Region;
 
-class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+class Collection extends \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
 {
     /**
      * Locale region name table name
@@ -46,27 +44,27 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     protected $_countryTable;
 
     /**
-     * @var \Magento\Locale\ResolverInterface
+     * @var \Magento\Framework\Locale\ResolverInterface
      */
     protected $_localeResolver;
 
     /**
      * @param \Magento\Core\Model\EntityFactory $entityFactory
-     * @param \Magento\Logger $logger
-     * @param \Magento\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
-     * @param \Magento\Event\ManagerInterface $eventManager
-     * @param \Magento\Locale\ResolverInterface $localeResolver
+     * @param \Magento\Framework\Logger $logger
+     * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      * @param mixed $connection
-     * @param \Magento\Core\Model\Resource\Db\AbstractDb $resource
+     * @param \Magento\Framework\Model\Resource\Db\AbstractDb $resource
      */
     public function __construct(
         \Magento\Core\Model\EntityFactory $entityFactory,
-        \Magento\Logger $logger,
-        \Magento\Data\Collection\Db\FetchStrategyInterface $fetchStrategy,
-        \Magento\Event\ManagerInterface $eventManager,
-        \Magento\Locale\ResolverInterface $localeResolver,
+        \Magento\Framework\Logger $logger,
+        \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy,
+        \Magento\Framework\Event\ManagerInterface $eventManager,
+        \Magento\Framework\Locale\ResolverInterface $localeResolver,
         $connection = null,
-        \Magento\Core\Model\Resource\Db\AbstractDb $resource = null
+        \Magento\Framework\Model\Resource\Db\AbstractDb $resource = null
     ) {
         $this->_localeResolver = $localeResolver;
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $connection, $resource);
@@ -81,11 +79,11 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     {
         $this->_init('Magento\Directory\Model\Region', 'Magento\Directory\Model\Resource\Region');
 
-        $this->_countryTable    = $this->getTable('directory_country');
+        $this->_countryTable = $this->getTable('directory_country');
         $this->_regionNameTable = $this->getTable('directory_country_region_name');
 
-        $this->addOrder('name', \Magento\Data\Collection::SORT_ORDER_ASC);
-        $this->addOrder('default_name', \Magento\Data\Collection::SORT_ORDER_ASC);
+        $this->addOrder('name', \Magento\Framework\Data\Collection::SORT_ORDER_ASC);
+        $this->addOrder('default_name', \Magento\Framework\Data\Collection::SORT_ORDER_ASC);
     }
 
     /**
@@ -102,7 +100,8 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
         $this->getSelect()->joinLeft(
             array('rname' => $this->_regionNameTable),
             'main_table.region_id = rname.region_id AND rname.locale = :region_locale',
-            array('name'));
+            array('name')
+        );
 
         return $this;
     }
@@ -133,12 +132,13 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
      */
     public function addCountryCodeFilter($countryCode)
     {
-        $this->getSelect()
-            ->joinLeft(
-                array('country' => $this->_countryTable),
-                'main_table.country_id = country.country_id'
-            )
-            ->where('country.iso3_code = ?', $countryCode);
+        $this->getSelect()->joinLeft(
+            array('country' => $this->_countryTable),
+            'main_table.country_id = country.country_id'
+        )->where(
+            'country.iso3_code = ?',
+            $countryCode
+        );
 
         return $this;
     }
@@ -189,7 +189,10 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     {
         if (!empty($region)) {
             $condition = is_array($region) ? array('in' => $region) : $region;
-            $this->addFieldToFilter(array('main_table.code', 'main_table.default_name'), array($condition, $condition));
+            $this->addFieldToFilter(
+                array('main_table.code', 'main_table.default_name'),
+                array($condition, $condition)
+            );
         }
         return $this;
     }
@@ -203,11 +206,7 @@ class Collection extends \Magento\Core\Model\Resource\Db\Collection\AbstractColl
     {
         $options = $this->_toOptionArray('region_id', 'default_name', array('title' => 'default_name'));
         if (count($options) > 0) {
-            array_unshift($options, array(
-                'title '=> null,
-                'value' => '0',
-                'label' => __('--Please select--')
-            ));
+            array_unshift($options, array('title ' => null, 'value' => '0', 'label' => __('--Please select--')));
         }
         return $options;
     }

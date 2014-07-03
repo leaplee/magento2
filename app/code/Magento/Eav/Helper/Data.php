@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Eav
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,7 +26,7 @@ namespace Magento\Eav\Helper;
 /**
  * Eav data helper
  */
-class Data extends \Magento\App\Helper\AbstractHelper
+class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      * XML path to input types validator data in config
@@ -50,9 +48,9 @@ class Data extends \Magento\App\Helper\AbstractHelper
     /**
      * Core store config
      *
-     * @var \Magento\Core\Model\Store\Config
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_coreStoreConfig;
+    protected $_scopeConfig;
 
     /**
      * @var \Magento\Eav\Model\Entity\Attribute\Config
@@ -65,18 +63,18 @@ class Data extends \Magento\App\Helper\AbstractHelper
     protected $_eavConfig;
 
     /**
-     * @param \Magento\App\Helper\Context $context
+     * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Eav\Model\Entity\Attribute\Config $attributeConfig
-     * @param \Magento\Core\Model\Store\Config $coreStoreConfig
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Eav\Model\Config $eavConfig
      */
     public function __construct(
-        \Magento\App\Helper\Context $context,
+        \Magento\Framework\App\Helper\Context $context,
         \Magento\Eav\Model\Entity\Attribute\Config $attributeConfig,
-        \Magento\Core\Model\Store\Config $coreStoreConfig,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Eav\Model\Config $eavConfig
     ) {
-        $this->_coreStoreConfig = $coreStoreConfig;
+        $this->_scopeConfig = $scopeConfig;
         $this->_attributeConfig = $attributeConfig;
         $this->_eavConfig = $eavConfig;
         parent::__construct($context);
@@ -90,34 +88,13 @@ class Data extends \Magento\App\Helper\AbstractHelper
     protected function _getDefaultFrontendClasses()
     {
         return array(
-            array(
-                'value' => '',
-                'label' => __('None')
-            ),
-            array(
-                'value' => 'validate-number',
-                'label' => __('Decimal Number')
-            ),
-            array(
-                'value' => 'validate-digits',
-                'label' => __('Integer Number')
-            ),
-            array(
-                'value' => 'validate-email',
-                'label' => __('Email')
-            ),
-            array(
-                'value' => 'validate-url',
-                'label' => __('URL')
-            ),
-            array(
-                'value' => 'validate-alpha',
-                'label' => __('Letters')
-            ),
-            array(
-                'value' => 'validate-alphanum',
-                'label' => __('Letters (a-z, A-Z) or Numbers (0-9)')
-            )
+            array('value' => '', 'label' => __('None')),
+            array('value' => 'validate-number', 'label' => __('Decimal Number')),
+            array('value' => 'validate-digits', 'label' => __('Integer Number')),
+            array('value' => 'validate-email', 'label' => __('Email')),
+            array('value' => 'validate-url', 'label' => __('URL')),
+            array('value' => 'validate-alpha', 'label' => __('Letters')),
+            array('value' => 'validate-alphanum', 'label' => __('Letters (a-z, A-Z) or Numbers (0-9)'))
         );
     }
 
@@ -132,10 +109,7 @@ class Data extends \Magento\App\Helper\AbstractHelper
         $_defaultClasses = $this->_getDefaultFrontendClasses();
 
         if (isset($this->_entityTypeFrontendClasses[$entityTypeCode])) {
-            return array_merge(
-                $_defaultClasses,
-                $this->_entityTypeFrontendClasses[$entityTypeCode]
-            );
+            return array_merge($_defaultClasses, $this->_entityTypeFrontendClasses[$entityTypeCode]);
         }
 
         return $_defaultClasses;
@@ -170,7 +144,7 @@ class Data extends \Magento\App\Helper\AbstractHelper
      */
     public function getInputTypesValidatorData()
     {
-        return $this->_coreStoreConfig->getConfig(self::XML_PATH_VALIDATOR_DATA_INPUT_TYPES);
+        return $this->_scopeConfig->getValue(self::XML_PATH_VALIDATOR_DATA_INPUT_TYPES, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -182,15 +156,17 @@ class Data extends \Magento\App\Helper\AbstractHelper
      *      'entity_type_id' => $entityTypeId,
      *      'attribute_id' => $attributeId,
      *      'attribute_table' => $attributeTable
+     *      'backend_type' => $backendType
      * ]</pre>
      */
     public function getAttributeMetadata($entityTypeCode, $attributeCode)
     {
         $attribute = $this->_eavConfig->getAttribute($entityTypeCode, $attributeCode);
-        return [
+        return array(
             'entity_type_id' => $attribute->getEntityTypeId(),
             'attribute_id' => $attribute->getAttributeId(),
             'attribute_table' => $attribute->getBackend()->getTable(),
-        ];
+            'backend_type' => $attribute->getBackendType()
+        );
     }
 }

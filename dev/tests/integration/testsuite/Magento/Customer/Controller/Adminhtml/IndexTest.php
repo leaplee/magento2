@@ -51,10 +51,12 @@ class IndexTest extends \Magento\Backend\Utility\Controller
     {
         parent::setUp();
         $this->_baseControllerUrl = 'http://localhost/index.php/backend/customer/index/';
-        $this->customerAccountService = Bootstrap::getObjectManager()
-            ->get('Magento\Customer\Service\V1\CustomerAccountServiceInterface');
-        $this->customerAddressService = Bootstrap::getObjectManager()
-            ->get('Magento\Customer\Service\V1\CustomerAddressServiceInterface');
+        $this->customerAccountService = Bootstrap::getObjectManager()->get(
+            'Magento\Customer\Service\V1\CustomerAccountServiceInterface'
+        );
+        $this->customerAddressService = Bootstrap::getObjectManager()->get(
+            'Magento\Customer\Service\V1\CustomerAddressServiceInterface'
+        );
     }
 
     protected function tearDown()
@@ -62,16 +64,17 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         /**
          * Unset customer data
          */
-        Bootstrap::getObjectManager()->get('Magento\Backend\Model\Session')
-            ->setCustomerData(null);
+        Bootstrap::getObjectManager()->get('Magento\Backend\Model\Session')->setCustomerData(null);
 
         /**
          * Unset messages
          */
-        Bootstrap::getObjectManager()->get('Magento\Backend\Model\Session')
-            ->getMessages(true);
+        Bootstrap::getObjectManager()->get('Magento\Backend\Model\Session')->getMessages(true);
     }
 
+    /**
+     * @magentoDbIsolation enabled
+     */
     public function testSaveActionWithEmptyPostData()
     {
         $this->getRequest()->setPost(array());
@@ -79,14 +82,12 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $this->assertRedirect($this->stringStartsWith($this->_baseControllerUrl));
     }
 
+    /**
+     * @magentoDbIsolation enabled
+     */
     public function testSaveActionWithInvalidFormData()
     {
-        $post = array(
-            'account' => array(
-                'middlename' => 'test middlename',
-                'group_id' => 1
-            )
-        );
+        $post = array('account' => array('middlename' => 'test middlename', 'group_id' => 1));
         $this->getRequest()->setPost($post);
         $this->dispatch('backend/customer/index/save');
         /**
@@ -94,15 +95,14 @@ class IndexTest extends \Magento\Backend\Utility\Controller
          */
         $this->assertSessionMessages(
             $this->logicalNot($this->isEmpty()),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
         /**
          * Check that customer data were set to session
          */
         $this->assertEquals(
             $post,
-            Bootstrap::getObjectManager()
-                ->get('Magento\Backend\Model\Session')->getCustomerData()
+            Bootstrap::getObjectManager()->get('Magento\Backend\Model\Session')->getCustomerData()
         );
         $this->assertRedirect($this->stringStartsWith($this->_baseControllerUrl . 'new'));
     }
@@ -120,9 +120,9 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                 'firstname' => 'test firstname',
                 'lastname' => 'test lastname',
                 'email' => 'example@domain.com',
-                'default_billing' => '_item1',
+                'default_billing' => '_item1'
             ),
-            'address' => array('_item1' => array()),
+            'address' => array('_item1' => array())
         );
         $this->getRequest()->setPost($post);
         $this->dispatch('backend/customer/index/save');
@@ -131,15 +131,14 @@ class IndexTest extends \Magento\Backend\Utility\Controller
          */
         $this->assertSessionMessages(
             $this->logicalNot($this->isEmpty()),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
         /**
          * Check that customer data were set to session
          */
         $this->assertEquals(
             $post,
-            Bootstrap::getObjectManager()
-                ->get('Magento\Backend\Model\Session')->getCustomerData()
+            Bootstrap::getObjectManager()->get('Magento\Backend\Model\Session')->getCustomerData()
         );
         $this->assertRedirect($this->stringStartsWith($this->_baseControllerUrl . 'new'));
     }
@@ -167,25 +166,28 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                 '_item1' => array(
                     'firstname' => 'test firstname',
                     'lastname' => 'test lastname',
-                    'street' => array(
-                        'test street'
-                    ),
+                    'street' => array('test street'),
                     'city' => 'test city',
                     'country_id' => 'US',
                     'postcode' => '01001',
-                    'telephone' => '+7000000001',
+                    'telephone' => '+7000000001'
                 )
-            ),
+            )
         );
         $this->getRequest()->setPost($post);
         $this->getRequest()->setParam('back', '1');
+
+        // Emulate setting customer data to session in editAction
+        $objectManager->get('Magento\Backend\Model\Session')->setCustomerData($post);
+
         $this->dispatch('backend/customer/index/save');
         /**
          * Check that errors was generated and set to session
          */
-        $this->assertSessionMessages($this->isEmpty(), \Magento\Message\MessageInterface::TYPE_ERROR);
+        $this->assertSessionMessages($this->isEmpty(), \Magento\Framework\Message\MessageInterface::TYPE_ERROR);
+
         /**
-         * Check that customer data were set to session
+         * Check that customer data were cleaned after it was saved successfully
          */
         $this->assertEmpty($objectManager->get('Magento\Backend\Model\Session')->getCustomerData());
 
@@ -194,13 +196,13 @@ class IndexTest extends \Magento\Backend\Utility\Controller
          */
         $this->assertSessionMessages(
             $this->logicalNot($this->isEmpty()),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
 
         /**
          * Check that customer id set and addresses saved
          */
-        $registry = $objectManager->get('Magento\Registry');
+        $registry = $objectManager->get('Magento\Framework\Registry');
         $customerId = $registry->registry(RegistryConstants::CURRENT_CUSTOMER_ID);
         $customer = $this->customerAccountService->getCustomer($customerId);
         $this->assertEquals('test firstname', $customer->getFirstname());
@@ -210,11 +212,14 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $this->assertNull($customer->getDefaultShipping());
 
         $this->assertRedirect(
-            $this->stringStartsWith(
-                $this->_baseControllerUrl
-                . 'edit/id/' . $customerId . '/back/1'
-            )
+            $this->stringStartsWith($this->_baseControllerUrl . 'edit/id/' . $customerId . '/back/1')
         );
+
+        /** @var \Magento\Newsletter\Model\Subscriber $subscriber */
+        $subscriber = $objectManager->get('Magento\Newsletter\Model\SubscriberFactory')->create();
+        $this->assertEmpty($subscriber->getId());
+        $subscriber->loadByCustomerId($customerId);
+        $this->assertEmpty($subscriber->getId());
     }
 
     /**
@@ -230,12 +235,11 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                 'website_id' => 1,
                 'firstname' => 'test firstname',
                 'lastname' => 'test lastname',
-                'email' => 'example@domain.com',
+                'email' => 'customer@example.com',
                 'default_shipping' => '_item1',
                 'new_password' => 'auto',
                 'sendemail_store_id' => '1',
-                'sendemail' => '1',
-
+                'sendemail' => '1'
             ),
             'address' => array(
                 '1' => array(
@@ -245,7 +249,7 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                     'city' => 'update city',
                     'country_id' => 'US',
                     'postcode' => '01001',
-                    'telephone' => '+7000000001',
+                    'telephone' => '+7000000001'
                 ),
                 '_item1' => array(
                     'firstname' => 'new firstname',
@@ -254,7 +258,7 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                     'city' => 'new city',
                     'country_id' => 'US',
                     'postcode' => '01001',
-                    'telephone' => '+7000000001',
+                    'telephone' => '+7000000001'
                 ),
                 '_template_' => array(
                     'firstname' => '',
@@ -263,9 +267,10 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                     'city' => '',
                     'country_id' => 'US',
                     'postcode' => '',
-                    'telephone' => '',
+                    'telephone' => ''
                 )
             ),
+            'subscription' => ''
         );
         $this->getRequest()->setPost($post);
         $this->getRequest()->setParam('customer_id', 1);
@@ -275,7 +280,7 @@ class IndexTest extends \Magento\Backend\Utility\Controller
          */
         $this->assertSessionMessages(
             $this->equalTo(array('You saved the customer.')),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
 
         /** @var $objectManager \Magento\TestFramework\ObjectManager */
@@ -284,7 +289,7 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         /**
          * Check that customer id set and addresses saved
          */
-        $registry = $objectManager->get('Magento\Registry');
+        $registry = $objectManager->get('Magento\Framework\Registry');
         $customerId = $registry->registry(RegistryConstants::CURRENT_CUSTOMER_ID);
         $customer = $this->customerAccountService->getCustomer($customerId);
         $this->assertEquals('test firstname', $customer->getFirstname());
@@ -303,6 +308,56 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $newAddress = $this->customerAddressService->getDefaultShippingAddress($customerId);
         $this->assertEquals('new firstname', $newAddress->getFirstname());
 
+        /** @var \Magento\Newsletter\Model\Subscriber $subscriber */
+        $subscriber = $objectManager->get('Magento\Newsletter\Model\SubscriberFactory')->create();
+        $this->assertEmpty($subscriber->getId());
+        $subscriber->loadByCustomerId($customerId);
+        $this->assertNotEmpty($subscriber->getId());
+        $this->assertEquals(1, $subscriber->getStatus());
+
+        $this->assertRedirect($this->stringStartsWith($this->_baseControllerUrl . 'index/key/'));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Newsletter/_files/subscribers.php
+     */
+    public function testSaveActionExistingCustomerUnsubscribeNewsletter()
+    {
+        $customerId = 1;
+        /** @var $objectManager \Magento\TestFramework\ObjectManager */
+        $objectManager = Bootstrap::getObjectManager();
+
+        /** @var \Magento\Newsletter\Model\Subscriber $subscriber */
+        $subscriber = $objectManager->get('Magento\Newsletter\Model\SubscriberFactory')->create();
+        $this->assertEmpty($subscriber->getId());
+        $subscriber->loadByCustomerId($customerId);
+        $this->assertNotEmpty($subscriber->getId());
+        $this->assertEquals(1, $subscriber->getStatus());
+
+        $post = array(
+            'customer_id' => $customerId,
+        );
+        $this->getRequest()->setPost($post);
+        $this->getRequest()->setParam('customer_id', 1);
+        $this->dispatch('backend/customer/index/save');
+
+        /** @var \Magento\Newsletter\Model\Subscriber $subscriber */
+        $subscriber = $objectManager->get('Magento\Newsletter\Model\SubscriberFactory')->create();
+        $this->assertEmpty($subscriber->getId());
+        $subscriber->loadByCustomerId($customerId);
+        $this->assertNotEmpty($subscriber->getId());
+        $this->assertEquals(3, $subscriber->getStatus());
+
+        /**
+         * Check that success message is set
+         */
+        $this->assertSessionMessages(
+            $this->equalTo(array('You saved the customer.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
+        );
+
+
+
         $this->assertRedirect($this->stringStartsWith($this->_baseControllerUrl . 'index/key/'));
     }
 
@@ -318,23 +373,22 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                 'website_id' => 1,
                 'firstname' => 'test firstname',
                 'lastname' => 'test lastname',
-                'email' => 'example@domain.com',
-                'password' => 'auto',
-            ),
+                'email' => 'customer@example.com',
+                'password' => 'auto'
+            )
         );
         $this->getRequest()->setPost($post);
         $this->dispatch('backend/customer/index/save');
         /*
-        * Check that error message is set
-        */
+         * Check that error message is set
+         */
         $this->assertSessionMessages(
             $this->equalTo(array('Customer with the same email already exists in associated website.')),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
         $this->assertEquals(
             $post,
-            Bootstrap::getObjectManager()
-                ->get('Magento\Backend\Model\Session')->getCustomerData()
+            Bootstrap::getObjectManager()->get('Magento\Backend\Model\Session')->getCustomerData()
         );
         $this->assertRedirect($this->stringStartsWith($this->_baseControllerUrl . 'new/key/'));
     }
@@ -344,22 +398,21 @@ class IndexTest extends \Magento\Backend\Utility\Controller
      */
     public function testEditAction()
     {
-        $customerData = [
+        $customerData = array(
             'customer_id' => '1',
-            'account' => [
+            'account' => array(
                 'middlename' => 'new middlename',
                 'group_id' => 1,
                 'website_id' => 1,
                 'firstname' => 'new firstname',
                 'lastname' => 'new lastname',
-                'email' => 'example@domain.com',
+                'email' => 'customer@example.com',
                 'default_shipping' => '_item1',
                 'new_password' => 'auto',
                 'sendemail_store_id' => '1',
-                'sendemail' => '1',
-
-            ],
-            'address' => [
+                'sendemail' => '1'
+            ),
+            'address' => array(
                 '1' => array(
                     'firstname' => 'update firstname',
                     'lastname' => 'update lastname',
@@ -367,33 +420,32 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                     'city' => 'update city',
                     'country_id' => 'US',
                     'postcode' => '01001',
-                    'telephone' => '+7000000001',
+                    'telephone' => '+7000000001'
                 ),
-                '_item1' => [
+                '_item1' => array(
                     'firstname' => 'default firstname',
                     'lastname' => 'default lastname',
                     'street' => array('default street'),
                     'city' => 'default city',
                     'country_id' => 'US',
                     'postcode' => '01001',
-                    'telephone' => '+7000000001',
-                ],
-                '_template_' => [
+                    'telephone' => '+7000000001'
+                ),
+                '_template_' => array(
                     'firstname' => '',
                     'lastname' => '',
                     'street' => array(),
                     'city' => '',
                     'country_id' => 'US',
                     'postcode' => '',
-                    'telephone' => '',
-                ]
-            ]
-        ];
+                    'telephone' => ''
+                )
+            )
+        );
         /**
          * set customer data
          */
-        Bootstrap::getObjectManager()->get('Magento\Backend\Model\Session')
-            ->setCustomerData($customerData);
+        Bootstrap::getObjectManager()->get('Magento\Backend\Model\Session')->setCustomerData($customerData);
         $this->getRequest()->setParam('id', 1);
         $this->dispatch('backend/customer/index/edit');
         $body = $this->getResponse()->getBody();
@@ -461,19 +513,19 @@ class IndexTest extends \Magento\Backend\Utility\Controller
      */
     public function testNewActionWithCustomerData()
     {
-        $customerData = [
+        $customerData = array(
             'customer_id' => 0,
-            'account'     => [
-                'created_in'                => false,
+            'account' => array(
+                'created_in' => false,
                 'disable_auto_group_change' => false,
-                'email'                     => false,
-                'firstname'                 => false,
-                'group_id'                  => false,
-                'lastname'                  => false,
-                'website_id'                => false,
-            ],
-            'address'     => []
-        ];
+                'email' => false,
+                'firstname' => false,
+                'group_id' => false,
+                'lastname' => false,
+                'website_id' => false
+            ),
+            'address' => array()
+        );
         $context = Bootstrap::getObjectManager()->get('Magento\Backend\Block\Template\Context');
         $context->getBackendSession()->setCustomerData($customerData);
         $this->testNewAction();
@@ -488,8 +540,8 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $this->dispatch('backend/customer/index/delete');
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['You deleted the customer.']),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            $this->equalTo(array('You deleted the customer.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
     }
 
@@ -502,8 +554,8 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $this->dispatch('backend/customer/index/delete');
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['No such entity with customerId = 2']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('No such entity with customerId = 2')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
@@ -517,7 +569,7 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $body = $this->getResponse()->getBody();
 
         $this->assertContains('test firstname test lastname', $body);
-        $this->assertContains('example@domain.com', $body);
+        $this->assertContains('customer@example.com', $body);
         $this->assertContains('+7000000001', $body);
         $this->assertContains('United States', $body);
     }
@@ -527,9 +579,7 @@ class IndexTest extends \Magento\Backend\Utility\Controller
      */
     public function testCartAction()
     {
-        $this->getRequest()->setParam('id', 1)
-            ->setParam('website_id', 1)
-            ->setPost('delete', 1);
+        $this->getRequest()->setParam('id', 1)->setParam('website_id', 1)->setPost('delete', 1);
         $this->dispatch('backend/customer/index/cart');
         $body = $this->getResponse()->getBody();
         $this->assertContains('<div id="customer_cart_grid1">', $body);
@@ -554,10 +604,10 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         // Pre-condition
         /** @var \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory */
         $subscriberFactory = Bootstrap::getObjectManager()->get('Magento\Newsletter\Model\SubscriberFactory');
-        $this->assertNull($subscriberFactory->create()->loadByCustomer(1)->getSubscriberStatus());
-        $this->assertNull($subscriberFactory->create()->loadByCustomer(2)->getSubscriberStatus());
+        $this->assertNull($subscriberFactory->create()->loadByCustomerId(1)->getSubscriberStatus());
+        $this->assertNull($subscriberFactory->create()->loadByCustomerId(2)->getSubscriberStatus());
         // Setup
-        $this->getRequest()->setParam('customer', [1, 2]);
+        $this->getRequest()->setParam('customer', array(1, 2));
 
         // Test
         $this->dispatch('backend/customer/index/massSubscribe');
@@ -565,40 +615,46 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         // Assertions
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['A total of 2 record(s) were updated.']),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            $this->equalTo(array('A total of 2 record(s) were updated.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
         $this->assertEquals(
             Subscriber::STATUS_SUBSCRIBED,
-            $subscriberFactory->create()->loadByCustomer(1)->getSubscriberStatus()
+            $subscriberFactory->create()->loadByCustomerId(1)->getSubscriberStatus()
         );
         $this->assertEquals(
             Subscriber::STATUS_SUBSCRIBED,
-            $subscriberFactory->create()->loadByCustomer(2)->getSubscriberStatus()
+            $subscriberFactory->create()->loadByCustomerId(2)->getSubscriberStatus()
         );
     }
 
+    /**
+     * @magentoDbIsolation enabled
+     */
     public function testMassSubscriberActionNoSelection()
     {
         $this->dispatch('backend/customer/index/massSubscribe');
 
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['Please select customer(s).']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('Please select customer(s).')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
+    /**
+     * @magentoDbIsolation enabled
+     */
     public function testMassSubscriberActionInvalidId()
     {
-        $this->getRequest()->setParam('customer', [4200]);
+        $this->getRequest()->setParam('customer', array(4200));
 
         $this->dispatch('backend/customer/index/massSubscribe');
 
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['No such entity with customerId = 4200']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('No such entity with customerId = 4200')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
@@ -610,10 +666,10 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         // Pre-condition
         /** @var \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory */
         $subscriberFactory = Bootstrap::getObjectManager()->get('Magento\Newsletter\Model\SubscriberFactory');
-        $this->assertNull($subscriberFactory->create()->loadByCustomer(1)->getSubscriberStatus());
-        $this->assertNull($subscriberFactory->create()->loadByCustomer(2)->getSubscriberStatus());
+        $this->assertNull($subscriberFactory->create()->loadByCustomerId(1)->getSubscriberStatus());
+        $this->assertNull($subscriberFactory->create()->loadByCustomerId(2)->getSubscriberStatus());
         // Setup
-        $this->getRequest()->setParam('customer', [1, 4200, 2]);
+        $this->getRequest()->setParam('customer', array(1, 4200, 2));
 
         // Test
         $this->dispatch('backend/customer/index/massSubscribe');
@@ -621,20 +677,20 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         // Assertions
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['A total of 2 record(s) were updated.']),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            $this->equalTo(array('A total of 2 record(s) were updated.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
         $this->assertSessionMessages(
-            $this->equalTo(['No such entity with customerId = 4200']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('No such entity with customerId = 4200')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
         $this->assertEquals(
             Subscriber::STATUS_SUBSCRIBED,
-            $subscriberFactory->create()->loadByCustomer(1)->getSubscriberStatus()
+            $subscriberFactory->create()->loadByCustomerId(1)->getSubscriberStatus()
         );
         $this->assertEquals(
             Subscriber::STATUS_SUBSCRIBED,
-            $subscriberFactory->create()->loadByCustomer(2)->getSubscriberStatus()
+            $subscriberFactory->create()->loadByCustomerId(2)->getSubscriberStatus()
         );
     }
 
@@ -643,34 +699,38 @@ class IndexTest extends \Magento\Backend\Utility\Controller
      */
     public function testMassDeleteAction()
     {
-        $this->getRequest()->setPost('customer', [1]);
+        $this->getRequest()->setPost('customer', array(1));
         $this->dispatch('backend/customer/index/massDelete');
         $this->assertSessionMessages(
-            $this->equalTo(['A total of 1 record(s) were deleted.']),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            $this->equalTo(array('A total of 1 record(s) were deleted.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
         $this->assertRedirect($this->stringContains('customer/index'));
     }
 
+    /**
+     * @magentoDbIsolation enabled
+     */
     public function testInvalidIdMassDeleteAction()
     {
-        $this->getRequest()->setPost('customer', [1]);
+        $this->getRequest()->setPost('customer', array(1));
         $this->dispatch('backend/customer/index/massDelete');
         $this->assertSessionMessages(
-            $this->equalTo(['No such entity with customerId = 1']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('No such entity with customerId = 1')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
     /**
      * Valid group Id but no customer Ids specified
+     * @magentoDbIsolation enabled
      */
     public function testMassDeleteActionNoCustomerIds()
     {
         $this->dispatch('backend/customer/index/massDelete');
         $this->assertSessionMessages(
-            $this->equalTo(['Please select customer(s).']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('Please select customer(s).')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
@@ -679,15 +739,15 @@ class IndexTest extends \Magento\Backend\Utility\Controller
      */
     public function testMassDeleteActionPartialUpdate()
     {
-        $this->getRequest()->setPost('customer', [1, 999, 2, 9999]);
+        $this->getRequest()->setPost('customer', array(1, 999, 2, 9999));
         $this->dispatch('backend/customer/index/massDelete');
         $this->assertSessionMessages(
-            $this->equalTo(['A total of 2 record(s) were deleted.']),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            $this->equalTo(array('A total of 2 record(s) were deleted.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
         $this->assertSessionMessages(
-            $this->equalTo(['No such entity with customerId = 999', 'No such entity with customerId = 9999']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('No such entity with customerId = 999', 'No such entity with customerId = 9999')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
@@ -699,11 +759,11 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $customer = $this->customerAccountService->getCustomer(1);
         $this->assertEquals(1, $customer->getGroupId());
 
-        $this->getRequest()->setParam('group', 0)->setPost('customer', [1]);
+        $this->getRequest()->setParam('group', 0)->setPost('customer', array(1));
         $this->dispatch('backend/customer/index/massAssignGroup');
         $this->assertSessionMessages(
-            $this->equalTo(['A total of 1 record(s) were updated.']),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            $this->equalTo(array('A total of 1 record(s) were updated.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
         $this->assertRedirect($this->stringContains('customer/index'));
 
@@ -713,27 +773,29 @@ class IndexTest extends \Magento\Backend\Utility\Controller
 
     /**
      * Valid group Id but no data fixture so no customer exists with customer Id = 1
+     * @magentoDbIsolation enabled
      */
     public function testMassAssignGroupActionInvalidCustomerId()
     {
-        $this->getRequest()->setParam('group', 0)->setPost('customer', [1]);
+        $this->getRequest()->setParam('group', 0)->setPost('customer', array(1));
         $this->dispatch('backend/customer/index/massAssignGroup');
         $this->assertSessionMessages(
-            $this->equalTo(['No such entity with customerId = 1']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('No such entity with customerId = 1')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
     /**
      * Valid group Id but no customer Ids specified
+     * @magentoDbIsolation enabled
      */
     public function testMassAssignGroupActionNoCustomerIds()
     {
         $this->getRequest()->setParam('group', 0);
         $this->dispatch('backend/customer/index/massAssignGroup');
         $this->assertSessionMessages(
-            $this->equalTo(['Please select customer(s).']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('Please select customer(s).')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
@@ -745,21 +807,20 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $this->assertEquals(1, $this->customerAccountService->getCustomer(1)->getGroupId());
         $this->assertEquals(1, $this->customerAccountService->getCustomer(2)->getGroupId());
 
-        $this->getRequest()->setParam('group', 0)->setPost('customer', [1, 4200, 2]);
+        $this->getRequest()->setParam('group', 0)->setPost('customer', array(1, 4200, 2));
         $this->dispatch('backend/customer/index/massAssignGroup');
         $this->assertSessionMessages(
-            $this->equalTo(['A total of 2 record(s) were updated.']),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            $this->equalTo(array('A total of 2 record(s) were updated.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
         $this->assertSessionMessages(
-            $this->equalTo(['No such entity with customerId = 4200']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('No such entity with customerId = 4200')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
 
         $this->assertEquals(0, $this->customerAccountService->getCustomer(1)->getGroupId());
         $this->assertEquals(0, $this->customerAccountService->getCustomer(2)->getGroupId());
     }
-
 
     /**
      * @magentoDataFixture Magento/Customer/_files/two_customers.php
@@ -769,8 +830,8 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         // Setup
         /** @var \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory */
         $subscriberFactory = Bootstrap::getObjectManager()->get('Magento\Newsletter\Model\SubscriberFactory');
-        $subscriberFactory->create()->updateSubscription(1, true);
-        $subscriberFactory->create()->updateSubscription(2, true);
+        $subscriberFactory->create()->subscribeCustomerById(1);
+        $subscriberFactory->create()->subscribeCustomerById(2);
         $this->getRequest()->setParam('customer', [1, 2]);
 
         // Test
@@ -779,40 +840,46 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         // Assertions
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['A total of 2 record(s) were updated.']),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            $this->equalTo(array('A total of 2 record(s) were updated.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
         $this->assertEquals(
             Subscriber::STATUS_UNSUBSCRIBED,
-            $subscriberFactory->create()->loadByCustomer(1)->getSubscriberStatus()
+            $subscriberFactory->create()->loadByCustomerId(1)->getSubscriberStatus()
         );
         $this->assertEquals(
             Subscriber::STATUS_UNSUBSCRIBED,
-            $subscriberFactory->create()->loadByCustomer(2)->getSubscriberStatus()
+            $subscriberFactory->create()->loadByCustomerId(2)->getSubscriberStatus()
         );
     }
 
+    /**
+     * @magentoDbIsolation enabled
+     */
     public function testMassUnsubscriberActionNoSelection()
     {
         $this->dispatch('backend/customer/index/massUnsubscribe');
 
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['Please select customer(s).']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('Please select customer(s).')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
+    /**
+     * @magentoDbIsolation enabled
+     */
     public function testMassUnsubscriberActionInvalidId()
     {
-        $this->getRequest()->setParam('customer', [4200]);
+        $this->getRequest()->setParam('customer', array(4200));
 
         $this->dispatch('backend/customer/index/massUnsubscribe');
 
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['No such entity with customerId = 4200']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('No such entity with customerId = 4200')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
     }
 
@@ -824,8 +891,8 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         // Setup
         /** @var \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory */
         $subscriberFactory = Bootstrap::getObjectManager()->get('Magento\Newsletter\Model\SubscriberFactory');
-        $subscriberFactory->create()->updateSubscription(1, true);
-        $subscriberFactory->create()->updateSubscription(2, true);
+        $subscriberFactory->create()->subscribeCustomerById(1);
+        $subscriberFactory->create()->subscribeCustomerById(2);
         $this->getRequest()->setParam('customer', [1, 4200, 2]);
 
         // Test
@@ -834,20 +901,20 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         // Assertions
         $this->assertRedirect($this->stringContains('customer/index'));
         $this->assertSessionMessages(
-            $this->equalTo(['A total of 2 record(s) were updated.']),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            $this->equalTo(array('A total of 2 record(s) were updated.')),
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
         $this->assertSessionMessages(
-            $this->equalTo(['No such entity with customerId = 4200']),
-            \Magento\Message\MessageInterface::TYPE_ERROR
+            $this->equalTo(array('No such entity with customerId = 4200')),
+            \Magento\Framework\Message\MessageInterface::TYPE_ERROR
         );
         $this->assertEquals(
             Subscriber::STATUS_UNSUBSCRIBED,
-            $subscriberFactory->create()->loadByCustomer(1)->getSubscriberStatus()
+            $subscriberFactory->create()->loadByCustomerId(1)->getSubscriberStatus()
         );
         $this->assertEquals(
             Subscriber::STATUS_UNSUBSCRIBED,
-            $subscriberFactory->create()->loadByCustomer(2)->getSubscriberStatus()
+            $subscriberFactory->create()->loadByCustomerId(2)->getSubscriberStatus()
         );
     }
 
@@ -857,9 +924,9 @@ class IndexTest extends \Magento\Backend\Utility\Controller
      */
     public function testValidateCustomerWithAddressSuccess()
     {
-        $customerData = [
+        $customerData = array(
             'id' => '1',
-            'account' => [
+            'account' => array(
                 'middlename' => 'new middlename',
                 'group_id' => 1,
                 'website_id' => 1,
@@ -869,30 +936,29 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                 'default_shipping' => '_item1',
                 'new_password' => 'auto',
                 'sendemail_store_id' => '1',
-                'sendemail' => '1',
-
-            ],
-            'address' => [
-                '_item1' => [
+                'sendemail' => '1'
+            ),
+            'address' => array(
+                '_item1' => array(
                     'firstname' => 'update firstname',
                     'lastname' => 'update lastname',
-                    'street' => ['update street'],
+                    'street' => array('update street'),
                     'city' => 'update city',
                     'country_id' => 'US',
                     'postcode' => '01001',
-                    'telephone' => '+7000000001',
-                ],
-                '_template_' => [
+                    'telephone' => '+7000000001'
+                ),
+                '_template_' => array(
                     'firstname' => '',
                     'lastname' => '',
-                    'street' => [],
+                    'street' => array(),
                     'city' => '',
                     'country_id' => 'US',
                     'postcode' => '',
-                    'telephone' => '',
-                ]
-            ]
-        ];
+                    'telephone' => ''
+                )
+            )
+        );
         /**
          * set customer data
          */
@@ -903,7 +969,7 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         /**
          * Check that no errors were generated and set to session
          */
-        $this->assertSessionMessages($this->isEmpty(), \Magento\Message\MessageInterface::TYPE_ERROR);
+        $this->assertSessionMessages($this->isEmpty(), \Magento\Framework\Message\MessageInterface::TYPE_ERROR);
 
         $this->assertEquals('{"error":0}', $body);
     }
@@ -914,9 +980,9 @@ class IndexTest extends \Magento\Backend\Utility\Controller
      */
     public function testValidateCustomerWithAddressFailure()
     {
-        $customerData = [
+        $customerData = array(
             'id' => '1',
-            'account' => [
+            'account' => array(
                 'middlename' => 'new middlename',
                 'group_id' => 1,
                 'website_id' => 1,
@@ -926,28 +992,27 @@ class IndexTest extends \Magento\Backend\Utility\Controller
                 'default_shipping' => '_item1',
                 'new_password' => 'auto',
                 'sendemail_store_id' => '1',
-                'sendemail' => '1',
-
-            ],
-            'address' => [
-                '1' => [
+                'sendemail' => '1'
+            ),
+            'address' => array(
+                '1' => array(
                     'firstname' => '',
                     'lastname' => '',
-                    'street' => ['update street'],
+                    'street' => array('update street'),
                     'city' => 'update city',
                     'postcode' => '01001',
-                    'telephone' => '',
-                ],
-                '_template_' => [
+                    'telephone' => ''
+                ),
+                '_template_' => array(
                     'lastname' => '',
-                    'street' => [],
+                    'street' => array(),
                     'city' => '',
                     'country_id' => 'US',
                     'postcode' => '',
-                    'telephone' => '',
-                ]
-            ]
-        ];
+                    'telephone' => ''
+                )
+            )
+        );
         /**
          * set customer data
          */
@@ -955,7 +1020,7 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $this->dispatch('backend/customer/index/validate');
         $body = $this->getResponse()->getBody();
 
-        $this->assertContains('{"error":1,"message":', $body);
+        $this->assertContains('{"error":1,"html_message":', $body);
         $this->assertContains('Please correct this email address: \"*\".', $body);
         $this->assertContains('\"First Name\" is a required value.', $body);
         $this->assertContains('\"First Name\" length must be equal or greater than 1 characters', $body);
@@ -966,6 +1031,9 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $this->assertContains('\"Country\" is a required value.', $body);
     }
 
+    /**
+     * @magentoDbIsolation enabled
+     */
     public function testResetPasswordActionNoCustomerId()
     {
         // No customer ID in post, will just get redirected to base
@@ -973,10 +1041,13 @@ class IndexTest extends \Magento\Backend\Utility\Controller
         $this->assertRedirect($this->stringStartsWith($this->_baseControllerUrl));
     }
 
+    /**
+     * @magentoDbIsolation enabled
+     */
     public function testResetPasswordActionBadCustomerId()
     {
         // Bad customer ID in post, will just get redirected to base
-        $this->getRequest()->setPost(['customer_id' => '789']);
+        $this->getRequest()->setPost(array('customer_id' => '789'));
         $this->dispatch('backend/customer/index/resetPassword');
         $this->assertRedirect($this->stringStartsWith($this->_baseControllerUrl));
     }
@@ -986,12 +1057,21 @@ class IndexTest extends \Magento\Backend\Utility\Controller
      */
     public function testResetPasswordActionSuccess()
     {
-        $this->getRequest()->setPost(['customer_id' => '1']);
+        $this->getRequest()->setPost(array('customer_id' => '1'));
         $this->dispatch('backend/customer/index/resetPassword');
         $this->assertSessionMessages(
             $this->equalTo(array('Customer will receive an email with a link to reset password.')),
-            \Magento\Message\MessageInterface::TYPE_SUCCESS
+            \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS
         );
         $this->assertRedirect($this->stringStartsWith($this->_baseControllerUrl . 'edit'));
+    }
+
+    public function testIndexActionCorrectTabsQty()
+    {
+        $this->dispatch('backend/customer/index/new/');
+        $html = $this->getResponse()->getBody();
+        $this->assertSelectCount('.tab-item-link', 2, $html);
+        $this->assertSelectCount('[title="Account Information"]', 1, $html);
+        $this->assertSelectCount('[title="Addresses"]', 1, $html);
     }
 }

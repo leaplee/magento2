@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category   Magento
- * @package    Tools
  * @copyright  Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -53,7 +51,7 @@ class Reader
     /**
      * pattern to find all system.xml files
      */
-    CONST SYSTEM_CONFIG_PATH_PATTERN = 'app/code/*/*/*/etc/system.xml';
+    const SYSTEM_CONFIG_PATH_PATTERN = 'app/code/*/*/*/etc/system.xml';
 
     /**
      * @param \Magento\Tools\Migration\System\FileManager $fileManager
@@ -80,17 +78,12 @@ class Reader
     public function getConfiguration()
     {
         $files = $this->_fileManager->getFileList(
-            $this->_basePath . '/'
-            . \Magento\Tools\Migration\System\Configuration\Reader::SYSTEM_CONFIG_PATH_PATTERN
+            $this->_basePath . '/' . \Magento\Tools\Migration\System\Configuration\Reader::SYSTEM_CONFIG_PATH_PATTERN
         );
         $result = array();
         foreach ($files as $fileName) {
             $result[$fileName] = $this->_mapper->transform(
-                $this->_parser->parse(
-                    $this->_getDOMDocument(
-                        $this->_fileManager->getContents($fileName)
-                    )
-                )
+                $this->_parser->parse($this->_getDOMDocument($this->_fileManager->getContents($fileName)))
             );
         }
 

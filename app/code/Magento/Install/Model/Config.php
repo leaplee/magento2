@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Install
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,15 +25,12 @@
 /**
  * Install config
  *
- * @category   Magento
- * @package    Magento_Install
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Install\Model;
 
 class Config
 {
-
     /**
      * Config data model
      *
@@ -46,7 +41,7 @@ class Config
     /**
      * Filesystem
      *
-     * @var \Magento\App\Filesystem
+     * @var \Magento\Framework\App\Filesystem
      */
     protected $filesystem;
 
@@ -54,20 +49,18 @@ class Config
      * Constructor
      *
      * @param Config\Data $dataStorage
-     * @param \Magento\App\Filesystem $filesystem
+     * @param \Magento\Framework\App\Filesystem $filesystem
      */
-    public function __construct(
-        \Magento\Install\Model\Config\Data  $dataStorage,
-        \Magento\App\Filesystem                 $filesystem
-    ) {
+    public function __construct(\Magento\Install\Model\Config\Data $dataStorage, \Magento\Framework\App\Filesystem $filesystem)
+    {
         $this->_dataStorage = $dataStorage;
-        $this->filesystem   = $filesystem;
+        $this->filesystem = $filesystem;
     }
 
     /**
      * Get array of wizard steps
      *
-     * Array($index => \Magento\Object)
+     * Array($index => \Magento\Framework\Object)
      *
      * @return array
      */
@@ -76,7 +69,7 @@ class Config
         $data = $this->_dataStorage->get();
         $steps = array();
         foreach ($data['steps'] as $step) {
-            $stepObject = new \Magento\Object($step);
+            $stepObject = new \Magento\Framework\Object($step);
             $steps[] = $stepObject;
         }
         return $steps;
@@ -103,9 +96,11 @@ class Config
         $data = $this->_dataStorage->get();
         $res = array();
 
-        $items = (isset($data['filesystem_prerequisites'])
-            && isset($data['filesystem_prerequisites']['writables'])) ?
-            $data['filesystem_prerequisites']['writables'] : array();
+        $items = isset(
+            $data['filesystem_prerequisites']
+        ) && isset(
+            $data['filesystem_prerequisites']['writables']
+        ) ? $data['filesystem_prerequisites']['writables'] : array();
 
         foreach ($items as $item) {
             $res['writeable'][] = $item;
@@ -123,9 +118,11 @@ class Config
     {
         $data = $this->_dataStorage->get();
         $paths = array();
-        $items = (isset($data['filesystem_prerequisites'])
-            && isset($data['filesystem_prerequisites']['writables'])) ?
-            $data['filesystem_prerequisites']['writables'] : array();
+        $items = isset(
+            $data['filesystem_prerequisites']
+        ) && isset(
+            $data['filesystem_prerequisites']['writables']
+        ) ? $data['filesystem_prerequisites']['writables'] : array();
         foreach ($items as $nodeKey => $item) {
             $value = $item;
             $value['path'] = $this->filesystem->getPath($nodeKey);

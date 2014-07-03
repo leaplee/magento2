@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_GoogleShopping
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,11 +28,9 @@ use Magento\Catalog\Model\Product as CatalogModelProduct;
 /**
  * Google Content Item Types Model
  *
- * @category   Magento
- * @package    Magento_GoogleShopping
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Item extends \Magento\Core\Model\AbstractModel
+class Item extends \Magento\Framework\Model\AbstractModel
 {
     /**
      * Registry keys for caching attributes and types
@@ -79,24 +75,24 @@ class Item extends \Magento\Core\Model\AbstractModel
     protected $_productFactory;
 
     /**
-     * @param \Magento\Model\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
      * @param \Magento\GoogleShopping\Model\Service\ItemFactory $itemFactory
      * @param \Magento\GoogleShopping\Model\TypeFactory $typeFactory
      * @param \Magento\Catalog\Model\ProductFactory $productFactory
      * @param \Magento\GoogleShopping\Model\Resource\Item $resource
-     * @param \Magento\Data\Collection\Db $resourceCollection
+     * @param \Magento\Framework\Data\Collection\Db $resourceCollection
      * @param \Magento\GoogleShopping\Model\Config $config
      * @param array $data
      */
     public function __construct(
-        \Magento\Model\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
         \Magento\GoogleShopping\Model\Service\ItemFactory $itemFactory,
         \Magento\GoogleShopping\Model\TypeFactory $typeFactory,
         \Magento\Catalog\Model\ProductFactory $productFactory,
         \Magento\GoogleShopping\Model\Resource\Item $resource,
-        \Magento\Data\Collection\Db $resourceCollection,
+        \Magento\Framework\Data\Collection\Db $resourceCollection,
         \Magento\GoogleShopping\Model\Config $config,
         array $data = array()
     ) {
@@ -160,8 +156,7 @@ class Item extends \Magento\Core\Model\AbstractModel
     public function insertItem(CatalogModelProduct $product)
     {
         $this->setProduct($product);
-        $this->getServiceItem()
-            ->insert($this);
+        $this->getServiceItem()->insert($this);
         $this->setTypeId($this->getType()->getTypeId());
 
         return $this;
@@ -175,8 +170,7 @@ class Item extends \Magento\Core\Model\AbstractModel
     public function updateItem()
     {
         if ($this->getId()) {
-            $this->getServiceItem()
-                ->update($this);
+            $this->getServiceItem()->update($this);
         }
         return $this;
     }
@@ -215,7 +209,7 @@ class Item extends \Magento\Core\Model\AbstractModel
         $attributeSetId = $this->getProduct()->getAttributeSetId();
         $targetCountry = $this->getTargetCountry();
 
-        $registry = $this->_coreRegistry->registry(self::TYPES_REGISTRY_KEY);
+        $registry = $this->_registry->registry(self::TYPES_REGISTRY_KEY);
         if (is_array($registry) && isset($registry[$attributeSetId][$targetCountry])) {
             return $registry[$attributeSetId][$targetCountry];
         }
@@ -223,8 +217,8 @@ class Item extends \Magento\Core\Model\AbstractModel
         $type = $this->_typeFactory->create()->loadByAttributeSetId($attributeSetId, $targetCountry);
 
         $registry[$attributeSetId][$targetCountry] = $type;
-        $this->_coreRegistry->unregister(self::TYPES_REGISTRY_KEY);
-        $this->_coreRegistry->register(self::TYPES_REGISTRY_KEY, $registry);
+        $this->_registry->unregister(self::TYPES_REGISTRY_KEY);
+        $this->_registry->register(self::TYPES_REGISTRY_KEY, $registry);
 
         return $type;
     }

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Downloadable
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -29,21 +27,27 @@ $installer = $this;
 
 $msrpEnabled = $installer->getAttribute('catalog_product', 'msrp_enabled', 'apply_to');
 if ($msrpEnabled && strstr($msrpEnabled, \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE) == false) {
-    $installer->updateAttribute('catalog_product', 'msrp_enabled', array(
-        'apply_to'      => $msrpEnabled . ',' . \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE,
-    ));
+    $installer->updateAttribute(
+        'catalog_product',
+        'msrp_enabled',
+        array('apply_to' => $msrpEnabled . ',' . \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE)
+    );
 }
 
 $msrpDisplay = $installer->getAttribute('catalog_product', 'msrp_display_actual_price_type', 'apply_to');
 if ($msrpDisplay && strstr($msrpEnabled, \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE) == false) {
-    $installer->updateAttribute('catalog_product', 'msrp_display_actual_price_type', array(
-        'apply_to'      => $msrpDisplay . ',' . \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE,
-    ));
+    $installer->updateAttribute(
+        'catalog_product',
+        'msrp_display_actual_price_type',
+        array('apply_to' => $msrpDisplay . ',' . \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE)
+    );
 }
 
 $msrp = $installer->getAttribute('catalog_product', 'msrp', 'apply_to');
 if ($msrp && strstr($msrpEnabled, \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE) == false) {
-    $installer->updateAttribute('catalog_product', 'msrp', array(
-        'apply_to'      => $msrp . ',' . \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE,
-    ));
+    $installer->updateAttribute(
+        'catalog_product',
+        'msrp',
+        array('apply_to' => $msrp . ',' . \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE)
+    );
 }

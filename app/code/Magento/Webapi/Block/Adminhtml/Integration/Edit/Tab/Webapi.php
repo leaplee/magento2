@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Webapi\Block\Adminhtml\Integration\Edit\Tab;
 
 use Magento\Integration\Block\Adminhtml\Integration\Edit\Tab\Info;
@@ -31,13 +30,13 @@ use Magento\Integration\Model\Integration as IntegrationModel;
 /**
  * Class for handling API section within integration.
  */
-class Webapi extends \Magento\Backend\Block\Widget\Form\Generic
-    implements \Magento\Backend\Block\Widget\Tab\TabInterface
+class Webapi extends \Magento\Backend\Block\Widget\Form\Generic implements
+    \Magento\Backend\Block\Widget\Tab\TabInterface
 {
     /**
      * Root ACL Resource
      *
-     * @var \Magento\Acl\RootResource
+     * @var \Magento\Framework\Acl\RootResource
      */
     protected $_rootResource;
 
@@ -51,7 +50,7 @@ class Webapi extends \Magento\Backend\Block\Widget\Form\Generic
     /**
      * Acl resource provider
      *
-     * @var \Magento\Acl\Resource\ProviderInterface
+     * @var \Magento\Framework\Acl\Resource\ProviderInterface
      */
     protected $_aclResourceProvider;
 
@@ -65,11 +64,11 @@ class Webapi extends \Magento\Backend\Block\Widget\Form\Generic
      * Initialize dependencies.
      *
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Registry $registry
-     * @param \Magento\Data\FormFactory $formFactory
-     * @param \Magento\Acl\RootResource $rootResource
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Data\FormFactory $formFactory
+     * @param \Magento\Framework\Acl\RootResource $rootResource
      * @param \Magento\User\Model\Resource\Rules\CollectionFactory $rulesCollectionFactory
-     * @param \Magento\Acl\Resource\ProviderInterface $aclResourceProvider
+     * @param \Magento\Framework\Acl\Resource\ProviderInterface $aclResourceProvider
      * @param \Magento\Webapi\Helper\Data $webapiData
      * @param \Magento\Integration\Helper\Data $integrationData
      * @param array $data
@@ -79,11 +78,11 @@ class Webapi extends \Magento\Backend\Block\Widget\Form\Generic
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        \Magento\Registry $registry,
-        \Magento\Data\FormFactory $formFactory,
-        \Magento\Acl\RootResource $rootResource,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Data\FormFactory $formFactory,
+        \Magento\Framework\Acl\RootResource $rootResource,
         \Magento\User\Model\Resource\Rules\CollectionFactory $rulesCollectionFactory,
-        \Magento\Acl\Resource\ProviderInterface $aclResourceProvider,
+        \Magento\Framework\Acl\Resource\ProviderInterface $aclResourceProvider,
         \Magento\Webapi\Helper\Data $webapiData,
         \Magento\Integration\Helper\Data $integrationData,
         array $data = array()
@@ -124,8 +123,9 @@ class Webapi extends \Magento\Backend\Block\Widget\Form\Generic
     public function canShowTab()
     {
         $integrationData = $this->_coreRegistry->registry(IntegrationController::REGISTRY_KEY_CURRENT_INTEGRATION);
-        return !isset($integrationData[Info::DATA_SETUP_TYPE])
-            || ($integrationData[Info::DATA_SETUP_TYPE] != IntegrationModel::TYPE_CONFIG);
+        return !isset(
+            $integrationData[Info::DATA_SETUP_TYPE]
+        ) || $integrationData[Info::DATA_SETUP_TYPE] != IntegrationModel::TYPE_CONFIG;
     }
 
     /**

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -34,8 +32,11 @@ class Group extends \Magento\Backend\App\Action
     {
         $model = $this->_objectManager->create('Magento\Eav\Model\Entity\Attribute\Group');
 
-        $model->setAttributeGroupName($this->getRequest()->getParam('attribute_group_name'))
-              ->setAttributeSetId($this->getRequest()->getParam('attribute_set_id'));
+        $model->setAttributeGroupName(
+            $this->getRequest()->getParam('attribute_group_name')
+        )->setAttributeSetId(
+            $this->getRequest()->getParam('attribute_set_id')
+        );
 
         if ($model->itemExists()) {
             $this->messageManager->addError(__('A group with the same name already exists.'));

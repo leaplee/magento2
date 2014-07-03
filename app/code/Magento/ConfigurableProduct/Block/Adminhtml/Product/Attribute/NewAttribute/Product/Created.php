@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,8 +25,6 @@
 /**
  * New product attribute created on product edit page
  *
- * @category   Magento
- * @package    Magento_Catalog
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\ConfigurableProduct\Block\Adminhtml\Product\Attribute\NewAttribute\Product;
@@ -43,7 +39,7 @@ class Created extends \Magento\Backend\Block\Widget
     /**
      * Core registry
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
 
@@ -58,24 +54,24 @@ class Created extends \Magento\Backend\Block\Widget
     protected $_setFactory;
 
     /**
-     * @var \Magento\Json\EncoderInterface
+     * @var \Magento\Framework\Json\EncoderInterface
      */
     protected $_jsonEncoder;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Json\EncoderInterface $jsonEncoder
+     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
      * @param \Magento\Eav\Model\Entity\Attribute\SetFactory $setFactory
      * @param \Magento\Eav\Model\Entity\AttributeFactory $attributeFactory
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Registry $registry
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        \Magento\Json\EncoderInterface $jsonEncoder,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         \Magento\Eav\Model\Entity\Attribute\SetFactory $setFactory,
         \Magento\Eav\Model\Entity\AttributeFactory $attributeFactory,
-        \Magento\Registry $registry,
+        \Magento\Framework\Registry $registry,
         array $data = array()
     ) {
         $this->_jsonEncoder = $jsonEncoder;
@@ -124,8 +120,7 @@ class Created extends \Magento\Backend\Block\Widget
         $result = array();
         if ($this->getRequest()->getParam('product_tab') == 'variations') {
             /** @var $attribute \Magento\Eav\Model\Entity\Attribute */
-            $attribute =
-                $this->_attributeFactory->create()->load($this->getRequest()->getParam('attribute'));
+            $attribute = $this->_attributeFactory->create()->load($this->getRequest()->getParam('attribute'));
             $result = array(
                 'tab' => $this->getRequest()->getParam('product_tab'),
                 'attribute' => array(
@@ -140,10 +135,7 @@ class Created extends \Magento\Backend\Block\Widget
         if ($newAttributeSetId) {
             /** @var $attributeSet \Magento\Eav\Model\Entity\Attribute\Set */
             $attributeSet = $this->_setFactory->create()->load($newAttributeSetId);
-            $result['set'] = array(
-                'id' => $attributeSet->getId(),
-                'label' => $attributeSet->getAttributeSetName(),
-            );
+            $result['set'] = array('id' => $attributeSet->getId(), 'label' => $attributeSet->getAttributeSetName());
         }
 
         return $this->_jsonEncoder->encode($result);

@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Indexer\Product\Flat;
 
 class State extends \Magento\Catalog\Model\Indexer\AbstractFlatState
@@ -42,22 +41,22 @@ class State extends \Magento\Catalog\Model\Indexer\AbstractFlatState
     protected $_productFlatIndexerHelper;
 
     /**
-     * @param \Magento\Core\Model\Store\ConfigInterface $storeConfig
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Indexer\Model\IndexerInterface $flatIndexer
      * @param \Magento\Catalog\Helper\Product\Flat\Indexer $flatIndexerHelper
      * @param bool $isAvailable
      */
     public function __construct(
-        \Magento\Core\Model\Store\ConfigInterface $storeConfig,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Indexer\Model\IndexerInterface $flatIndexer,
         \Magento\Catalog\Helper\Product\Flat\Indexer $flatIndexerHelper,
         $isAvailable = false
     ) {
-        $this->storeConfig = $storeConfig;
+        $this->scopeConfig = $scopeConfig;
         $this->flatIndexer = $flatIndexer;
         $this->_productFlatIndexerHelper = $flatIndexerHelper;
         $this->isAvailable = $isAvailable;
-        parent::__construct($storeConfig, $flatIndexer, $isAvailable);
+        parent::__construct($scopeConfig, $flatIndexer, $isAvailable);
     }
 
     /**

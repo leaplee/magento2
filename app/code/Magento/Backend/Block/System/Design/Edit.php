@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -35,18 +33,18 @@ class Edit extends \Magento\Backend\Block\Widget
     /**
      * Core registry
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Registry $registry
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\Registry $registry,
         array $data = array()
     ) {
         $this->_coreRegistry = $registry;
@@ -68,27 +66,42 @@ class Edit extends \Magento\Backend\Block\Widget
      */
     protected function _prepareLayout()
     {
-        $this->addChild('back_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Back'),
-            'onclick'   => 'setLocation(\'' . $this->getUrl('adminhtml/*/') . '\')',
-            'class' => 'back'
-        ));
+        $this->getToolbar()->addChild(
+            'back_button',
+            'Magento\Backend\Block\Widget\Button',
+            array(
+                'label' => __('Back'),
+                'onclick' => 'setLocation(\'' . $this->getUrl('adminhtml/*/') . '\')',
+                'class' => 'back'
+            )
+        );
 
-        $this->addChild('save_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Save'),
-            'class' => 'save',
-            'data_attribute'  => array(
-                'mage-init' => array(
-                    'button' => array('event' => 'save', 'target' => '#design-edit-form'),
-                ),
-            ),
-        ));
+        if ($this->getDesignChangeId()) {
+            $this->getToolbar()->addChild(
+                'delete_button',
+                'Magento\Backend\Block\Widget\Button',
+                array(
+                    'label' => __('Delete'),
+                    'onclick' => 'confirmSetLocation(\'' . __(
+                        'Are you sure?'
+                    ) . '\', \'' . $this->getDeleteUrl() . '\')',
+                    'class' => 'delete'
+                )
+            );
+        }
 
-        $this->addChild('delete_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Delete'),
-            'onclick'   => 'confirmSetLocation(\'' . __('Are you sure?') . '\', \'' . $this->getDeleteUrl() . '\')',
-            'class'  => 'delete'
-        ));
+        $this->getToolbar()->addChild(
+            'save_button',
+            'Magento\Backend\Block\Widget\Button',
+            array(
+                'label' => __('Save'),
+                'class' => 'save primary',
+                'data_attribute' => array(
+                    'mage-init' => array('button' => array('event' => 'save', 'target' => '#design-edit-form'))
+                )
+            )
+        );
+
         return parent::_prepareLayout();
     }
 
@@ -105,7 +118,7 @@ class Edit extends \Magento\Backend\Block\Widget
      */
     public function getDeleteUrl()
     {
-        return $this->getUrl('adminhtml/*/delete', array('_current'=>true));
+        return $this->getUrl('adminhtml/*/delete', array('_current' => true));
     }
 
     /**
@@ -113,7 +126,7 @@ class Edit extends \Magento\Backend\Block\Widget
      */
     public function getSaveUrl()
     {
-        return $this->getUrl('adminhtml/*/save', array('_current'=>true));
+        return $this->getUrl('adminhtml/*/save', array('_current' => true));
     }
 
     /**
@@ -121,7 +134,7 @@ class Edit extends \Magento\Backend\Block\Widget
      */
     public function getValidationUrl()
     {
-        return $this->getUrl('adminhtml/*/validate', array('_current'=>true));
+        return $this->getUrl('adminhtml/*/validate', array('_current' => true));
     }
 
     /**

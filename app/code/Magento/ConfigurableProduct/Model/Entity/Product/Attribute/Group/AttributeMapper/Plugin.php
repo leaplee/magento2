@@ -25,7 +25,7 @@
  */
 namespace Magento\ConfigurableProduct\Model\Entity\Product\Attribute\Group\AttributeMapper;
 
-use Magento\Registry;
+use Magento\Framework\Registry;
 use Magento\ConfigurableProduct\Model\Resource\Product\Type\Configurable\AttributeFactory;
 
 class Plugin
@@ -36,7 +36,7 @@ class Plugin
     protected $attributeFactory;
 
     /**
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $registry;
 
@@ -49,10 +49,8 @@ class Plugin
      * @param AttributeFactory $attributeFactory
      * @param Registry $registry
      */
-    public function __construct(
-        AttributeFactory $attributeFactory,
-        Registry $registry
-    ) {
+    public function __construct(AttributeFactory $attributeFactory, Registry $registry)
+    {
         $this->registry = $registry;
         $this->attributeFactory = $attributeFactory;
     }
@@ -77,7 +75,10 @@ class Plugin
         if (!isset($this->configurableAttributes[$setId])) {
             $this->configurableAttributes[$setId] = $this->attributeFactory->create()->getUsedAttributes($setId);
         }
-        $result['is_configurable'] = (int)in_array($attribute->getAttributeId(), $this->configurableAttributes[$setId]);
+        $result['is_configurable'] = (int)in_array(
+            $attribute->getAttributeId(),
+            $this->configurableAttributes[$setId]
+        );
         return $result;
     }
 }

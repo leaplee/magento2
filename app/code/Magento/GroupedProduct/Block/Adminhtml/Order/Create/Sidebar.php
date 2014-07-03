@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\GroupedProduct\Block\Adminhtml\Order\Create;
 
 class Sidebar
@@ -31,7 +30,7 @@ class Sidebar
      *
      * @param \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\AbstractSidebar $subject
      * @param callable $proceed
-     * @param \Magento\Object $item
+     * @param \Magento\Framework\Object $item
      *
      * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -39,7 +38,7 @@ class Sidebar
     public function aroundGetItemQty(
         \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\AbstractSidebar $subject,
         \Closure $proceed,
-        \Magento\Object $item
+        \Magento\Framework\Object $item
     ) {
         if ($item->getProduct()->getTypeId() == \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE) {
             return '';
@@ -67,4 +66,4 @@ class Sidebar
         }
         return $proceed($productType);
     }
-} 
+}

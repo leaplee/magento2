@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category   Magento
- * @package    Mage
  * @copyright  Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -76,7 +74,7 @@ INSTALLSCHEME;
         'admin_password' => '1234qasd',
         'use_secure' => 'no',
         'secure_base_url' => '"https://magento.local"',
-        'cleanup_database' => '',
+        'cleanup_database' => ''
     );
     echo 'Example of installation:' . PHP_EOL;
     echo '  php -f ' . $_SERVER['argv'][0] . ' --';
@@ -94,5 +92,9 @@ INSTALLSCHEME;
 define('BARE_BOOTSTRAP', 1);
 require_once __DIR__ . '/../../app/bootstrap.php';
 
-$entryPoint = new \Magento\App\EntryPoint\EntryPoint(BP);
+$_SERVER[\Magento\Framework\App\State::PARAM_MODE] = isset($_SERVER[\Magento\Framework\App\State::PARAM_MODE])
+    ? $_SERVER[\Magento\Framework\App\State::PARAM_MODE]
+    : \Magento\Framework\App\State::MODE_DEVELOPER;
+
+$entryPoint = new \Magento\Framework\App\EntryPoint\EntryPoint(BP, $_SERVER);
 $entryPoint->run('Magento\Install\App\Console', array('arguments' => $args));

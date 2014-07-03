@@ -23,10 +23,9 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Product;
 
-class Copier 
+class Copier
 {
     /**
      * @var CopyConstructorInterface
@@ -46,7 +45,7 @@ class Copier
         CopyConstructorInterface $copyConstructor,
         \Magento\Catalog\Model\ProductFactory $productFactory
     ) {
-        $this->productFactory  = $productFactory;
+        $this->productFactory = $productFactory;
         $this->copyConstructor = $copyConstructor;
     }
 
@@ -69,7 +68,7 @@ class Copier
         $duplicate->setCreatedAt(null);
         $duplicate->setUpdatedAt(null);
         $duplicate->setId(null);
-        $duplicate->setStoreId(\Magento\Core\Model\Store::DEFAULT_STORE_ID);
+        $duplicate->setStoreId(\Magento\Store\Model\Store::DEFAULT_STORE_ID);
 
         $this->copyConstructor->build($product, $duplicate);
         $duplicate->save();
@@ -78,4 +77,4 @@ class Copier
         $product->getResource()->duplicate($product->getId(), $duplicate->getId());
         return $duplicate;
     }
-} 
+}

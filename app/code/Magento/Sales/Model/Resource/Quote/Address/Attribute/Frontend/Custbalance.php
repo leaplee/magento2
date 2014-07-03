@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,12 +26,9 @@ namespace Magento\Sales\Model\Resource\Quote\Address\Attribute\Frontend;
 /**
  * Quote address attribute frontend custbalance resource model
  *
- * @category    Magento
- * @package     Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Custbalance
-    extends \Magento\Sales\Model\Resource\Quote\Address\Attribute\Frontend
+class Custbalance extends \Magento\Sales\Model\Resource\Quote\Address\Attribute\Frontend
 {
     /**
      * Fetch customer balance
@@ -45,11 +40,9 @@ class Custbalance
     {
         $custbalance = $address->getCustbalanceAmount();
         if ($custbalance != 0) {
-            $address->addTotal(array(
-                'code'  => 'custbalance',
-                'title' => __('Store Credit'),
-                'value' => -$custbalance
-            ));
+            $address->addTotal(
+                array('code' => 'custbalance', 'title' => __('Store Credit'), 'value' => -$custbalance)
+            );
         }
         return $this;
     }

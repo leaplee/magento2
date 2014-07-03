@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_GoogleShopping
  * @copyright  Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,11 +26,9 @@ namespace Magento\GoogleShopping\Model;
 /**
  * Google shopping synchronization operations flag
  *
- * @category    Magento
- * @package     Magento_GoogleShopping
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Flag extends \Magento\Core\Model\Flag
+class Flag extends \Magento\Framework\Flag
 {
     /**
      * Flag time to live in seconds
@@ -53,8 +49,7 @@ class Flag extends \Magento\Core\Model\Flag
      */
     public function lock()
     {
-        $this->setState(1)
-            ->save();
+        $this->setState(1)->save();
     }
 
     /**
@@ -91,7 +86,7 @@ class Flag extends \Magento\Core\Model\Flag
     {
         if (!!$this->getState() && \Magento\GoogleShopping\Model\Flag::FLAG_TTL) {
             if ($this->getLastUpdate()) {
-                return (time() > (strtotime($this->getLastUpdate()) + \Magento\GoogleShopping\Model\Flag::FLAG_TTL));
+                return time() > strtotime($this->getLastUpdate()) + \Magento\GoogleShopping\Model\Flag::FLAG_TTL;
             } else {
                 return true;
             }

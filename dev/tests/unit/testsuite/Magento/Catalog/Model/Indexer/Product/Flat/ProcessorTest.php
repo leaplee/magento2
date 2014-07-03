@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
- * @subpackage  unit_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Indexer\Product\Flat;
 
 class ProcessorTest extends \PHPUnit_Framework_TestCase
@@ -45,6 +41,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     protected $_indexerMock;
 
     /**
+     * @var \Magento\Indexer\Model\IndexerFactory|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $_indexerFactoryMock;
+
+    /**
      * @var \Magento\Catalog\Model\Indexer\Product\Flat\State|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $_stateMock;
@@ -54,15 +55,32 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->_objectManager = new \Magento\TestFramework\Helper\ObjectManager($this);
 
         $this->_indexerMock = $this->getMock(
-            'Magento\Indexer\Model\Indexer', array('getId', 'invalidate'), array(), '', false
+            'Magento\Indexer\Model\Indexer',
+            array('getId', 'invalidate'),
+            array(),
+            '',
+            false
         );
         $this->_indexerMock->expects($this->any())->method('getId')->will($this->returnValue(1));
 
+        $this->_indexerFactoryMock = $this->getMock(
+            'Magento\Indexer\Model\IndexerFactory', array('create'), array(), '', false
+        );
+
+        $this->_indexerFactoryMock
+            ->expects($this->any())
+            ->method('create')
+            ->will($this->returnValue($this->_indexerMock));
+
         $this->_stateMock = $this->getMock(
-            'Magento\Catalog\Model\Indexer\Product\Flat\State', array('isFlatEnabled'), array(), '', false
+            'Magento\Catalog\Model\Indexer\Product\Flat\State',
+            array('isFlatEnabled'),
+            array(),
+            '',
+            false
         );
         $this->_model = $this->_objectManager->getObject('Magento\Catalog\Model\Indexer\Product\Flat\Processor', array(
-            'indexer' => $this->_indexerMock,
+            'indexerFactory' => $this->_indexerFactoryMock,
             'state'  => $this->_stateMock
         ));
     }

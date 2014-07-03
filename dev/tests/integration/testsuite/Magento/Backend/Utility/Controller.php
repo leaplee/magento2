@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Backend\Utility;
 
 /**
@@ -65,13 +61,13 @@ class Controller extends \Magento\TestFramework\TestCase\AbstractController
     {
         return array(
             'user' => \Magento\TestFramework\Bootstrap::ADMIN_NAME,
-            'password' => \Magento\TestFramework\Bootstrap::ADMIN_PASSWORD,
+            'password' => \Magento\TestFramework\Bootstrap::ADMIN_PASSWORD
         );
     }
 
     protected function tearDown()
     {
-        $this->_auth->logout();
+        $this->_auth->getAuthStorage()->destroy(['send_expire_cookie' => false]);
         $this->_auth = null;
         $this->_session = null;
         $this->_objectManager->get('Magento\Backend\Model\UrlInterface')->turnOnSecretKey();
@@ -83,11 +79,13 @@ class Controller extends \Magento\TestFramework\TestCase\AbstractController
      *
      * @param \PHPUnit_Framework_Constraint $constraint
      * @param string|null $messageType
-     * @param string $messageManager
+     * @param string $messageManagerClass
      */
     public function assertSessionMessages(
-        \PHPUnit_Framework_Constraint $constraint, $messageType = null, $messageManager = 'Magento\Message\Manager'
+        \PHPUnit_Framework_Constraint $constraint,
+        $messageType = null,
+        $messageManagerClass = 'Magento\Framework\Message\Manager'
     ) {
-        parent::assertSessionMessages($constraint, $messageType, $messageManager);
+        parent::assertSessionMessages($constraint, $messageType, $messageManagerClass);
     }
 }

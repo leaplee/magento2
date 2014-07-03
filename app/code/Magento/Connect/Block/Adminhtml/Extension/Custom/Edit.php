@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Connect
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,8 +25,6 @@
 /**
  * Extension edit page
  *
- * @category    Magento
- * @package     Magento_Connect
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Connect\Block\Adminhtml\Extension\Custom;
@@ -44,35 +40,37 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
      */
     protected function _construct()
     {
-        $this->_objectId    = 'id';
-        $this->_blockGroup  = 'Magento_Connect';
-        $this->_controller  = 'adminhtml_extension_custom';
+        $this->_objectId = 'id';
+        $this->_blockGroup = 'Magento_Connect';
+        $this->_controller = 'adminhtml_extension_custom';
 
         parent::_construct();
 
         $this->_removeButton('back');
         $this->_updateButton('reset', 'onclick', "resetPackage()");
 
-        $this->_addButton('create', array(
-            'label'     => __('Save Data and Create Package'),
-            'class'     => 'save',
-            'onclick'   => "createPackage()",
-            'data_attribute'  => array(
-                'mage-init' => array(
-                    'button' => array('event' => 'save', 'target' => '#edit_form'),
-                ),
-            ),
-        ));
-        $this->_addButton('save_as', array(
-            'label'     => __('Save As...'),
-            'title'     => __('Save package with custom package file name'),
-            'onclick'   => 'saveAsPackage(event)',
-            'data_attribute'  => array(
-                'mage-init' => array(
-                    'button' => array('event' => 'save', 'target' => '#edit_form'),
-                ),
-            ),
-        ));
+        $this->_addButton(
+            'create',
+            array(
+                'label' => __('Save Data and Create Package'),
+                'class' => 'save',
+                'onclick' => "createPackage()",
+                'data_attribute' => array(
+                    'mage-init' => array('button' => array('event' => 'save', 'target' => '#edit_form'))
+                )
+            )
+        );
+        $this->_addButton(
+            'save_as',
+            array(
+                'label' => __('Save As...'),
+                'title' => __('Save package with custom package file name'),
+                'onclick' => 'saveAsPackage(event)',
+                'data_attribute' => array(
+                    'mage-init' => array('button' => array('event' => 'save', 'target' => '#edit_form'))
+                )
+            )
+        );
     }
 
     /**

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_GiftMessage
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\GiftMessage\Block\Adminhtml\Sales\Order\View;
 /**
  * Gift message adminhtml sales order view items
  *
- * @category   Magento
- * @package    Magento_GiftMessage
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Items extends \Magento\Backend\Block\Template
@@ -155,8 +151,9 @@ class Items extends \Magento\Backend\Block\Template
      */
     protected function _initMessage()
     {
-        $this->_giftMessage[$this->getItem()->getGiftMessageId()] =
-            $this->_messageHelper->getGiftMessage($this->getItem()->getGiftMessageId());
+        $this->_giftMessage[$this->getItem()->getGiftMessageId()] = $this->_messageHelper->getGiftMessage(
+            $this->getItem()->getGiftMessageId()
+        );
 
         // init default values for giftmessage form
         if (!$this->getMessage()->getSender()) {
@@ -190,11 +187,10 @@ class Items extends \Magento\Backend\Block\Template
      */
     public function getSaveUrl()
     {
-        return $this->getUrl('sales/order_view_giftmessage/save', array(
-            'entity'    => $this->getItem()->getId(),
-            'type'      => 'order_item',
-            'reload'    => true
-        ));
+        return $this->getUrl(
+            'sales/order_view_giftmessage/save',
+            array('entity' => $this->getItem()->getId(), 'type' => 'order_item', 'reload' => true)
+        );
     }
 
     /**

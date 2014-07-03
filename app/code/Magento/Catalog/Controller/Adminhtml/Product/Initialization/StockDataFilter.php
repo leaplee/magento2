@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Controller\Adminhtml\Product\Initialization;
 
 class StockDataFilter
@@ -32,16 +31,16 @@ class StockDataFilter
     const MAX_QTY_VALUE = 99999999.9999;
 
     /**
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $storeManager;
+    protected $scopeConfig;
 
     /**
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
-    public function __construct(\Magento\Core\Model\StoreManagerInterface $storeManager)
+    public function __construct(\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig)
     {
-        $this->storeManager = $storeManager;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -57,10 +56,12 @@ class StockDataFilter
         }
 
         if ($stockData['use_config_manage_stock'] == 1 && !isset($stockData['manage_stock'])) {
-            $stockData['manage_stock'] = $this->storeManager->getStore()
-                ->getConfig(\Magento\CatalogInventory\Model\Stock\Item::XML_PATH_MANAGE_STOCK);
+            $stockData['manage_stock'] = $this->scopeConfig->getValue(
+                \Magento\CatalogInventory\Model\Stock\Item::XML_PATH_MANAGE_STOCK,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
         }
-        if (isset($stockData['qty']) && (float)$stockData['qty'] > self::MAX_QTY_VALUE) {
+        if (isset($stockData['qty']) && (double)$stockData['qty'] > self::MAX_QTY_VALUE) {
             $stockData['qty'] = self::MAX_QTY_VALUE;
         }
 
@@ -74,4 +75,4 @@ class StockDataFilter
 
         return $stockData;
     }
-} 
+}

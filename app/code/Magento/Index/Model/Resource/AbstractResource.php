@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Index
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,19 +25,18 @@
 /**
  * Abstract resource model. Can be used as base for indexer resources
  *
- * @category    Magento
- * @package     Magento_Index
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Index\Model\Resource;
 
-use Magento\DB\Adapter\AdapterInterface;
-use Magento\DB\Select;
+use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\DB\Select;
 
-abstract class AbstractResource extends \Magento\Core\Model\Resource\Db\AbstractDb
+abstract class AbstractResource extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
-    const IDX_SUFFIX= '_idx';
-    const TMP_SUFFIX= '_tmp';
+    const IDX_SUFFIX = '_idx';
+
+    const TMP_SUFFIX = '_tmp';
 
     /**
      * Flag that defines if need to use "_idx" index table suffix instead of "_tmp"
@@ -145,11 +142,11 @@ abstract class AbstractResource extends \Magento\Core\Model\Resource\Db\Abstract
     public function insertFromSelect($select, $destTable, array $columns, $readToIndex = true)
     {
         if ($readToIndex) {
-            $from   = $this->_getWriteAdapter();
-            $to     = $this->_getIndexAdapter();
+            $from = $this->_getWriteAdapter();
+            $to = $this->_getIndexAdapter();
         } else {
-            $from   = $this->_getIndexAdapter();
-            $to     = $this->_getWriteAdapter();
+            $from = $this->_getIndexAdapter();
+            $to = $this->_getWriteAdapter();
         }
 
         if ($from === $to) {
@@ -162,7 +159,7 @@ abstract class AbstractResource extends \Magento\Core\Model\Resource\Db\Abstract
             while ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
                 $data[] = $row;
                 $counter++;
-                if ($counter>2000) {
+                if ($counter > 2000) {
                     $to->insertArray($destTable, $columns, $data);
                     $data = array();
                     $counter = 0;

@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Rule
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
-
 namespace Magento\Rule\Model\Action;
 
 class Collection extends AbstractAction
@@ -35,21 +31,21 @@ class Collection extends AbstractAction
     protected $_actionFactory;
 
     /**
-     * @param \Magento\View\Url $viewUrl
-     * @param \Magento\View\LayoutInterface $layout
+     * @param \Magento\Framework\View\Asset\Repository $assetRepo
+     * @param \Magento\Framework\View\LayoutInterface $layout
      * @param \Magento\Rule\Model\ActionFactory $actionFactory
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Url $viewUrl,
-        \Magento\View\LayoutInterface $layout,
+        \Magento\Framework\View\Asset\Repository $assetRepo,
+        \Magento\Framework\View\LayoutInterface $layout,
         \Magento\Rule\Model\ActionFactory $actionFactory,
         array $data = array()
     ) {
         $this->_actionFactory = $actionFactory;
         $this->_layout = $layout;
 
-        parent::__construct($viewUrl, $layout, $data);
+        parent::__construct($assetRepo, $layout, $data);
 
         $this->setActions(array());
         $this->setType('Magento\Rule\Model\Action\Collection');
@@ -109,7 +105,7 @@ class Collection extends AbstractAction
 
         $actions[] = $action;
         if (!$action->getId()) {
-            $action->setId($this->getId().'.'.sizeof($actions));
+            $action->setId($this->getId() . '.' . sizeof($actions));
         }
 
         $this->setActions($actions);
@@ -121,9 +117,9 @@ class Collection extends AbstractAction
      */
     public function asHtml()
     {
-        $html = $this->getTypeElement()->toHtml().'Perform following actions: ';
-        if ($this->getId()!='1') {
-            $html.= $this->getRemoveLinkHtml();
+        $html = $this->getTypeElement()->toHtml() . 'Perform following actions: ';
+        if ($this->getId() != '1') {
+            $html .= $this->getRemoveLinkHtml();
         }
         return $html;
     }
@@ -133,11 +129,17 @@ class Collection extends AbstractAction
      */
     public function getNewChildElement()
     {
-        return $this->getForm()->addField('action:' . $this->getId() . ':new_child', 'select', array(
-            'name' => 'rule[actions][' . $this->getId() . '][new_child]',
-            'values' => $this->getNewChildSelectOptions(),
-            'value_name' => $this->getNewChildName(),
-        ))->setRenderer($this->_layout->getBlockSingleton('Magento\Rule\Block\Newchild'));
+        return $this->getForm()->addField(
+            'action:' . $this->getId() . ':new_child',
+            'select',
+            array(
+                'name' => 'rule[actions][' . $this->getId() . '][new_child]',
+                'values' => $this->getNewChildSelectOptions(),
+                'value_name' => $this->getNewChildName()
+            )
+        )->setRenderer(
+            $this->_layout->getBlockSingleton('Magento\Rule\Block\Newchild')
+        );
     }
 
     /**

@@ -18,37 +18,40 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_ImportExport
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\ImportExport\Block\Adminhtml\Import\Frame;
 
-use Magento\View\Element\Template;
+use Magento\Framework\View\Element\Template;
 
 /**
  * Import frame result block.
  *
- * @category    Magento
- * @package     Magento_ImportExport
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Result extends \Magento\Backend\Block\Template
 {
     /**
      * JavaScript actions for response.
+     *     'clear'           remove element from DOM
+     *     'innerHTML'       set innerHTML property (use: elementID => new content)
+     *     'value'           set value for form element (use: elementID => new value)
+     *     'show'            show specified element
+     *     'hide'            hide specified element
+     *     'removeClassName' remove specified class name from element
+     *     'addClassName'    add specified class name to element
      *
      * @var array
      */
     protected $_actions = array(
-        'clear'           => array(), // remove element from DOM
-        'innerHTML'       => array(), // set innerHTML property (use: elementID => new content)
-        'value'           => array(), // set value for form element (use: elementID => new value)
-        'show'            => array(), // show specified element
-        'hide'            => array(), // hide specified element
-        'removeClassName' => array(), // remove specified class name from element
-        'addClassName'    => array()  // add specified class name to element
+        'clear' => array(),
+        'innerHTML' => array(),
+        'value' => array(),
+        'show' => array(),
+        'hide' => array(),
+        'removeClassName' => array(),
+        'addClassName' => array()
     );
 
     /**
@@ -56,25 +59,21 @@ class Result extends \Magento\Backend\Block\Template
      *
      * @var array
      */
-    protected $_messages = array(
-        'error'   => array(),
-        'success' => array(),
-        'notice'  => array()
-    );
+    protected $_messages = array('error' => array(), 'success' => array(), 'notice' => array());
 
     /**
-     * @var \Magento\Json\EncoderInterface
+     * @var \Magento\Framework\Json\EncoderInterface
      */
     protected $_jsonEncoder;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Json\EncoderInterface $jsonEncoder
+     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        \Magento\Json\EncoderInterface $jsonEncoder,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         array $data = array()
     ) {
         $this->_jsonEncoder = $jsonEncoder;
@@ -170,9 +169,15 @@ class Result extends \Magento\Backend\Block\Template
      */
     public function getImportButtonHtml()
     {
-        return '&nbsp;&nbsp;<button onclick="varienImport.startImport(\'' . $this->getImportStartUrl()
-            . '\', \'' . \Magento\ImportExport\Model\Import::FIELD_NAME_SOURCE_FILE . '\');" class="scalable save"'
-            . ' type="button"><span><span><span>' . __('Import') . '</span></span></span></button>';
+        return '&nbsp;&nbsp;<button onclick="varienImport.startImport(\'' .
+            $this->getImportStartUrl() .
+            '\', \'' .
+            \Magento\ImportExport\Model\Import::FIELD_NAME_SOURCE_FILE .
+            '\');" class="scalable save"' .
+            ' type="button"><span><span><span>' .
+            __(
+                'Import'
+            ) . '</span></span></span></button>';
     }
 
     /**
@@ -202,14 +207,14 @@ class Result extends \Magento\Backend\Block\Template
      */
     public function getMessagesHtml()
     {
-        /** @var $messagesBlock \Magento\View\Element\Messages */
-        $messagesBlock = $this->_layout->createBlock('Magento\View\Element\Messages');
+        /** @var $messagesBlock \Magento\Framework\View\Element\Messages */
+        $messagesBlock = $this->_layout->createBlock('Magento\Framework\View\Element\Messages');
 
         foreach ($this->_messages as $priority => $messages) {
             $method = "add{$priority}";
 
             foreach ($messages as $message) {
-                $messagesBlock->$method($message);
+                $messagesBlock->{$method}($message);
             }
         }
         return $messagesBlock->toHtml();

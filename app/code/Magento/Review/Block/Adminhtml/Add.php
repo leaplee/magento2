@@ -18,19 +18,14 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Review
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Review\Block\Adminhtml;
 
 /**
  * Adminhtml add Review main block
  *
- * @category   Magento
- * @package    Magento_Review
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Add extends \Magento\Backend\Block\Widget\Form\Container
@@ -96,7 +91,11 @@ class Add extends \Magento\Backend\Block\Widget\Form\Container
                         if (!params.form_key) {
                             params.form_key = FORM_KEY;
                         }
-                        new Ajax.Updater("rating_detail", "'.$this->getUrl('catalog/*/ratingItems').'", {parameters:params, evalScripts: true,  onComplete:function(){ $(\'save_button\').disabled = false; } });
+                        new Ajax.Updater("rating_detail", "' .
+            $this->getUrl(
+                'review/product/ratingItems'
+            ) .
+            '", {parameters:params, evalScripts: true,  onComplete:function(){ $(\'save_button\').disabled = false; } });
                     },
 
                     reqSuccess :function(o) {
@@ -106,8 +105,12 @@ class Add extends \Magento\Backend\Block\Widget\Form\Container
                         } else if( response.id ){
                             $("product_id").value = response.id;
 
-                            $("product_name").innerHTML = \'<a href="' . $this->getUrl('catalog/product/edit') . 'id/\' + response.id + \'" target="_blank">\' + response.name + \'</a>\';
-                        } else if( response.message ) {
+                            $("product_name").innerHTML = \'<a href="' .
+            $this->getUrl(
+                'catalog/product/edit'
+            ) .
+            'id/\' + response.id + \'" target="_blank">\' + response.name + \'</a>\';
+                        } else if ( response.message ) {
                             alert(response.message);
                         }
                     }

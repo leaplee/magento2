@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,17 +25,14 @@
 /* @var $installer \Magento\Sales\Model\Resource\Setup */
 $installer = $this;
 
-$entitiesToAlter = array(
-    'quote_address',
-    'order_address'
-);
+$entitiesToAlter = array('quote_address', 'order_address');
 
 $attributes = array(
-    'vat_id' => array('type' => \Magento\DB\Ddl\Table::TYPE_TEXT),
-    'vat_is_valid' => array('type' => \Magento\DB\Ddl\Table::TYPE_SMALLINT),
-    'vat_request_id' => array('type' => \Magento\DB\Ddl\Table::TYPE_TEXT),
-    'vat_request_date' => array('type' => \Magento\DB\Ddl\Table::TYPE_TEXT),
-    'vat_request_success' => array('type' => \Magento\DB\Ddl\Table::TYPE_SMALLINT)
+    'vat_id' => array('type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT),
+    'vat_is_valid' => array('type' => \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT),
+    'vat_request_id' => array('type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT),
+    'vat_request_date' => array('type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT),
+    'vat_request_success' => array('type' => \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT)
 );
 
 foreach ($entitiesToAlter as $entityName) {

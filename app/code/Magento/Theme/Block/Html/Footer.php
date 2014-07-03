@@ -21,13 +21,12 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Theme\Block\Html;
 
 /**
  * Html page footer block
  */
-class Footer extends \Magento\View\Element\Template implements \Magento\View\Block\IdentityInterface
+class Footer extends \Magento\Framework\View\Element\Template implements \Magento\Framework\View\Block\IdentityInterface
 {
     /**
      * Copyright information
@@ -37,21 +36,21 @@ class Footer extends \Magento\View\Element\Template implements \Magento\View\Blo
     protected $_copyright;
 
     /**
-     * @var \Magento\Customer\Model\Session
+     * @var \Magento\Framework\App\Http\Context
      */
-    protected $_customerSession;
+    protected $httpContext;
 
     /**
-     * @param \Magento\View\Element\Template\Context $context
-     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param \Magento\Framework\App\Http\Context $httpContext
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Template\Context $context,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Framework\App\Http\Context $httpContext,
         array $data = array()
     ) {
-        $this->_customerSession = $customerSession;
+        $this->httpContext = $httpContext;
         parent::__construct($context, $data);
     }
 
@@ -62,13 +61,12 @@ class Footer extends \Magento\View\Element\Template implements \Magento\View\Blo
      */
     protected function _construct()
     {
-        $this->addData(array(
-            'cache_lifetime'=> false,
-            'cache_tags' => array(
-                \Magento\Core\Model\Store::CACHE_TAG,
-                \Magento\Cms\Model\Block::CACHE_TAG,
+        $this->addData(
+            array(
+                'cache_lifetime' => false,
+                'cache_tags' => array(\Magento\Store\Model\Store::CACHE_TAG, \Magento\Cms\Model\Block::CACHE_TAG)
             )
-        ));
+        );
     }
 
     /**
@@ -83,7 +81,7 @@ class Footer extends \Magento\View\Element\Template implements \Magento\View\Blo
             $this->_storeManager->getStore()->getId(),
             (int)$this->_storeManager->getStore()->isCurrentlySecure(),
             $this->_design->getDesignTheme()->getId(),
-            $this->_customerSession->isLoggedIn(),
+            $this->httpContext->getValue(\Magento\Customer\Helper\Data::CONTEXT_AUTH),
         );
     }
 
@@ -95,7 +93,10 @@ class Footer extends \Magento\View\Element\Template implements \Magento\View\Blo
     public function getCopyright()
     {
         if (!$this->_copyright) {
-            $this->_copyright = $this->_storeConfig->getConfig('design/footer/copyright');
+            $this->_copyright = $this->_scopeConfig->getValue(
+                'design/footer/copyright',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
         }
         return $this->_copyright;
     }
@@ -107,7 +108,6 @@ class Footer extends \Magento\View\Element\Template implements \Magento\View\Blo
      */
     public function getIdentities()
     {
-        return array(\Magento\Core\Model\Store::CACHE_TAG, \Magento\Cms\Model\Block::CACHE_TAG);
+        return array(\Magento\Store\Model\Store::CACHE_TAG, \Magento\Cms\Model\Block::CACHE_TAG);
     }
-
 }

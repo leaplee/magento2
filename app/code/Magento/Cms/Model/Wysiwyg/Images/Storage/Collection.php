@@ -18,29 +18,26 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Cms
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Cms\Model\Wysiwyg\Images\Storage;
 
 /**
  * Wysiwyg Images storage collection
  */
-class Collection extends \Magento\Data\Collection\Filesystem
+class Collection extends \Magento\Framework\Data\Collection\Filesystem
 {
     /**
-     * @var \Magento\App\Filesystem
+     * @var \Magento\Framework\App\Filesystem
      */
     protected $_filesystem;
 
     /**
      * @param \Magento\Core\Model\EntityFactory $entityFactory
-     * @param \Magento\App\Filesystem $filesystem
+     * @param \Magento\Framework\App\Filesystem $filesystem
      */
-    public function __construct(\Magento\Core\Model\EntityFactory $entityFactory, \Magento\App\Filesystem $filesystem)
+    public function __construct(\Magento\Core\Model\EntityFactory $entityFactory, \Magento\Framework\App\Filesystem $filesystem)
     {
         $this->_filesystem = $filesystem;
         parent::__construct($entityFactory);
@@ -55,11 +52,11 @@ class Collection extends \Magento\Data\Collection\Filesystem
     protected function _generateRow($filename)
     {
         $filename = preg_replace('~[/\\\]+~', '/', $filename);
-        $path = $this->_filesystem->getDirectoryWrite(\Magento\App\Filesystem::MEDIA_DIR);
+        $path = $this->_filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem::MEDIA_DIR);
         return array(
             'filename' => $filename,
             'basename' => basename($filename),
-            'mtime'    => $path->stat($path->getRelativePath($filename))['mtime']
+            'mtime' => $path->stat($path->getRelativePath($filename))['mtime']
         );
     }
 }

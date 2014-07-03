@@ -18,12 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Theme
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Theme\Block\Adminhtml\Wysiwyg\Files;
 
 /**
@@ -70,36 +67,48 @@ class Content extends \Magento\Backend\Block\Widget\Container
         parent::_construct();
         $this->_headerText = __('Media Storage');
         $this->_removeButton('back')->_removeButton('edit');
-        $this->_addButton('newfolder', array(
-            'class'   => 'save',
-            'label'   => __('Create Folder'),
-            'type'    => 'button',
-            'onclick' => 'MediabrowserInstance.newFolder();'
-        ));
+        $this->_addButton(
+            'newfolder',
+            array(
+                'class' => 'save',
+                'label' => __('Create Folder'),
+                'type' => 'button',
+                'onclick' => 'MediabrowserInstance.newFolder();'
+            )
+        );
 
-        $this->_addButton('delete_folder', array(
-            'class'   => 'delete no-display',
-            'label'   => __('Delete Folder'),
-            'type'    => 'button',
-            'onclick' => 'MediabrowserInstance.deleteFolder();',
-            'id'      => 'button_delete_folder'
-        ));
+        $this->_addButton(
+            'delete_folder',
+            array(
+                'class' => 'delete no-display',
+                'label' => __('Delete Folder'),
+                'type' => 'button',
+                'onclick' => 'MediabrowserInstance.deleteFolder();',
+                'id' => 'button_delete_folder'
+            )
+        );
 
-        $this->_addButton('delete_files', array(
-            'class'   => 'delete no-display',
-            'label'   => __('Delete File'),
-            'type'    => 'button',
-            'onclick' => 'MediabrowserInstance.deleteFiles();',
-            'id'      => 'button_delete_files'
-        ));
+        $this->_addButton(
+            'delete_files',
+            array(
+                'class' => 'delete no-display',
+                'label' => __('Delete File'),
+                'type' => 'button',
+                'onclick' => 'MediabrowserInstance.deleteFiles();',
+                'id' => 'button_delete_files'
+            )
+        );
 
-        $this->_addButton('insert_files', array(
-            'class'   => 'save no-display',
-            'label'   => __('Insert File'),
-            'type'    => 'button',
-            'onclick' => 'MediabrowserInstance.insert();',
-            'id'      => 'button_insert_files'
-        ));
+        $this->_addButton(
+            'insert_files',
+            array(
+                'class' => 'save no-display',
+                'label' => __('Insert File'),
+                'type' => 'button',
+                'onclick' => 'MediabrowserInstance.insert();',
+                'id' => 'button_insert_files'
+            )
+        );
     }
 
     /**
@@ -109,8 +118,10 @@ class Content extends \Magento\Backend\Block\Widget\Container
      */
     public function getContentsUrl()
     {
-        return $this->getUrl('adminhtml/*/contents', array('type' => $this->getRequest()->getParam('type'))
-            + $this->_storageHelper->getRequestParams());
+        return $this->getUrl(
+            'adminhtml/*/contents',
+            array('type' => $this->getRequest()->getParam('type')) + $this->_storageHelper->getRequestParams()
+        );
     }
 
     /**
@@ -120,21 +131,23 @@ class Content extends \Magento\Backend\Block\Widget\Container
      */
     public function getFilebrowserSetupObject()
     {
-        $setupObject = new \Magento\Object();
+        $setupObject = new \Magento\Framework\Object();
 
-        $setupObject->setData(array(
-            'newFolderPrompt'                 => __('New Folder Name:'),
-            'deleteFolderConfirmationMessage' => __('Are you sure you want to delete this folder?'),
-            'deleteFileConfirmationMessage'   => __('Are you sure you want to delete this file?'),
-            'targetElementId' => $this->getTargetElementId(),
-            'contentsUrl'     => $this->getContentsUrl(),
-            'onInsertUrl'     => $this->getOnInsertUrl(),
-            'newFolderUrl'    => $this->getNewfolderUrl(),
-            'deleteFolderUrl' => $this->getDeletefolderUrl(),
-            'deleteFilesUrl'  => $this->getDeleteFilesUrl(),
-            'headerText'      => $this->getHeaderText(),
-            'showBreadcrumbs' => true
-        ));
+        $setupObject->setData(
+            array(
+                'newFolderPrompt' => __('New Folder Name:'),
+                'deleteFolderConfirmationMessage' => __('Are you sure you want to delete this folder?'),
+                'deleteFileConfirmationMessage' => __('Are you sure you want to delete this file?'),
+                'targetElementId' => $this->getTargetElementId(),
+                'contentsUrl' => $this->getContentsUrl(),
+                'onInsertUrl' => $this->getOnInsertUrl(),
+                'newFolderUrl' => $this->getNewfolderUrl(),
+                'deleteFolderUrl' => $this->getDeletefolderUrl(),
+                'deleteFilesUrl' => $this->getDeleteFilesUrl(),
+                'headerText' => $this->getHeaderText(),
+                'showBreadcrumbs' => true
+            )
+        );
 
         return $this->_coreHelper->jsonEncode($setupObject);
     }
@@ -146,9 +159,7 @@ class Content extends \Magento\Backend\Block\Widget\Container
      */
     public function getNewfolderUrl()
     {
-        return $this->getUrl(
-            'adminhtml/*/newFolder', $this->_storageHelper->getRequestParams()
-        );
+        return $this->getUrl('adminhtml/*/newFolder', $this->_storageHelper->getRequestParams());
     }
 
     /**
@@ -158,9 +169,7 @@ class Content extends \Magento\Backend\Block\Widget\Container
      */
     protected function getDeletefolderUrl()
     {
-        return $this->getUrl(
-            'adminhtml/*/deleteFolder', $this->_storageHelper->getRequestParams()
-        );
+        return $this->getUrl('adminhtml/*/deleteFolder', $this->_storageHelper->getRequestParams());
     }
 
     /**
@@ -170,9 +179,7 @@ class Content extends \Magento\Backend\Block\Widget\Container
      */
     public function getDeleteFilesUrl()
     {
-        return $this->getUrl(
-            'adminhtml/*/deleteFiles', $this->_storageHelper->getRequestParams()
-        );
+        return $this->getUrl('adminhtml/*/deleteFiles', $this->_storageHelper->getRequestParams());
     }
 
     /**

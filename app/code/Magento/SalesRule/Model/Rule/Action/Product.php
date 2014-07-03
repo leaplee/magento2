@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_SalesRule
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -34,9 +32,7 @@ class Product extends \Magento\Rule\Model\Action\AbstractAction
      */
     public function loadAttributeOptions()
     {
-        $this->setAttributeOption(array(
-            'rule_price'=>__('Special Price'),
-        ));
+        $this->setAttributeOption(array('rule_price' => __('Special Price')));
         return $this;
     }
 
@@ -47,12 +43,14 @@ class Product extends \Magento\Rule\Model\Action\AbstractAction
      */
     public function loadOperatorOptions()
     {
-        $this->setOperatorOption(array(
-            'to_fixed'=>__('To Fixed Value'),
-            'to_percent'=>__('To Percentage'),
-            'by_fixed'=>__('By Fixed value'),
-            'by_percent'=>__('By Percentage'),
-        ));
+        $this->setOperatorOption(
+            array(
+                'to_fixed' => __('To Fixed Value'),
+                'to_percent' => __('To Percentage'),
+                'by_fixed' => __('By Fixed value'),
+                'by_percent' => __('By Percentage')
+            )
+        );
         return $this;
     }
 
@@ -63,8 +61,13 @@ class Product extends \Magento\Rule\Model\Action\AbstractAction
      */
     public function asHtml()
     {
-        $html = $this->getTypeElement()->getHtml().__("Update product's %1 %2: %3", $this->getAttributeElement()->getHtml(), $this->getOperatorElement()->getHtml(), $this->getValueElement()->getHtml());
-        $html.= $this->getRemoveLinkHtml();
+        $html = $this->getTypeElement()->getHtml() . __(
+            "Update product's %1 %2: %3",
+            $this->getAttributeElement()->getHtml(),
+            $this->getOperatorElement()->getHtml(),
+            $this->getValueElement()->getHtml()
+        );
+        $html .= $this->getRemoveLinkHtml();
         return $html;
     }
 }

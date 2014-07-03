@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Payment
- * @subpackage  unit_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\OfflinePayments\Model;
 
 class CashondeliveryTest extends \PHPUnit_Framework_TestCase
@@ -38,18 +34,26 @@ class CashondeliveryTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new \Magento\TestFramework\Helper\ObjectManager($this);
 
-        $eventManager = $this->getMock('Magento\Event\ManagerInterface', array(), array(), '', false);
+        $eventManager = $this->getMock('Magento\Framework\Event\ManagerInterface', array(), array(), '', false);
         $paymentDataMock = $this->getMock('Magento\Payment\Helper\Data', array(), array(), '', false);
-        $adapterFactoryMock = $this->getMock('Magento\Logger\AdapterFactory', array('create'),
-            array(), '', false);
+        $adapterFactoryMock = $this->getMock(
+            'Magento\Framework\Logger\AdapterFactory',
+            array('create'),
+            array(),
+            '',
+            false
+        );
 
-        $coreStoreConfig = $this->getMock('Magento\Core\Model\Store\Config', array(), array(), '', false);
-        $this->_object = $helper->getObject('Magento\OfflinePayments\Model\Cashondelivery', array(
-            'eventManager' => $eventManager,
-            'paymentData' => $paymentDataMock,
-            'coreStoreConfig' => $coreStoreConfig,
-            'logAdapterFactory' => $adapterFactoryMock,
-        ));
+        $scopeConfig = $this->getMock('Magento\Framework\App\Config\ScopeConfigInterface');
+        $this->_object = $helper->getObject(
+            'Magento\OfflinePayments\Model\Cashondelivery',
+            array(
+                'eventManager' => $eventManager,
+                'paymentData' => $paymentDataMock,
+                'scopeConfig' => $scopeConfig,
+                'logAdapterFactory' => $adapterFactoryMock
+            )
+        );
     }
 
     public function testGetInfoBlockType()

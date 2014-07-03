@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,15 +25,11 @@
 /**
  * customers defined options
  *
- * @category   Magento
- * @package    Magento_Catalog
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-
 namespace Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Options\Type;
 
-class Select extends
-    \Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Options\Type\AbstractType
+class Select extends \Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Options\Type\AbstractType
 {
     /**
      * @var string
@@ -60,17 +54,25 @@ class Select extends
      */
     protected function _prepareLayout()
     {
-        $this->addChild('add_select_row_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label' => __('Add New Row'),
-            'class' => 'add add-select-row',
-            'id'    => 'product_option_${option_id}_add_select_row'
-        ));
+        $this->addChild(
+            'add_select_row_button',
+            'Magento\Backend\Block\Widget\Button',
+            array(
+                'label' => __('Add New Row'),
+                'class' => 'add add-select-row',
+                'id' => 'product_option_${option_id}_add_select_row'
+            )
+        );
 
-        $this->addChild('delete_select_row_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label' => __('Delete Row'),
-            'class' => 'delete delete-select-row icon-btn',
-            'id'    => 'product_option_${id}_select_${select_id}_delete'
-        ));
+        $this->addChild(
+            'delete_select_row_button',
+            'Magento\Backend\Block\Widget\Button',
+            array(
+                'label' => __('Delete Row'),
+                'class' => 'delete delete-select-row icon-btn',
+                'id' => 'product_option_${id}_select_${select_id}_delete'
+            )
+        );
 
         return parent::_prepareLayout();
     }
@@ -96,9 +98,14 @@ class Select extends
      */
     public function getPriceTypeSelectHtml()
     {
-        $this->getChildBlock('option_price_type')
-            ->setData('id', 'product_option_${id}_select_${select_id}_price_type')
-            ->setName('product[options][${id}][values][${select_id}][price_type]');
+        $this->getChildBlock(
+            'option_price_type'
+        )->setData(
+            'id',
+            'product_option_${id}_select_${select_id}_price_type'
+        )->setName(
+            'product[options][${id}][values][${select_id}][price_type]'
+        );
 
         return parent::getPriceTypeSelectHtml();
     }

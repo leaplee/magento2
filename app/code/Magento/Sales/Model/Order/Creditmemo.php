@@ -18,14 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Sales\Model\Order;
 
-use Magento\Core\Exception;
+use Magento\Framework\Model\Exception;
 
 /**
  * Order creditmemo model
@@ -124,26 +122,39 @@ use Magento\Core\Exception;
  */
 class Creditmemo extends \Magento\Sales\Model\AbstractModel
 {
-    const STATE_OPEN        = 1;
-    const STATE_REFUNDED    = 2;
-    const STATE_CANCELED    = 3;
+    const STATE_OPEN = 1;
 
-    const XML_PATH_EMAIL_TEMPLATE               = 'sales_email/creditmemo/template';
-    const XML_PATH_EMAIL_GUEST_TEMPLATE         = 'sales_email/creditmemo/guest_template';
-    const XML_PATH_EMAIL_IDENTITY               = 'sales_email/creditmemo/identity';
-    const XML_PATH_EMAIL_COPY_TO                = 'sales_email/creditmemo/copy_to';
-    const XML_PATH_EMAIL_COPY_METHOD            = 'sales_email/creditmemo/copy_method';
-    const XML_PATH_EMAIL_ENABLED                = 'sales_email/creditmemo/enabled';
+    const STATE_REFUNDED = 2;
 
-    const XML_PATH_UPDATE_EMAIL_TEMPLATE        = 'sales_email/creditmemo_comment/template';
-    const XML_PATH_UPDATE_EMAIL_GUEST_TEMPLATE  = 'sales_email/creditmemo_comment/guest_template';
-    const XML_PATH_UPDATE_EMAIL_IDENTITY        = 'sales_email/creditmemo_comment/identity';
-    const XML_PATH_UPDATE_EMAIL_COPY_TO         = 'sales_email/creditmemo_comment/copy_to';
-    const XML_PATH_UPDATE_EMAIL_COPY_METHOD     = 'sales_email/creditmemo_comment/copy_method';
-    const XML_PATH_UPDATE_EMAIL_ENABLED         = 'sales_email/creditmemo_comment/enabled';
+    const STATE_CANCELED = 3;
 
-    const REPORT_DATE_TYPE_ORDER_CREATED        = 'order_created';
-    const REPORT_DATE_TYPE_REFUND_CREATED       = 'refund_created';
+    const XML_PATH_EMAIL_TEMPLATE = 'sales_email/creditmemo/template';
+
+    const XML_PATH_EMAIL_GUEST_TEMPLATE = 'sales_email/creditmemo/guest_template';
+
+    const XML_PATH_EMAIL_IDENTITY = 'sales_email/creditmemo/identity';
+
+    const XML_PATH_EMAIL_COPY_TO = 'sales_email/creditmemo/copy_to';
+
+    const XML_PATH_EMAIL_COPY_METHOD = 'sales_email/creditmemo/copy_method';
+
+    const XML_PATH_EMAIL_ENABLED = 'sales_email/creditmemo/enabled';
+
+    const XML_PATH_UPDATE_EMAIL_TEMPLATE = 'sales_email/creditmemo_comment/template';
+
+    const XML_PATH_UPDATE_EMAIL_GUEST_TEMPLATE = 'sales_email/creditmemo_comment/guest_template';
+
+    const XML_PATH_UPDATE_EMAIL_IDENTITY = 'sales_email/creditmemo_comment/identity';
+
+    const XML_PATH_UPDATE_EMAIL_COPY_TO = 'sales_email/creditmemo_comment/copy_to';
+
+    const XML_PATH_UPDATE_EMAIL_COPY_METHOD = 'sales_email/creditmemo_comment/copy_method';
+
+    const XML_PATH_UPDATE_EMAIL_ENABLED = 'sales_email/creditmemo_comment/enabled';
+
+    const REPORT_DATE_TYPE_ORDER_CREATED = 'order_created';
+
+    const REPORT_DATE_TYPE_REFUND_CREATED = 'refund_created';
 
     /*
      * Identifier for order history item
@@ -204,9 +215,9 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     /**
      * Core store config
      *
-     * @var \Magento\Core\Model\Store\ConfigInterface
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_coreStoreConfig;
+    protected $_scopeConfig;
 
     /**
      * @var \Magento\Sales\Model\Order\Creditmemo\Config
@@ -224,12 +235,12 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     protected $_cmItemCollectionFactory;
 
     /**
-     * @var \Magento\Math\CalculatorFactory
+     * @var \Magento\Framework\Math\CalculatorFactory
      */
     protected $_calculatorFactory;
 
     /**
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
@@ -244,53 +255,53 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     protected $_commentCollectionFactory;
 
     /**
-     * @var \Magento\Mail\Template\TransportBuilder
+     * @var \Magento\Framework\Mail\Template\TransportBuilder
      */
     protected $_transportBuilder;
 
     /**
-     * @param \Magento\Model\Context $context
-     * @param \Magento\Registry $registry
-     * @param \Magento\Stdlib\DateTime\TimezoneInterface $localeDate
-     * @param \Magento\Stdlib\DateTime $dateTime
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
+     * @param \Magento\Framework\Stdlib\DateTime $dateTime
      * @param \Magento\Payment\Helper\Data $paymentData
      * @param \Magento\Sales\Helper\Data $salesData
-     * @param \Magento\Core\Model\Store\ConfigInterface $coreStoreConfig
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param Creditmemo\Config $creditmemoConfig
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Magento\Sales\Model\Resource\Order\Creditmemo\Item\CollectionFactory $cmItemCollectionFactory
-     * @param \Magento\Math\CalculatorFactory $calculatorFactory
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Math\CalculatorFactory $calculatorFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param Creditmemo\CommentFactory $commentFactory
      * @param \Magento\Sales\Model\Resource\Order\Creditmemo\Comment\CollectionFactory $commentCollectionFactory
-     * @param \Magento\Mail\Template\TransportBuilder $transportBuilder
-     * @param \Magento\Core\Model\Resource\AbstractResource $resource
-     * @param \Magento\Data\Collection\Db $resourceCollection
+     * @param \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\Db $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Magento\Model\Context $context,
-        \Magento\Registry $registry,
-        \Magento\Stdlib\DateTime\TimezoneInterface $localeDate,
-        \Magento\Stdlib\DateTime $dateTime,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
+        \Magento\Framework\Stdlib\DateTime $dateTime,
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Sales\Helper\Data $salesData,
-        \Magento\Core\Model\Store\ConfigInterface $coreStoreConfig,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Sales\Model\Order\Creditmemo\Config $creditmemoConfig,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Magento\Sales\Model\Resource\Order\Creditmemo\Item\CollectionFactory $cmItemCollectionFactory,
-        \Magento\Math\CalculatorFactory $calculatorFactory,
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Math\CalculatorFactory $calculatorFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Sales\Model\Order\Creditmemo\CommentFactory $commentFactory,
         \Magento\Sales\Model\Resource\Order\Creditmemo\Comment\CollectionFactory $commentCollectionFactory,
-        \Magento\Mail\Template\TransportBuilder $transportBuilder,
-        \Magento\Core\Model\Resource\AbstractResource $resource = null,
-        \Magento\Data\Collection\Db $resourceCollection = null,
+        \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
+        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\Db $resourceCollection = null,
         array $data = array()
     ) {
         $this->_paymentData = $paymentData;
         $this->_salesData = $salesData;
-        $this->_coreStoreConfig = $coreStoreConfig;
+        $this->_scopeConfig = $scopeConfig;
         $this->_creditmemoConfig = $creditmemoConfig;
         $this->_orderFactory = $orderFactory;
         $this->_cmItemCollectionFactory = $cmItemCollectionFactory;
@@ -325,7 +336,7 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     /**
      * Retrieve creditmemo store instance
      *
-     * @return \Magento\Core\Model\Store
+     * @return \Magento\Store\Model\Store
      */
     public function getStore()
     {
@@ -341,8 +352,7 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     public function setOrder(\Magento\Sales\Model\Order $order)
     {
         $this->_order = $order;
-        $this->setOrderId($order->getId())
-            ->setStoreId($order->getStoreId());
+        $this->setOrderId($order->getId())->setStoreId($order->getStoreId());
         return $this;
     }
 
@@ -404,7 +414,7 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
         $items = array();
         foreach ($this->getItemsCollection() as $item) {
             if (!$item->isDeleted()) {
-                $items[] =  $item;
+                $items[] = $item;
             }
         }
         return $items;
@@ -446,9 +456,7 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
      */
     public function addItem(\Magento\Sales\Model\Order\Creditmemo\Item $item)
     {
-        $item->setCreditmemo($this)
-            ->setParentId($this->getId())
-            ->setStoreId($this->getStoreId());
+        $item->setCreditmemo($this)->setParentId($this->getId())->setStoreId($this->getStoreId());
         if (!$item->getId()) {
             $this->getItemsCollection()->addItem($item);
         }
@@ -492,9 +500,9 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
      */
     public function canRefund()
     {
-        if ($this->getState() != self::STATE_CANCELED
-            && $this->getState() != self::STATE_REFUNDED
-            && $this->getOrder()->getPayment()->canRefund()
+        if ($this->getState() != self::STATE_CANCELED &&
+            $this->getState() != self::STATE_REFUNDED &&
+            $this->getOrder()->getPayment()->canRefund()
         ) {
             return true;
         }
@@ -549,43 +557,46 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
             $this->getOrder()->getTotalRefunded() + $this->getGrandTotal()
         );
         $baseOrderRefund = $this->_storeManager->getStore()->roundPrice(
-            $this->getOrder()->getBaseTotalRefunded()+$this->getBaseGrandTotal()
+            $this->getOrder()->getBaseTotalRefunded() + $this->getBaseGrandTotal()
         );
 
         if ($baseOrderRefund > $this->_storeManager->getStore()->roundPrice($this->getOrder()->getBaseTotalPaid())) {
 
-            $baseAvailableRefund = $this->getOrder()->getBaseTotalPaid()- $this->getOrder()->getBaseTotalRefunded();
+            $baseAvailableRefund = $this->getOrder()->getBaseTotalPaid() - $this->getOrder()->getBaseTotalRefunded();
 
             throw new Exception(
-                __('The most money available to refund is %1.', $this->getOrder()->formatBasePrice($baseAvailableRefund))
+                __(
+                    'The most money available to refund is %1.',
+                    $this->getOrder()->formatBasePrice($baseAvailableRefund)
+                )
             );
         }
         $order = $this->getOrder();
         $order->setBaseTotalRefunded($baseOrderRefund);
         $order->setTotalRefunded($orderRefund);
 
-        $order->setBaseSubtotalRefunded($order->getBaseSubtotalRefunded()+$this->getBaseSubtotal());
-        $order->setSubtotalRefunded($order->getSubtotalRefunded()+$this->getSubtotal());
+        $order->setBaseSubtotalRefunded($order->getBaseSubtotalRefunded() + $this->getBaseSubtotal());
+        $order->setSubtotalRefunded($order->getSubtotalRefunded() + $this->getSubtotal());
 
-        $order->setBaseTaxRefunded($order->getBaseTaxRefunded()+$this->getBaseTaxAmount());
-        $order->setTaxRefunded($order->getTaxRefunded()+$this->getTaxAmount());
-        $order->setBaseHiddenTaxRefunded($order->getBaseHiddenTaxRefunded()+$this->getBaseHiddenTaxAmount());
-        $order->setHiddenTaxRefunded($order->getHiddenTaxRefunded()+$this->getHiddenTaxAmount());
+        $order->setBaseTaxRefunded($order->getBaseTaxRefunded() + $this->getBaseTaxAmount());
+        $order->setTaxRefunded($order->getTaxRefunded() + $this->getTaxAmount());
+        $order->setBaseHiddenTaxRefunded($order->getBaseHiddenTaxRefunded() + $this->getBaseHiddenTaxAmount());
+        $order->setHiddenTaxRefunded($order->getHiddenTaxRefunded() + $this->getHiddenTaxAmount());
 
-        $order->setBaseShippingRefunded($order->getBaseShippingRefunded()+$this->getBaseShippingAmount());
-        $order->setShippingRefunded($order->getShippingRefunded()+$this->getShippingAmount());
+        $order->setBaseShippingRefunded($order->getBaseShippingRefunded() + $this->getBaseShippingAmount());
+        $order->setShippingRefunded($order->getShippingRefunded() + $this->getShippingAmount());
 
-        $order->setBaseShippingTaxRefunded($order->getBaseShippingTaxRefunded()+$this->getBaseShippingTaxAmount());
-        $order->setShippingTaxRefunded($order->getShippingTaxRefunded()+$this->getShippingTaxAmount());
+        $order->setBaseShippingTaxRefunded($order->getBaseShippingTaxRefunded() + $this->getBaseShippingTaxAmount());
+        $order->setShippingTaxRefunded($order->getShippingTaxRefunded() + $this->getShippingTaxAmount());
 
-        $order->setAdjustmentPositive($order->getAdjustmentPositive()+$this->getAdjustmentPositive());
-        $order->setBaseAdjustmentPositive($order->getBaseAdjustmentPositive()+$this->getBaseAdjustmentPositive());
+        $order->setAdjustmentPositive($order->getAdjustmentPositive() + $this->getAdjustmentPositive());
+        $order->setBaseAdjustmentPositive($order->getBaseAdjustmentPositive() + $this->getBaseAdjustmentPositive());
 
-        $order->setAdjustmentNegative($order->getAdjustmentNegative()+$this->getAdjustmentNegative());
-        $order->setBaseAdjustmentNegative($order->getBaseAdjustmentNegative()+$this->getBaseAdjustmentNegative());
+        $order->setAdjustmentNegative($order->getAdjustmentNegative() + $this->getAdjustmentNegative());
+        $order->setBaseAdjustmentNegative($order->getBaseAdjustmentNegative() + $this->getBaseAdjustmentNegative());
 
-        $order->setDiscountRefunded($order->getDiscountRefunded()+$this->getDiscountAmount());
-        $order->setBaseDiscountRefunded($order->getBaseDiscountRefunded()+$this->getBaseDiscountAmount());
+        $order->setDiscountRefunded($order->getDiscountRefunded() + $this->getDiscountAmount());
+        $order->setBaseDiscountRefunded($order->getBaseDiscountRefunded() + $this->getBaseDiscountAmount());
 
         if ($this->getInvoice()) {
             $this->getInvoice()->setIsUsedForRefund(true);
@@ -618,34 +629,34 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
 
         if ($this->getTransactionId()) {
             $this->getOrder()->setTotalOnlineRefunded(
-                $this->getOrder()->getTotalOnlineRefunded()-$this->getGrandTotal()
+                $this->getOrder()->getTotalOnlineRefunded() - $this->getGrandTotal()
             );
             $this->getOrder()->setBaseTotalOnlineRefunded(
-                $this->getOrder()->getBaseTotalOnlineRefunded()-$this->getBaseGrandTotal()
+                $this->getOrder()->getBaseTotalOnlineRefunded() - $this->getBaseGrandTotal()
             );
         } else {
             $this->getOrder()->setTotalOfflineRefunded(
-                $this->getOrder()->getTotalOfflineRefunded()-$this->getGrandTotal()
+                $this->getOrder()->getTotalOfflineRefunded() - $this->getGrandTotal()
             );
             $this->getOrder()->setBaseTotalOfflineRefunded(
-                $this->getOrder()->getBaseTotalOfflineRefunded()-$this->getBaseGrandTotal()
+                $this->getOrder()->getBaseTotalOfflineRefunded() - $this->getBaseGrandTotal()
             );
         }
 
         $this->getOrder()->setBaseSubtotalRefunded(
-            $this->getOrder()->getBaseSubtotalRefunded()-$this->getBaseSubtotal()
+            $this->getOrder()->getBaseSubtotalRefunded() - $this->getBaseSubtotal()
         );
-        $this->getOrder()->setSubtotalRefunded($this->getOrder()->getSubtotalRefunded()-$this->getSubtotal());
+        $this->getOrder()->setSubtotalRefunded($this->getOrder()->getSubtotalRefunded() - $this->getSubtotal());
 
-        $this->getOrder()->setBaseTaxRefunded($this->getOrder()->getBaseTaxRefunded()-$this->getBaseTaxAmount());
-        $this->getOrder()->setTaxRefunded($this->getOrder()->getTaxRefunded()-$this->getTaxAmount());
+        $this->getOrder()->setBaseTaxRefunded($this->getOrder()->getBaseTaxRefunded() - $this->getBaseTaxAmount());
+        $this->getOrder()->setTaxRefunded($this->getOrder()->getTaxRefunded() - $this->getTaxAmount());
 
         $this->getOrder()->setBaseShippingRefunded(
-            $this->getOrder()->getBaseShippingRefunded()-$this->getBaseShippingAmount()
+            $this->getOrder()->getBaseShippingRefunded() - $this->getBaseShippingAmount()
         );
-        $this->getOrder()->setShippingRefunded($this->getOrder()->getShippingRefunded()-$this->getShippingAmount());
+        $this->getOrder()->setShippingRefunded($this->getOrder()->getShippingRefunded() - $this->getShippingAmount());
 
-        $this->_eventManager->dispatch('sales_order_creditmemo_cancel', array($this->_eventObject=>$this));
+        $this->_eventManager->dispatch('sales_order_creditmemo_cancel', array($this->_eventObject => $this));
         return $this;
     }
 
@@ -713,9 +724,9 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     {
         if (is_null(self::$_states)) {
             self::$_states = array(
-                self::STATE_OPEN       => __('Pending'),
-                self::STATE_REFUNDED   => __('Refunded'),
-                self::STATE_CANCELED   => __('Canceled'),
+                self::STATE_OPEN => __('Pending'),
+                self::STATE_REFUNDED => __('Refunded'),
+                self::STATE_CANCELED => __('Canceled')
             );
         }
         return self::$_states;
@@ -749,12 +760,12 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     public function setShippingAmount($amount)
     {
         // base shipping amount calculated in total model
-//        $amount = $this->getStore()->roundPrice($amount);
-//        $this->setData('base_shipping_amount', $amount);
-//
-//        $amount = $this->getStore()->roundPrice(
-//            $amount*$this->getOrder()->getStoreToOrderRate()
-//        );
+        //        $amount = $this->getStore()->roundPrice($amount);
+        //        $this->setData('base_shipping_amount', $amount);
+        //
+        //        $amount = $this->getStore()->roundPrice(
+        //            $amount*$this->getOrder()->getStoreToOrderRate()
+        //        );
         $this->setData('shipping_amount', $amount);
         return $this;
     }
@@ -767,16 +778,14 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     {
         $amount = trim($amount);
         if (substr($amount, -1) == '%') {
-            $amount = (float)substr($amount, 0, -1);
+            $amount = (double)substr($amount, 0, -1);
             $amount = $this->getOrder()->getGrandTotal() * $amount / 100;
         }
 
         $amount = $this->getStore()->roundPrice($amount);
         $this->setData('base_adjustment_positive', $amount);
 
-        $amount = $this->getStore()->roundPrice(
-            $amount*$this->getOrder()->getBaseToOrderRate()
-        );
+        $amount = $this->getStore()->roundPrice($amount * $this->getOrder()->getBaseToOrderRate());
         $this->setData('adjustment_positive', $amount);
         return $this;
     }
@@ -789,16 +798,14 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     {
         $amount = trim($amount);
         if (substr($amount, -1) == '%') {
-            $amount = (float) substr($amount, 0, -1);
+            $amount = (double)substr($amount, 0, -1);
             $amount = $this->getOrder()->getGrandTotal() * $amount / 100;
         }
 
         $amount = $this->getStore()->roundPrice($amount);
         $this->setData('base_adjustment_negative', $amount);
 
-        $amount = $this->getStore()->roundPrice(
-            $amount*$this->getOrder()->getBaseToOrderRate()
-        );
+        $amount = $this->getStore()->roundPrice($amount * $this->getOrder()->getBaseToOrderRate());
         $this->setData('adjustment_negative', $amount);
         return $this;
     }
@@ -815,15 +822,16 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
      */
     public function addComment($comment, $notify = false, $visibleOnFront = false)
     {
-        if (!($comment instanceof \Magento\Sales\Model\Order\Creditmemo\Comment)) {
-            $comment = $this->_commentFactory->create()
-                ->setComment($comment)
-                ->setIsCustomerNotified($notify)
-                ->setIsVisibleOnFront($visibleOnFront);
+        if (!$comment instanceof \Magento\Sales\Model\Order\Creditmemo\Comment) {
+            $comment = $this->_commentFactory->create()->setComment(
+                $comment
+            )->setIsCustomerNotified(
+                $notify
+            )->setIsVisibleOnFront(
+                $visibleOnFront
+            );
         }
-        $comment->setCreditmemo($this)
-            ->setParentId($this->getId())
-            ->setStoreId($this->getStoreId());
+        $comment->setCreditmemo($this)->setParentId($this->getId())->setStoreId($this->getStoreId());
         if (!$comment->getId()) {
             $this->getCommentsCollection()->addItem($comment);
         }
@@ -838,9 +846,9 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     public function getCommentsCollection($reload = false)
     {
         if (is_null($this->_comments) || $reload) {
-            $this->_comments = $this->_commentCollectionFactory->create()
-                ->setCreditmemoFilter($this->getId())
-                ->setCreatedAtOrder();
+            $this->_comments = $this->_commentCollectionFactory->create()->setCreditmemoFilter(
+                $this->getId()
+            )->setCreatedAtOrder();
             /**
              * When credit memo created with adding comment,
              * comments collection must be loaded before we added this comment.
@@ -873,7 +881,11 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
         }
         // Get the destination email addresses to send copies to
         $copyTo = $this->_getEmails(self::XML_PATH_EMAIL_COPY_TO);
-        $copyMethod = $this->_coreStoreConfig->getConfig(self::XML_PATH_EMAIL_COPY_METHOD, $storeId);
+        $copyMethod = $this->_scopeConfig->getValue(
+            self::XML_PATH_EMAIL_COPY_METHOD,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
         // Check if at least one recipient is found
         if (!$notifyCustomer && !$copyTo) {
             return $this;
@@ -883,62 +895,81 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
 
         // Retrieve corresponding email template id and customer name
         if ($order->getCustomerIsGuest()) {
-            $templateId = $this->_coreStoreConfig->getConfig(self::XML_PATH_EMAIL_GUEST_TEMPLATE, $storeId);
+            $templateId = $this->_scopeConfig->getValue(
+                self::XML_PATH_EMAIL_GUEST_TEMPLATE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
             $customerName = $order->getBillingAddress()->getName();
         } else {
-            $templateId = $this->_coreStoreConfig->getConfig(self::XML_PATH_EMAIL_TEMPLATE, $storeId);
+            $templateId = $this->_scopeConfig->getValue(
+                self::XML_PATH_EMAIL_TEMPLATE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
             $customerName = $order->getCustomerName();
         }
 
         if ($notifyCustomer) {
-            $this->_transportBuilder
-                ->setTemplateIdentifier($templateId)
-                ->setTemplateOptions(array(
-                    'area' => \Magento\Core\Model\App\Area::AREA_FRONTEND,
-                    'store' => $storeId
-                ))
-                ->setTemplateVars(array(
-                    'order'        => $order,
-                    'invoice'      => $this,
-                    'comment'      => $comment,
-                    'billing'      => $order->getBillingAddress(),
+            $this->_transportBuilder->setTemplateIdentifier(
+                $templateId
+            )->setTemplateOptions(
+                array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $storeId)
+            )->setTemplateVars(
+                array(
+                    'order' => $order,
+                    'invoice' => $this,
+                    'comment' => $comment,
+                    'billing' => $order->getBillingAddress(),
                     'payment_html' => $paymentBlockHtml,
-                    'store'        => $this->getStore()
-                ))
-                ->setFrom($this->_coreStoreConfig->getConfig(self::XML_PATH_EMAIL_IDENTITY, $storeId))
-                ->addTo($order->getCustomerEmail(), $customerName);
+                    'store' => $this->getStore()
+                )
+            )->setFrom(
+                $this->_scopeConfig->getValue(
+                    self::XML_PATH_EMAIL_IDENTITY,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $storeId
+                )
+            )->addTo(
+                $order->getCustomerEmail(),
+                $customerName
+            );
             if ($copyTo && $copyMethod == 'bcc') {
                 // Add bcc to customer email
                 foreach ($copyTo as $email) {
                     $this->_transportBuilder->addBcc($email);
                 }
             }
-            /** @var \Magento\Mail\TransportInterface $transport */
-            $transport =  $this->_transportBuilder->getTransport();
+            /** @var \Magento\Framework\Mail\TransportInterface $transport */
+            $transport = $this->_transportBuilder->getTransport();
             $transport->sendMessage();
         }
 
         // Email copies are sent as separated emails if their copy method is 'copy' or a customer should not be notified
         if ($copyTo && ($copyMethod == 'copy' || !$notifyCustomer)) {
             foreach ($copyTo as $email) {
-                $this->_transportBuilder
-                    ->setTemplateIdentifier($templateId)
-                    ->setTemplateOptions(array(
-                        'area' => \Magento\Core\Model\App\Area::AREA_FRONTEND,
-                        'store' => $storeId
-                    ))
-                    ->setTemplateVars(array(
-                        'order'        => $order,
-                        'invoice'      => $this,
-                        'comment'      => $comment,
-                        'billing'      => $order->getBillingAddress(),
+                $this->_transportBuilder->setTemplateIdentifier(
+                    $templateId
+                )->setTemplateOptions(
+                    array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $storeId)
+                )->setTemplateVars(
+                    array(
+                        'order' => $order,
+                        'invoice' => $this,
+                        'comment' => $comment,
+                        'billing' => $order->getBillingAddress(),
                         'payment_html' => $paymentBlockHtml,
-                        'store'        => $this->getStore()
-                    ))
-                    ->setFrom($this->_coreStoreConfig->getConfig(self::XML_PATH_EMAIL_IDENTITY, $storeId))
-                    ->addTo($email)
-                    ->getTransport()
-                    ->sendMessage();
+                        'store' => $this->getStore()
+                    )
+                )->setFrom(
+                    $this->_scopeConfig->getValue(
+                        self::XML_PATH_EMAIL_IDENTITY,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
+                    )
+                )->addTo(
+                    $email
+                )->getTransport()->sendMessage();
             }
         }
 
@@ -965,7 +996,11 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
         }
         // Get the destination email addresses to send copies to
         $copyTo = $this->_getEmails(self::XML_PATH_UPDATE_EMAIL_COPY_TO);
-        $copyMethod = $this->_coreStoreConfig->getConfig(self::XML_PATH_UPDATE_EMAIL_COPY_METHOD, $storeId);
+        $copyMethod = $this->_scopeConfig->getValue(
+            self::XML_PATH_UPDATE_EMAIL_COPY_METHOD,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
         // Check if at least one recipient is found
         if (!$notifyCustomer && !$copyTo) {
             return $this;
@@ -973,61 +1008,79 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
 
         // Retrieve corresponding email template id and customer name
         if ($order->getCustomerIsGuest()) {
-            $templateId = $this->_coreStoreConfig->getConfig(self::XML_PATH_UPDATE_EMAIL_GUEST_TEMPLATE, $storeId);
+            $templateId = $this->_scopeConfig->getValue(
+                self::XML_PATH_UPDATE_EMAIL_GUEST_TEMPLATE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
             $customerName = $order->getBillingAddress()->getName();
         } else {
-            $templateId = $this->_coreStoreConfig->getConfig(self::XML_PATH_UPDATE_EMAIL_TEMPLATE, $storeId);
+            $templateId = $this->_scopeConfig->getValue(
+                self::XML_PATH_UPDATE_EMAIL_TEMPLATE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
             $customerName = $order->getCustomerName();
         }
 
         if ($notifyCustomer) {
-            $this->_transportBuilder
-                ->setTemplateIdentifier($templateId)
-                ->setTemplateOptions(array(
-                    'area' => \Magento\Core\Model\App\Area::AREA_FRONTEND,
-                    'store' => $storeId
-                ))
-                ->setTemplateVars(array(
-                    'order'        => $order,
-                    'creditmemo'      => $this,
-                    'comment'      => $comment,
-                    'billing'      => $order->getBillingAddress(),
-                    'store'        => $this->getStore()
-                ))
-                ->setFrom($this->_coreStoreConfig->getConfig(self::XML_PATH_UPDATE_EMAIL_IDENTITY, $storeId))
-                ->addTo($order->getCustomerEmail(), $customerName);
+            $this->_transportBuilder->setTemplateIdentifier(
+                $templateId
+            )->setTemplateOptions(
+                array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $storeId)
+            )->setTemplateVars(
+                array(
+                    'order' => $order,
+                    'creditmemo' => $this,
+                    'comment' => $comment,
+                    'billing' => $order->getBillingAddress(),
+                    'store' => $this->getStore()
+                )
+            )->setFrom(
+                $this->_scopeConfig->getValue(
+                    self::XML_PATH_UPDATE_EMAIL_IDENTITY,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $storeId
+                )
+            )->addTo(
+                $order->getCustomerEmail(),
+                $customerName
+            );
             if ($copyTo && $copyMethod == 'bcc') {
                 // Add bcc to customer email
                 foreach ($copyTo as $email) {
                     $this->_transportBuilder->addBcc($email);
                 }
             }
-            /** @var \Magento\Mail\TransportInterface $transport */
-            $transport =  $this->_transportBuilder->getTransport();
+            /** @var \Magento\Framework\Mail\TransportInterface $transport */
+            $transport = $this->_transportBuilder->getTransport();
             $transport->sendMessage();
         }
 
         // Email copies are sent as separated emails if their copy method is 'copy' or a customer should not be notified
         if ($copyTo && ($copyMethod == 'copy' || !$notifyCustomer)) {
             foreach ($copyTo as $email) {
-                $this->_transportBuilder
-                    ->setTemplateIdentifier($templateId)
-                    ->setTemplateOptions(array(
-                            'area' => \Magento\Core\Model\App\Area::AREA_FRONTEND,
-                            'store' => $storeId
-                        )
-                    )
-                    ->setTemplateVars(array(
-                        'order'      => $order,
+                $this->_transportBuilder->setTemplateIdentifier(
+                    $templateId
+                )->setTemplateOptions(
+                    array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $storeId)
+                )->setTemplateVars(
+                    array(
+                        'order' => $order,
                         'creditmemo' => $this,
-                        'comment'    => $comment,
-                        'billing'    => $order->getBillingAddress(),
-                        'store'      => $this->getStore()
-                    ))
-                    ->setFrom($this->_coreStoreConfig->getConfig(self::XML_PATH_UPDATE_EMAIL_IDENTITY, $storeId))
-                    ->addTo($email)
-                    ->getTransport()
-                    ->sendMessage();
+                        'comment' => $comment,
+                        'billing' => $order->getBillingAddress(),
+                        'store' => $this->getStore()
+                    )
+                )->setFrom(
+                    $this->_scopeConfig->getValue(
+                        self::XML_PATH_UPDATE_EMAIL_IDENTITY,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
+                    )
+                )->addTo(
+                    $email
+                )->getTransport()->sendMessage();
             }
         }
 
@@ -1040,7 +1093,11 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
      */
     protected function _getEmails($configPath)
     {
-        $data = $this->_coreStoreConfig->getConfig($configPath, $this->getStoreId());
+        $data = $this->_scopeConfig->getValue(
+            $configPath,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStoreId()
+        );
         if (!empty($data)) {
             return explode(',', $data);
         }
@@ -1048,11 +1105,10 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
     }
 
     /**
-     * @return \Magento\Core\Model\AbstractModel
+     * @return \Magento\Framework\Model\AbstractModel
      */
     protected function _beforeDelete()
     {
-        $this->_protectFromNonAdmin();
         return parent::_beforeDelete();
     }
 
@@ -1070,7 +1126,7 @@ class Creditmemo extends \Magento\Sales\Model\AbstractModel
         }
 
         if (null !== $this->_comments) {
-            foreach($this->_comments as $comment) {
+            foreach ($this->_comments as $comment) {
                 $comment->save();
             }
         }

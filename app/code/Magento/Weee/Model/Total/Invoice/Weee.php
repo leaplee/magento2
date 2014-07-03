@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Weee
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
-
 namespace Magento\Weee\Model\Total\Invoice;
 
 class Weee extends \Magento\Sales\Model\Order\Invoice\Total\AbstractTotal
@@ -45,10 +41,8 @@ class Weee extends \Magento\Sales\Model\Order\Invoice\Total\AbstractTotal
      * @param \Magento\Weee\Helper\Data $weeeData
      * @param array $data
      */
-    public function __construct(
-        \Magento\Weee\Helper\Data $weeeData,
-        array $data = array()
-    ) {
+    public function __construct(\Magento\Weee\Helper\Data $weeeData, array $data = array())
+    {
         $this->_weeeData = $weeeData;
         parent::__construct($data);
     }
@@ -109,8 +103,9 @@ class Weee extends \Magento\Sales\Model\Order\Invoice\Total\AbstractTotal
         $order = $invoice->getOrder();
         if ($this->_weeeData->includeInSubtotal($store)) {
             $allowedSubtotal = $order->getSubtotal() - $order->getSubtotalInvoiced() - $invoice->getSubtotal();
-            $allowedBaseSubtotal = $order->getBaseSubtotal() - $order->getBaseSubtotalInvoiced()
-                - $invoice->getBaseSubtotal();
+            $allowedBaseSubtotal = $order->getBaseSubtotal() -
+                $order->getBaseSubtotalInvoiced() -
+                $invoice->getBaseSubtotal();
             $totalTax = min($allowedSubtotal, $totalTax);
             $baseTotalTax = min($allowedBaseSubtotal, $baseTotalTax);
 

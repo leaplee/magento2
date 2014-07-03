@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,14 +25,11 @@
 /**
  * Catalog product MAP "Display Actual Price" attribute source
  *
- * @category   Magento
- * @package    Magento_Catalog
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Catalog\Model\Product\Attribute\Source\Msrp;
 
-class Type
-    extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
+class Type extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
 {
     /**
      * Display Product Price on gesture
@@ -44,7 +39,7 @@ class Type
     /**
      * Display Product Price in cart
      */
-    const TYPE_IN_CART    = '2';
+    const TYPE_IN_CART = '2';
 
     /**
      * Display Product Price before order confirmation
@@ -60,18 +55,9 @@ class Type
     {
         if (!$this->_options) {
             $this->_options = array(
-                array(
-                    'label' => __('In Cart'),
-                    'value' => self::TYPE_IN_CART
-                ),
-                array(
-                    'label' => __('Before Order Confirmation'),
-                    'value' => self::TYPE_BEFORE_ORDER_CONFIRM
-                ),
-                array(
-                    'label' => __('On Gesture'),
-                    'value' => self::TYPE_ON_GESTURE
-                ),
+                array('label' => __('In Cart'), 'value' => self::TYPE_IN_CART),
+                array('label' => __('Before Order Confirmation'), 'value' => self::TYPE_BEFORE_ORDER_CONFIRM),
+                array('label' => __('On Gesture'), 'value' => self::TYPE_ON_GESTURE)
             );
         }
         return $this->_options;

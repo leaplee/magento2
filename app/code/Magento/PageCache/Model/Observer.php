@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_PageCache
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -38,7 +36,7 @@ class Observer
     protected $_config;
 
     /**
-     * @var \Magento\App\PageCache\Cache
+     * @var \Magento\Framework\App\PageCache\Cache
      */
     protected $_cache;
 
@@ -48,41 +46,65 @@ class Observer
     protected $_helper;
 
     /**
+     * @var \Magento\Framework\App\Cache\TypeListInterface
+     */
+    protected $_typeList;
+
+    /**
+     * @var \Magento\Framework\Session\Generic
+     */
+    protected $_session;
+
+    /**
+     * @var \Magento\Framework\App\PageCache\FormKey
+     */
+    protected $_formKey;
+
+    /**
      * Constructor
      *
-     * @param \Magento\PageCache\Model\Config $config
-     * @param \Magento\App\PageCache\Cache $cache
+     * @param Config $config
+     * @param \Magento\Framework\App\PageCache\Cache $cache
      * @param \Magento\PageCache\Helper\Data $helper
+     * @param \Magento\Framework\App\Cache\TypeListInterface $typeList
+     * @param \Magento\Framework\Session\Generic $session
+     * @param \Magento\Framework\App\PageCache\FormKey $formKey
      */
     public function __construct(
         \Magento\PageCache\Model\Config $config,
-        \Magento\App\PageCache\Cache $cache,
-        \Magento\PageCache\Helper\Data $helper
-    ){
+        \Magento\Framework\App\PageCache\Cache $cache,
+        \Magento\PageCache\Helper\Data $helper,
+        \Magento\Framework\App\Cache\TypeListInterface $typeList,
+        \Magento\Framework\App\PageCache\FormKey $formKey,
+        \Magento\Framework\Session\Generic $session
+    ) {
         $this->_config = $config;
         $this->_cache = $cache;
         $this->_helper = $helper;
+        $this->_typeList = $typeList;
+        $this->_session = $session;
+        $this->_formKey = $formKey;
     }
 
     /**
      * Add comment cache containers to private blocks
      * Blocks are wrapped only if page is cacheable
      *
-     * @param \Magento\Event\Observer $observer
+     * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function processLayoutRenderElement(\Magento\Event\Observer $observer)
+    public function processLayoutRenderElement(\Magento\Framework\Event\Observer $observer)
     {
         $event = $observer->getEvent();
-        /** @var \Magento\Core\Model\Layout $layout */
+        /** @var \Magento\Framework\View\Layout $layout */
         $layout = $event->getLayout();
-        if ($layout->isCacheable()) {
+        if ($layout->isCacheable() && $this->_config->isEnabled()) {
             $name = $event->getElementName();
             $block = $layout->getBlock($name);
             $transport = $event->getTransport();
-            if ($block instanceof \Magento\View\Element\AbstractBlock) {
+            if ($block instanceof \Magento\Framework\View\Element\AbstractBlock) {
                 $blockTtl = $block->getTtl();
-                $varnishIsEnabledFlag = $this->_config->getType() == \Magento\PageCache\Model\Config::VARNISH;
+                $varnishIsEnabledFlag = ($this->_config->getType() == \Magento\PageCache\Model\Config::VARNISH);
                 $output = $transport->getData('output');
                 if ($varnishIsEnabledFlag && isset($blockTtl)) {
                     $output = $this->_wrapEsi($block);
@@ -101,18 +123,17 @@ class Observer
     /**
      * Replace the output of the block, containing ttl attribute, with ESI tag
      *
-     * @param \Magento\View\Element\AbstractBlock $block
+     * @param \Magento\Framework\View\Element\AbstractBlock $block
      * @return string
      */
-    protected function _wrapEsi(
-        \Magento\View\Element\AbstractBlock $block
-    ) {
+    protected function _wrapEsi(\Magento\Framework\View\Element\AbstractBlock $block)
+    {
         $url = $block->getUrl(
             'page_cache/block/esi',
-            [
-                'blocks' => json_encode([$block->getNameInLayout()]),
+            array(
+                'blocks' => json_encode(array($block->getNameInLayout())),
                 'handles' => json_encode($this->_helper->getActualHandles())
-            ]
+            )
         );
         return sprintf('<esi:include src="%s" />', $url);
     }
@@ -121,15 +142,19 @@ class Observer
      * If Built-In caching is enabled it collects array of tags
      * of incoming object and asks to clean cache.
      *
-     * @param \Magento\Event\Observer $observer
+     * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function invalidateCache(\Magento\Event\Observer $observer)
+    public function flushCacheByTags(\Magento\Framework\Event\Observer $observer)
     {
-        $object = $observer->getEvent()->getObject();
-        if ($object instanceof \Magento\Object\IdentityInterface) {
-            if ($this->_config->getType() == \Magento\PageCache\Model\Config::BUILT_IN) {
-                $this->_cache->clean($object->getIdentities());
+        if ($this->_config->getType() == \Magento\PageCache\Model\Config::BUILT_IN && $this->_config->isEnabled()) {
+            $object = $observer->getEvent()->getObject();
+            if ($object instanceof \Magento\Framework\Object\IdentityInterface) {
+                $tags = $object->getIdentities();
+                foreach ($tags as $tag) {
+                    $tags[] = preg_replace("~_\\d+$~", '', $tag);
+                }
+                $this->_cache->clean(array_unique($tags));
             }
         }
     }
@@ -137,13 +162,40 @@ class Observer
     /**
      * Flash Built-In cache
      *
-     * @param \Magento\Event\Observer $observer
+     * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function flushAllCache(\Magento\Event\Observer $observer)
+    public function flushAllCache(\Magento\Framework\Event\Observer $observer)
     {
         if ($this->_config->getType() == \Magento\PageCache\Model\Config::BUILT_IN) {
             $this->_cache->clean();
+        }
+    }
+
+    /**
+     * Invalidate full page cache
+     *
+     * @return \Magento\PageCache\Model\Observer
+     */
+    public function invalidateCache()
+    {
+        if ($this->_config->isEnabled()) {
+            $this->_typeList->invalidate('full_page');
+        }
+        return $this;
+    }
+
+    /**
+     * Register form key in session from cookie value
+     *
+     * @param \Magento\Framework\Event\Observer $observer
+     * @return void
+     */
+    public function registerFormKeyFromCookie(\Magento\Framework\Event\Observer $observer)
+    {
+        $formKeyFromCookie = $this->_formKey->get();
+        if ($formKeyFromCookie) {
+            $this->_session->setData(\Magento\Framework\Data\Form\FormKey::FORM_KEY, $formKeyFromCookie);
         }
     }
 }

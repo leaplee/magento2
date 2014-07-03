@@ -18,9 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_PageCache
- * @subpackage  unit_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -33,18 +30,28 @@ namespace Magento\PageCache\Helper;
 /**
  * Class DataTest
  *
- * @package Magento\PageCache\Controller
  */
 class DataTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \Magento\PageCache\Helper\Data */
+    /**
+     * @var Data
+     */
     protected $helper;
 
-    /** @var \Magento\View\Layout\ProcessorInterface */
+    /**
+     * @var \Magento\Framework\View\Layout\ProcessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $updateLayoutMock;
 
-    /** @var \Magento\Theme\Model\Layout\Config */
-    protected $configMock;
+    /**
+     * @var \Magento\Framework\App\Helper\Context|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $contextMock;
+
+    /**
+     * @var \Magento\Framework\App\View|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $viewMock;
 
     public function testMaxAgeCache()
     {
@@ -64,54 +71,45 @@ class DataTest extends \PHPUnit_Framework_TestCase
             'config_layout_handle1',
             'handle2'
         ];
-        $configHandles = [
-            'config_layout_handle1'
-        ];
-        $resultHandles = [
-            'default',
-            'config_layout_handle1'
-        ];
 
         $this->updateLayoutMock->expects($this->once())
             ->method('getHandles')
             ->will($this->returnValue($layoutHandles));
-        $this->configMock->expects($this->once())
-            ->method('getPageLayoutHandles')
-            ->will($this->returnValue($configHandles));
 
-        $this->assertEquals($resultHandles, $this->helper->getActualHandles());
+        $this->assertEquals($layoutHandles, $this->helper->getActualHandles());
     }
 
     protected function prepareMocks()
     {
-        $this->configMock = $this->getMock('Magento\Theme\Model\Layout\Config', [], [], '', false);
-        $viewMock = $this->getMock('Magento\App\View', ['getLayout'], ['getPageLayoutHandles'], '', false);
+        $this->contextMock = $this->getMock('Magento\Framework\App\Helper\Context', [], [], '', false);
+        $this->viewMock =
+            $this->getMock('Magento\Framework\App\View', ['getLayout'], ['getPageLayoutHandles'], '', false);
         $layoutMock = $this->getMockForAbstractClass(
-            'Magento\View\LayoutInterface',
-            [],
+            'Magento\Framework\View\LayoutInterface',
+            array(),
             '',
             false,
             true,
             true,
-            ['getUpdate']
+            array('getUpdate')
         );
         $this->updateLayoutMock = $this->getMockForAbstractClass(
-            'Magento\View\Layout\ProcessorInterface',
-            [],
+            'Magento\Framework\View\Layout\ProcessorInterface',
+            array(),
             '',
             false,
             true,
             true,
-            []
+            array()
         );
 
-        $viewMock->expects($this->once())
+        $this->viewMock->expects($this->once())
             ->method('getLayout')
             ->will($this->returnValue($layoutMock));
         $layoutMock->expects($this->once())
             ->method('getUpdate')
             ->will($this->returnValue($this->updateLayoutMock));
 
-        $this->helper = new \Magento\PageCache\Helper\Data($this->configMock, $viewMock);
+        $this->helper = new Data($this->contextMock, $this->viewMock);
     }
 }

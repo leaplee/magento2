@@ -26,12 +26,12 @@
 namespace Magento\Eav\Model\Entity\Setup\PropertyMapper;
 
 use Magento\Eav\Model\Entity\Setup\PropertyMapperInterface;
-use Magento\ObjectManager;
+use Magento\Framework\ObjectManager;
 
 class Composite implements PropertyMapperInterface
 {
     /**
-     * @var \Magento\ObjectManager
+     * @var \Magento\Framework\ObjectManager
      */
     protected $objectManager;
 
@@ -64,8 +64,10 @@ class Composite implements PropertyMapperInterface
         foreach ($this->propertyMappers as $class) {
             if (!is_subclass_of($class, '\Magento\Eav\Model\Entity\Setup\PropertyMapperInterface')) {
                 throw new \InvalidArgumentException(
-                    'Property mapper ' . $class . ' must'
-                        . ' implement \Magento\Eav\Model\Entity\Setup\PropertyMapperInterface'
+                    'Property mapper ' .
+                    $class .
+                    ' must' .
+                    ' implement \Magento\Eav\Model\Entity\Setup\PropertyMapperInterface'
                 );
             }
             $data = array_replace($data, $this->objectManager->get($class)->map($input, $entityTypeId));

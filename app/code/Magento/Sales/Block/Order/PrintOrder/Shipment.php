@@ -18,14 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Sales\Block\Order\PrintOrder;
 
-use Magento\View\Element\AbstractBlock;
+use Magento\Framework\View\Element\AbstractBlock;
 
 /**
  * Sales order details block
@@ -49,7 +47,7 @@ class Shipment extends \Magento\Sales\Block\Items\AbstractItems
     /**
      * Core registry
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
 
@@ -59,14 +57,14 @@ class Shipment extends \Magento\Sales\Block\Items\AbstractItems
     protected $_paymentHelper;
 
     /**
-     * @param \Magento\View\Element\Template\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param \Magento\Framework\Registry $registry
      * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Template\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Framework\Registry $registry,
         \Magento\Payment\Helper\Data $paymentHelper,
         array $data = array()
     ) {
@@ -108,10 +106,7 @@ class Shipment extends \Magento\Sales\Block\Items\AbstractItems
         if ($headBlock) {
             $headBlock->setTitle(__('Order # %1', $this->getOrder()->getRealOrderId()));
         }
-        $this->setChild(
-            'payment_info',
-            $this->_paymentHelper->getInfoBlock($this->getOrder()->getPayment())
-        );
+        $this->setChild('payment_info', $this->_paymentHelper->getInfoBlock($this->getOrder()->getPayment()));
     }
 
     /**
@@ -199,7 +194,7 @@ class Shipment extends \Magento\Sales\Block\Items\AbstractItems
     public function getShipmentAddressFormattedHtml($shipment)
     {
         $shippingAddress = $shipment->getShippingAddress();
-        if (!($shippingAddress instanceof \Magento\Sales\Model\Order\Address)) {
+        if (!$shippingAddress instanceof \Magento\Sales\Model\Order\Address) {
             return '';
         }
         return $shippingAddress->format('html');
@@ -214,7 +209,7 @@ class Shipment extends \Magento\Sales\Block\Items\AbstractItems
     public function getBillingAddressFormattedHtml($order)
     {
         $billingAddress = $order->getBillingAddress();
-        if (!($billingAddress instanceof \Magento\Sales\Model\Order\Address)) {
+        if (!$billingAddress instanceof \Magento\Sales\Model\Order\Address) {
             return '';
         }
         return $billingAddress->format('html');
@@ -237,4 +232,3 @@ class Shipment extends \Magento\Sales\Block\Items\AbstractItems
         return $res;
     }
 }
-

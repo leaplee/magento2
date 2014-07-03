@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Backend\Block\System\Store\Delete;
 /**
  * Adminhtml store delete group block
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Group extends \Magento\Backend\Block\Template
@@ -42,23 +38,23 @@ class Group extends \Magento\Backend\Block\Template
         $itemId = $this->getRequest()->getParam('group_id');
 
         $this->setTemplate('system/store/delete_group.phtml');
-        $this->setAction($this->getUrl('adminhtml/*/deleteGroupPost', array('group_id'=>$itemId)));
-        $this->addChild('confirm_deletion_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Delete Store'),
-            'onclick'   => "deleteForm.submit()",
-            'class'     => 'cancel'
-        ));
-        $onClick = "setLocation('".$this->getUrl('adminhtml/*/editGroup', array('group_id'=>$itemId))."')";
-        $this->addChild('cancel_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Cancel'),
-            'onclick'   => $onClick,
-            'class'     => 'cancel'
-        ));
-        $this->addChild('back_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Back'),
-            'onclick'   => $onClick,
-            'class'     => 'cancel'
-        ));
+        $this->setAction($this->getUrl('adminhtml/*/deleteGroupPost', array('group_id' => $itemId)));
+        $this->addChild(
+            'confirm_deletion_button',
+            'Magento\Backend\Block\Widget\Button',
+            array('label' => __('Delete Store'), 'onclick' => "deleteForm.submit()", 'class' => 'cancel')
+        );
+        $onClick = "setLocation('" . $this->getUrl('adminhtml/*/editGroup', array('group_id' => $itemId)) . "')";
+        $this->addChild(
+            'cancel_button',
+            'Magento\Backend\Block\Widget\Button',
+            array('label' => __('Cancel'), 'onclick' => $onClick, 'class' => 'cancel')
+        );
+        $this->addChild(
+            'back_button',
+            'Magento\Backend\Block\Widget\Button',
+            array('label' => __('Back'), 'onclick' => $onClick, 'class' => 'cancel')
+        );
         return parent::_prepareLayout();
     }
 }

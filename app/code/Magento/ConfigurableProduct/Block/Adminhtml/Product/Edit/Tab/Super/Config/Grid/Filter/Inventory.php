@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -34,26 +32,15 @@ use Magento\Backend\Block\Widget\Grid\Column\Filter\Select;
 
 class Inventory extends Select
 {
-
     /**
      * @return array
      */
     protected function _getOptions()
     {
         return array(
-            array(
-                'value' =>  '',
-                'label' =>  ''
-            ),
-            array(
-                'value' =>  1,
-                'label' =>  __('In Stock')
-            ),
-            array(
-                'value' =>  0,
-                'label' =>  __('Out of Stock')
-            )
+            array('value' => '', 'label' => ''),
+            array('value' => 1, 'label' => __('In Stock')),
+            array('value' => 0, 'label' => __('Out of Stock'))
         );
     }
-
 }

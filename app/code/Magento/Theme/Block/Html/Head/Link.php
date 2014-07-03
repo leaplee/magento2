@@ -21,13 +21,12 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Theme\Block\Html\Head;
 
 /**
  * Link page block
  */
-class Link extends \Magento\View\Element\Template implements AssetBlockInterface
+class Link extends \Magento\Framework\View\Element\Template implements AssetBlockInterface
 {
     /**
      * Virtual content type
@@ -35,31 +34,12 @@ class Link extends \Magento\View\Element\Template implements AssetBlockInterface
     const VIRTUAL_CONTENT_TYPE = 'link';
 
     /**
-     * @param \Magento\View\Element\Template\Context $context
-     * @param \Magento\View\Asset\RemoteFactory $remoteFactory
-     * @param array $data
-     */
-    public function __construct(
-        \Magento\View\Element\Template\Context $context,
-        \Magento\View\Asset\RemoteFactory $remoteFactory,
-        array $data = array()
-    ) {
-        parent::__construct($context, $data);
-        $this->setAsset(
-            $remoteFactory->create(array(
-                'url' => (string)$this->getData('url'),
-                'contentType' => self::VIRTUAL_CONTENT_TYPE,
-            ))
-        );
-    }
-
-    /**
      * Get block asset
      *
-     * @return \Magento\View\Asset\AssetInterface
+     * @return \Magento\Framework\View\Asset\AssetInterface
      */
     public function getAsset()
     {
-        return $this->_getData('asset');
+        return $this->_assetRepo->createRemoteAsset($this->_getData('url'), self::VIRTUAL_CONTENT_TYPE);
     }
 }

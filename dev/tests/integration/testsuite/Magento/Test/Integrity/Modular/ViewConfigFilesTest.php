@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Core
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Test\Integrity\Modular;
 
 class ViewConfigFilesTest extends \PHPUnit_Framework_TestCase
@@ -35,11 +31,13 @@ class ViewConfigFilesTest extends \PHPUnit_Framework_TestCase
      */
     public function testViewConfigFile($file)
     {
-        $domConfig = new \Magento\Config\Dom($file);
+        $domConfig = new \Magento\Framework\Config\Dom($file);
         $result = $domConfig->validate(
-            \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-                ->get('Magento\App\Filesystem')->getPath(\Magento\App\Filesystem::LIB_DIR)
-                . '/Magento/Config/etc/view.xsd',
+            \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+                'Magento\Framework\App\Filesystem'
+            )->getPath(
+                \Magento\Framework\App\Filesystem::LIB_INTERNAL
+            ) . '/Magento/Framework/Config/etc/view.xsd',
             $errors
         );
         $message = "Invalid XML-file: {$file}\n";
@@ -55,9 +53,11 @@ class ViewConfigFilesTest extends \PHPUnit_Framework_TestCase
     public function viewConfigFileDataProvider()
     {
         $result = array();
-        $files = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->get('Magento\Module\Dir\Reader')
-            ->getConfigurationFiles('view.xml');
+        $files = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Framework\Module\Dir\Reader'
+        )->getConfigurationFiles(
+            'view.xml'
+        );
         foreach ($files as $file) {
             $result[] = array($file);
         }

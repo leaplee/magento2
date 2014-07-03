@@ -21,10 +21,9 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Usps\Block\Rma\Adminhtml\Rma\Edit\Tab\General\Shipping\Packaging;
 
-use Magento\App\RequestInterface;
+use Magento\Framework\App\RequestInterface;
 use Magento\Usps\Helper\Data as UspsHelper;
 use Magento\Usps\Model\Carrier;
 
@@ -43,7 +42,7 @@ class Plugin
     /**
      * Request
      *
-     * @var \Magento\App\RequestInterface
+     * @var \Magento\Framework\App\RequestInterface
      */
     protected $request;
 
@@ -51,7 +50,7 @@ class Plugin
      * Construct
      *
      * @param \Magento\Usps\Helper\Data $uspsHelper
-     * @param \Magento\App\RequestInterface $request
+     * @param \Magento\Framework\App\RequestInterface $request
      */
     public function __construct(UspsHelper $uspsHelper, RequestInterface $request)
     {
@@ -62,54 +61,43 @@ class Plugin
     /**
      * Add rule to isGirthAllowed() method
      *
-     * @param \Magento\Object $subject $subject
+     * @param \Magento\Framework\Object $subject $subject
      * @param bool $result
      * @return bool
      */
-    public function afterIsGirthAllowed(
-        \Magento\Object $subject,
-        $result
-    ) {
+    public function afterIsGirthAllowed(\Magento\Framework\Object $subject, $result)
+    {
         return $result && $this->uspsHelper->displayGirthValue($this->request->getParam('method'));
     }
 
     /**
      * Add rule to isGirthAllowed() method
      *
-     * @param \Magento\Object $subject
+     * @param \Magento\Framework\Object $subject
      * @param \Closure $proceed
      * @return array
      */
-    public function aroundCheckSizeAndGirthParameter(
-        \Magento\Object $subject,
-        \Closure $proceed
-    ) {
+    public function aroundCheckSizeAndGirthParameter(\Magento\Framework\Object $subject, \Closure $proceed)
+    {
         $carrier = $subject->getCarrier();
         $size = $subject->getSourceSizeModel();
 
         $girthEnabled = false;
         $sizeEnabled = false;
         if ($carrier && isset($size[0]['value'])) {
-            if ($size[0]['value'] == Carrier::SIZE_LARGE
-                && in_array(
-                    key($subject->getContainers()),
-                    array(
-                        Carrier::CONTAINER_NONRECTANGULAR,
-                        Carrier::CONTAINER_VARIABLE,
-                    )
-                )
+            if ($size[0]['value'] == Carrier::SIZE_LARGE && in_array(
+                key($subject->getContainers()),
+                array(Carrier::CONTAINER_NONRECTANGULAR, Carrier::CONTAINER_VARIABLE)
+            )
             ) {
                 $girthEnabled = true;
             }
 
             if (in_array(
                 key($subject->getContainers()),
-                array(
-                    Carrier::CONTAINER_NONRECTANGULAR,
-                    Carrier::CONTAINER_RECTANGULAR,
-                    Carrier::CONTAINER_VARIABLE,
-                )
-            )) {
+                array(Carrier::CONTAINER_NONRECTANGULAR, Carrier::CONTAINER_RECTANGULAR, Carrier::CONTAINER_VARIABLE)
+            )
+            ) {
                 $sizeEnabled = true;
             }
         }

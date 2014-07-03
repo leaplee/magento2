@@ -18,14 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Sales\Helper;
 
-class Admin extends \Magento\App\Helper\AbstractHelper
+class Admin extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      * @var \Magento\Sales\Model\Config
@@ -33,18 +31,18 @@ class Admin extends \Magento\App\Helper\AbstractHelper
     protected $_salesConfig;
 
     /**
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
     /**
-     * @param \Magento\App\Helper\Context $context
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Sales\Model\Config $salesConfig
      */
     public function __construct(
-        \Magento\App\Helper\Context $context,
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Sales\Model\Config $salesConfig
     ) {
         $this->_storeManager = $storeManager;
@@ -55,7 +53,7 @@ class Admin extends \Magento\App\Helper\AbstractHelper
     /**
      * Display price attribute value in base order currency and in place order currency
      *
-     * @param   \Magento\Object $dataObject
+     * @param   \Magento\Framework\Object $dataObject
      * @param   string $code
      * @param   bool $strong
      * @param   string $separator
@@ -65,7 +63,7 @@ class Admin extends \Magento\App\Helper\AbstractHelper
     {
         return $this->displayPrices(
             $dataObject,
-            $dataObject->getData('base_'.$code),
+            $dataObject->getData('base_' . $code),
             $dataObject->getData($code),
             $strong,
             $separator
@@ -75,7 +73,7 @@ class Admin extends \Magento\App\Helper\AbstractHelper
     /**
      * Get "double" prices html (block with base and place currency)
      *
-     * @param   \Magento\Object $dataObject
+     * @param   \Magento\Framework\Object $dataObject
      * @param   float $basePrice
      * @param   float $price
      * @param   bool $strong
@@ -93,18 +91,18 @@ class Admin extends \Magento\App\Helper\AbstractHelper
 
         if ($order && $order->isCurrencyDifferent()) {
             $res = '<strong>';
-            $res.= $order->formatBasePrice($basePrice);
-            $res.= '</strong>'.$separator;
-            $res.= '['.$order->formatPrice($price).']';
+            $res .= $order->formatBasePrice($basePrice);
+            $res .= '</strong>' . $separator;
+            $res .= '[' . $order->formatPrice($price) . ']';
         } elseif ($order) {
             $res = $order->formatPrice($price);
             if ($strong) {
-                $res = '<strong>'.$res.'</strong>';
+                $res = '<strong>' . $res . '</strong>';
             }
         } else {
             $res = $this->_storeManager->getStore()->formatPrice($price);
             if ($strong) {
-                $res = '<strong>'.$res.'</strong>';
+                $res = '<strong>' . $res . '</strong>';
             }
         }
         return $res;
@@ -113,13 +111,13 @@ class Admin extends \Magento\App\Helper\AbstractHelper
     /**
      * Filter collection by removing not available product types
      *
-     * @param \Magento\Core\Model\Resource\Db\Collection\AbstractCollection $collection
-     * @return \Magento\Core\Model\Resource\Db\Collection\AbstractCollection
+     * @param \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection $collection
+     * @return \Magento\Framework\Model\Resource\Db\Collection\AbstractCollection
      */
     public function applySalableProductTypesFilter($collection)
     {
         $productTypes = $this->_salesConfig->getAvailableProductTypes();
-        foreach($collection->getItems() as $key => $item) {
+        foreach ($collection->getItems() as $key => $item) {
             if ($item instanceof \Magento\Catalog\Model\Product) {
                 $type = $item->getTypeId();
             } else if ($item instanceof \Magento\Sales\Model\Order\Item) {

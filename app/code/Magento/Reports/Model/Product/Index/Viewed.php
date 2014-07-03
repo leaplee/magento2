@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Reports
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -38,8 +36,6 @@ namespace Magento\Reports\Model\Product\Index;
  * @method string getAddedAt()
  * @method \Magento\Reports\Model\Product\Index\Viewed setAddedAt(string $value)
  *
- * @category    Magento
- * @package     Magento_Reports
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Viewed extends \Magento\Reports\Model\Product\Index\AbstractIndex
@@ -49,7 +45,7 @@ class Viewed extends \Magento\Reports\Model\Product\Index\AbstractIndex
      *
      * @var string
      */
-    protected $_countCacheKey   = 'product_index_viewed_count';
+    protected $_countCacheKey = 'product_index_viewed_count';
 
     /**
      * Initialize resource model
@@ -70,8 +66,8 @@ class Viewed extends \Magento\Reports\Model\Product\Index\AbstractIndex
     {
         $productIds = array();
 
-        if ($this->_coreRegistry->registry('current_product')) {
-            $productIds[] = $this->_coreRegistry->registry('current_product')->getId();
+        if ($this->_registry->registry('current_product')) {
+            $productIds[] = $this->_registry->registry('current_product')->getId();
         }
 
         return $productIds;

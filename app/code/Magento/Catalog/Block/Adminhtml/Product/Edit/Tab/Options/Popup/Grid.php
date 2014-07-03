@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,21 +25,18 @@
 /**
  * Adminhtml product grid in custom options popup
  *
- * @category   Magento
- * @package    Magento_Catalog
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Options\Popup;
 
 use Magento\Catalog\Model\Product;
 
-class Grid
-    extends \Magento\Catalog\Block\Adminhtml\Product\Grid
+class Grid extends \Magento\Catalog\Block\Adminhtml\Product\Grid
 {
     /**
      * Return empty row url for disabling JS click events
      *
-     * @param Product|\Magento\Object $row
+     * @param Product|\Magento\Framework\Object $row
      * @return string|null
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -72,9 +67,7 @@ class Grid
     public function _prepareMassaction()
     {
         $this->setMassactionIdField('entity_id');
-        $this->getMassactionBlock()
-            ->setFormFieldName('product')
-            ->addItem('import', array('label' => __('Import')));
+        $this->getMassactionBlock()->setFormFieldName('product')->addItem('import', array('label' => __('Import')));
 
         return $this;
     }

@@ -20,12 +20,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_GroupedProduct
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\GroupedProduct\Model\Product\Type\Grouped;
 
 class Price extends \Magento\Catalog\Model\Product\Type\Price
@@ -47,8 +44,12 @@ class Price extends \Magento\Catalog\Model\Product\Type\Price
         if ($product->hasCustomOptions()) {
             /* @var $typeInstance \Magento\GroupedProduct\Model\Product\Type\Grouped */
             $typeInstance = $product->getTypeInstance();
-            $associatedProducts = $typeInstance->setStoreFilter($product->getStore(), $product)
-                ->getAssociatedProducts($product);
+            $associatedProducts = $typeInstance->setStoreFilter(
+                $product->getStore(),
+                $product
+            )->getAssociatedProducts(
+                $product
+            );
             foreach ($associatedProducts as $childProduct) {
                 /* @var $childProduct \Magento\Catalog\Model\Product */
                 $option = $product->getCustomOption('associated_product_' . $childProduct->getId());

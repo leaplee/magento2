@@ -18,21 +18,19 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Review
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Review\Model\Resource\Review;
 
-use Magento\Core\Model\AbstractModel;
+use Magento\Framework\Model\AbstractModel;
 
 /**
  * Review summary resource model
  *
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Summary extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Summary extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
      * Define module
@@ -68,14 +66,12 @@ class Summary extends \Magento\Core\Model\Resource\Db\AbstractDb
     public function reAggregate($summary)
     {
         $adapter = $this->_getWriteAdapter();
-        $select = $adapter->select()
-            ->from($this->getMainTable(),
-                array(
-                    'primary_id' => new \Zend_Db_Expr('MAX(primary_id)'),
-                    'store_id',
-                    'entity_pk_value'
-                ))
-            ->group(array('entity_pk_value', 'store_id'));
+        $select = $adapter->select()->from(
+            $this->getMainTable(),
+            array('primary_id' => new \Zend_Db_Expr('MAX(primary_id)'), 'store_id', 'entity_pk_value')
+        )->group(
+            array('entity_pk_value', 'store_id')
+        );
         foreach ($adapter->fetchAll($select) as $row) {
             if (isset($summary[$row['store_id']]) && isset($summary[$row['store_id']][$row['entity_pk_value']])) {
                 $summaryItem = $summary[$row['store_id']][$row['entity_pk_value']];

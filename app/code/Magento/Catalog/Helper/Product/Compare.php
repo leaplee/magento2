@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -99,7 +97,7 @@ class Compare extends \Magento\Core\Helper\Url
     protected $_itemCollectionFactory;
 
     /**
-     * @var \Magento\Data\Form\FormKey
+     * @var \Magento\Framework\Data\Form\FormKey
      */
     protected $_formKey;
 
@@ -114,26 +112,26 @@ class Compare extends \Magento\Core\Helper\Url
     protected $_coreHelper;
 
     /**
-     * @param \Magento\App\Helper\Context $context
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Catalog\Model\Resource\Product\Compare\Item\CollectionFactory $itemCollectionFactory
      * @param \Magento\Catalog\Model\Product\Visibility $catalogProductVisibility
      * @param \Magento\Log\Model\Visitor $logVisitor
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Catalog\Model\Session $catalogSession
-     * @param \Magento\Data\Form\FormKey $formKey
+     * @param \Magento\Framework\Data\Form\FormKey $formKey
      * @param \Magento\Wishlist\Helper\Data $wishlistHelper
      * @param \Magento\Core\Helper\PostData $coreHelper
      */
     public function __construct(
-        \Magento\App\Helper\Context $context,
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Catalog\Model\Resource\Product\Compare\Item\CollectionFactory $itemCollectionFactory,
         \Magento\Catalog\Model\Product\Visibility $catalogProductVisibility,
         \Magento\Log\Model\Visitor $logVisitor,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Catalog\Model\Session $catalogSession,
-        \Magento\Data\Form\FormKey $formKey,
+        \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Wishlist\Helper\Data $wishlistHelper,
         \Magento\Core\Helper\PostData $coreHelper
     ) {
@@ -161,8 +159,8 @@ class Compare extends \Magento\Core\Helper\Url
         }
 
         $params = array(
-            'items'=>implode(',', $itemIds),
-            \Magento\App\Action\Action::PARAM_NAME_URL_ENCODED => $this->getEncodedUrl()
+            'items' => implode(',', $itemIds),
+            \Magento\Framework\App\Action\Action::PARAM_NAME_URL_ENCODED => $this->getEncodedUrl()
         );
 
         return $this->_getUrl('catalog/product_compare', $params);
@@ -176,7 +174,7 @@ class Compare extends \Magento\Core\Helper\Url
      */
     public function getPostDataParams($product)
     {
-        return $this->_coreHelper->getPostData($this->getAddUrl(), ['product' => $product->getId()]);
+        return $this->_coreHelper->getPostData($this->getAddUrl(), array('product' => $product->getId()));
     }
 
     /**
@@ -200,7 +198,7 @@ class Compare extends \Magento\Core\Helper\Url
         $beforeCompareUrl = $this->_catalogSession->getBeforeCompareUrl();
 
         $encodedUrl = array(
-            \Magento\App\Action\Action::PARAM_NAME_URL_ENCODED => $this->getEncodedUrl($beforeCompareUrl)
+            \Magento\Framework\App\Action\Action::PARAM_NAME_URL_ENCODED => $this->getEncodedUrl($beforeCompareUrl)
         );
 
         return $this->_wishlistHelper->getAddParams($product, $encodedUrl);
@@ -217,7 +215,7 @@ class Compare extends \Magento\Core\Helper\Url
         $beforeCompareUrl = $this->_catalogSession->getBeforeCompareUrl();
         $params = array(
             'product' => $product->getId(),
-            \Magento\App\Action\Action::PARAM_NAME_URL_ENCODED => $this->getEncodedUrl($beforeCompareUrl)
+            \Magento\Framework\App\Action\Action::PARAM_NAME_URL_ENCODED => $this->getEncodedUrl($beforeCompareUrl)
         );
 
         return $this->_getUrl('checkout/cart/add', $params);
@@ -241,7 +239,12 @@ class Compare extends \Magento\Core\Helper\Url
      */
     public function getPostDataRemove($product)
     {
-        return $this->_coreHelper->getPostData($this->getRemoveUrl(), ['product' => $product->getId()]);
+        $listCleanUrl = $this->getEncodedUrl($this->_getUrl('catalog/product_compare'));
+        $data = array(
+            \Magento\Framework\App\Action\Action::PARAM_NAME_URL_ENCODED => $listCleanUrl,
+            'product' => $product->getId()
+        );
+        return $this->_coreHelper->getPostData($this->getRemoveUrl(), $data);
     }
 
     /**
@@ -251,10 +254,21 @@ class Compare extends \Magento\Core\Helper\Url
      */
     public function getClearListUrl()
     {
+        return $this->_getUrl('catalog/product_compare/clear');
+    }
+
+    /**
+     * Get parameters to clear compare list
+     *
+     * @return string
+     */
+    public function getPostDataClearList()
+    {
+        $refererUrl = $this->_getRequest()->getServer('HTTP_REFERER');
         $params = array(
-            \Magento\App\Action\Action::PARAM_NAME_URL_ENCODED => $this->getEncodedUrl()
+            \Magento\Framework\App\Action\Action::PARAM_NAME_URL_ENCODED => $this->urlEncode($refererUrl)
         );
-        return $this->_getUrl('catalog/product_compare/clear', $params);
+        return $this->_coreHelper->getPostData($this->getClearListUrl(), $params);
     }
 
     /**
@@ -268,8 +282,7 @@ class Compare extends \Magento\Core\Helper\Url
             // cannot be placed in constructor because of the cyclic dependency which cannot be fixed with proxy class
             // collection uses this helper in constructor when calling isEnabledFlat() method
             $this->_itemCollection = $this->_itemCollectionFactory->create();
-            $this->_itemCollection->useProductItem(true)
-                ->setStoreId($this->_storeManager->getStore()->getId());
+            $this->_itemCollection->useProductItem(true)->setStoreId($this->_storeManager->getStore()->getId());
 
             if ($this->_customerSession->isLoggedIn()) {
                 $this->_itemCollection->setCustomerId($this->_customerSession->getCustomerId());
@@ -279,16 +292,12 @@ class Compare extends \Magento\Core\Helper\Url
                 $this->_itemCollection->setVisitorId($this->_logVisitor->getId());
             }
 
-            $this->_itemCollection->setVisibility(
-                $this->_catalogProductVisibility->getVisibleInSiteIds()
-            );
+            $this->_itemCollection->setVisibility($this->_catalogProductVisibility->getVisibleInSiteIds());
 
             /* Price data is added to consider item stock status using price index */
             $this->_itemCollection->addPriceData();
 
-            $this->_itemCollection->addAttributeToSelect('name')
-                ->addUrlRewrite()
-                ->load();
+            $this->_itemCollection->addAttributeToSelect('name')->addUrlRewrite()->load();
 
             /* update compare items count */
             $this->_catalogSession->setCatalogCompareItemsCount(count($this->_itemCollection));
@@ -305,28 +314,22 @@ class Compare extends \Magento\Core\Helper\Url
      */
     public function calculate($logout = false)
     {
-        // first visit
-        if (!$this->_catalogSession->hasCatalogCompareItemsCount() && !$this->_customerId) {
-            $count = 0;
+        /** @var $collection Collection */
+        $collection = $this->_itemCollectionFactory->create()
+            ->useProductItem(true);
+        if (!$logout && $this->_customerSession->isLoggedIn()) {
+            $collection->setCustomerId($this->_customerSession->getCustomerId());
+        } elseif ($this->_customerId) {
+            $collection->setCustomerId($this->_customerId);
         } else {
-            /** @var $collection Collection */
-            $collection = $this->_itemCollectionFactory->create()
-                ->useProductItem(true);
-            if (!$logout && $this->_customerSession->isLoggedIn()) {
-                $collection->setCustomerId($this->_customerSession->getCustomerId());
-            } elseif ($this->_customerId) {
-                $collection->setCustomerId($this->_customerId);
-            } else {
-                $collection->setVisitorId($this->_logVisitor->getId());
-            }
-
-            /* Price data is added to consider item stock status using price index */
-            $collection->addPriceData()
-                ->setVisibility($this->_catalogProductVisibility->getVisibleInSiteIds());
-
-            $count = $collection->getSize();
+            $collection->setVisitorId($this->_logVisitor->getId());
         }
 
+        /* Price data is added to consider item stock status using price index */
+        $collection->addPriceData()
+            ->setVisibility($this->_catalogProductVisibility->getVisibleInSiteIds());
+
+        $count = $collection->getSize();
         $this->_catalogSession->setCatalogCompareItemsCount($count);
 
         return $this;

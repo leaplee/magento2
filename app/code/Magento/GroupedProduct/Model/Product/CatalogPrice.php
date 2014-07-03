@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\GroupedProduct\Model\Product;
 
 /**
@@ -30,7 +29,7 @@ namespace Magento\GroupedProduct\Model\Product;
 class CatalogPrice implements \Magento\Catalog\Model\Product\CatalogPriceInterface
 {
     /**
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
 
@@ -40,11 +39,11 @@ class CatalogPrice implements \Magento\Catalog\Model\Product\CatalogPriceInterfa
     protected $commonPriceModel;
 
     /**
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Catalog\Model\Product\CatalogPrice $commonPriceModel
      */
     public function __construct(
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Catalog\Model\Product\CatalogPrice $commonPriceModel
     ) {
         $this->storeManager = $storeManager;
@@ -55,7 +54,7 @@ class CatalogPrice implements \Magento\Catalog\Model\Product\CatalogPriceInterfa
      * Minimal price for "regular" user
      *
      * @param \Magento\Catalog\Model\Product $product
-     * @param null|\Magento\Core\Model\Store $store Store view
+     * @param null|\Magento\Store\Model\Store $store Store view
      * @param bool $inclTax
      * @return null|float
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -63,12 +62,12 @@ class CatalogPrice implements \Magento\Catalog\Model\Product\CatalogPriceInterfa
     public function getCatalogPrice(\Magento\Catalog\Model\Product $product, $store = null, $inclTax = false)
     {
         // Workaround to avoid loading stock status by admin's website
-        if ($store instanceof \Magento\Core\Model\Store) {
+        if ($store instanceof \Magento\Store\Model\Store) {
             $oldStore = $this->storeManager->getStore();
             $this->storeManager->setCurrentStore($store);
         }
         $subProducts = $product->getTypeInstance()->getAssociatedProducts($product);
-        if ($store instanceof \Magento\Core\Model\Store) {
+        if ($store instanceof \Magento\Store\Model\Store) {
             $this->storeManager->setCurrentStore($oldStore);
         }
         if (!count($subProducts)) {
@@ -76,8 +75,7 @@ class CatalogPrice implements \Magento\Catalog\Model\Product\CatalogPriceInterfa
         }
         $minPrice = null;
         foreach ($subProducts as $subProduct) {
-            $subProduct->setWebsiteId($product->getWebsiteId())
-                ->setCustomerGroupId($product->getCustomerGroupId());
+            $subProduct->setWebsiteId($product->getWebsiteId())->setCustomerGroupId($product->getCustomerGroupId());
             if ($subProduct->isSalable()) {
                 if ($this->commonPriceModel->getCatalogPrice($subProduct) < $minPrice || $minPrice === null) {
                     $minPrice = $this->commonPriceModel->getCatalogPrice($subProduct);

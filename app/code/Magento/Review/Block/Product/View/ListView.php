@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Review
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Review\Block\Product\View;
 /**
  * Detailed Product Reviews
  *
- * @category   Magento
- * @package    Magento_Review
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class ListView extends \Magento\Review\Block\Product\View
@@ -43,11 +39,12 @@ class ListView extends \Magento\Review\Block\Product\View
     /**
      * Get product id
      *
-     * @return int
+     * @return int|null
      */
     public function getProductId()
     {
-        return $this->_coreRegistry->registry('product')->getId();
+        $product = $this->_coreRegistry->registry('product');
+        return $product ? $product->getId() : null;
     }
 
     /**
@@ -74,9 +71,7 @@ class ListView extends \Magento\Review\Block\Product\View
      */
     protected function _beforeToHtml()
     {
-        $this->getReviewsCollection()
-            ->load()
-            ->addRateVotes();
+        $this->getReviewsCollection()->load()->addRateVotes();
         return parent::_beforeToHtml();
     }
 

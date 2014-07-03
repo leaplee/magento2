@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Checkout\Controller\Express;
 
 interface RedirectLoginInterface
@@ -53,7 +52,7 @@ interface RedirectLoginInterface
     /**
      * Retrieve response object
      *
-     * @return \Magento\App\ResponseInterface
+     * @return \Magento\Framework\App\ResponseInterface
      */
     public function getResponse();
-} 
+}

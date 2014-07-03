@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -35,8 +33,6 @@ namespace Magento\Backend\Block\Urlrewrite\Catalog\Product;
  * @method \Magento\Backend\Block\Urlrewrite\Catalog\Product\Edit setProduct(\Magento\Catalog\Model\Product $product)
  * @method bool getIsCategoryMode()
  *
- * @category   Magento
- * @package    Magento_Adminhtml
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Edit extends \Magento\Backend\Block\Urlrewrite\Edit
@@ -53,7 +49,7 @@ class Edit extends \Magento\Backend\Block\Urlrewrite\Edit
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Core\Model\Url\RewriteFactory $rewriteFactory
+     * @param \Magento\UrlRewrite\Model\UrlRewriteFactory $rewriteFactory
      * @param \Magento\Backend\Helper\Data $adminhtmlData
      * @param \Magento\Catalog\Model\ProductFactory $productFactory
      * @param \Magento\Catalog\Model\CategoryFactory $categoryFactory
@@ -61,7 +57,7 @@ class Edit extends \Magento\Backend\Block\Urlrewrite\Edit
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        \Magento\Core\Model\Url\RewriteFactory $rewriteFactory,
+        \Magento\UrlRewrite\Model\UrlRewriteFactory $rewriteFactory,
         \Magento\Backend\Helper\Data $adminhtmlData,
         \Magento\Catalog\Model\ProductFactory $productFactory,
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
@@ -97,8 +93,10 @@ class Edit extends \Magento\Backend\Block\Urlrewrite\Edit
             if ($this->_getCategory()->getId() || !$this->getIsCategoryMode()) {
                 $this->_addEditFormBlock();
                 $this->_updateBackButtonLink(
-                    $this->_adminhtmlData
-                        ->getUrl('adminhtml/*/edit', array('product' => $this->_getProduct()->getId())) . 'category'
+                    $this->_adminhtmlData->getUrl(
+                        'adminhtml/*/edit',
+                        array('product' => $this->_getProduct()->getId())
+                    ) . 'category'
                 );
             } else {
                 // categories selector & skip categories button
@@ -145,11 +143,15 @@ class Edit extends \Magento\Backend\Block\Urlrewrite\Edit
      */
     private function _addProductLinkBlock()
     {
-        $this->addChild('product_link', 'Magento\Backend\Block\Urlrewrite\Link', array(
-            'item_url'  => $this->_adminhtmlData->getUrl('adminhtml/*/*') . 'product',
-            'item_name' => $this->_getProduct()->getName(),
-            'label'     => __('Product:')
-        ));
+        $this->addChild(
+            'product_link',
+            'Magento\Backend\Block\Urlrewrite\Link',
+            array(
+                'item_url' => $this->_adminhtmlData->getUrl('adminhtml/*/*') . 'product',
+                'item_name' => $this->_getProduct()->getName(),
+                'label' => __('Product:')
+            )
+        );
     }
 
     /**
@@ -159,12 +161,18 @@ class Edit extends \Magento\Backend\Block\Urlrewrite\Edit
      */
     private function _addCategoryLinkBlock()
     {
-        $this->addChild('category_link', 'Magento\Backend\Block\Urlrewrite\Link', array(
-            'item_url'  => $this->_adminhtmlData
-                ->getUrl('adminhtml/*/*', array('product' => $this->_getProduct()->getId())) . 'category',
-            'item_name' => $this->_getCategory()->getName(),
-            'label'     => __('Category:')
-        ));
+        $this->addChild(
+            'category_link',
+            'Magento\Backend\Block\Urlrewrite\Link',
+            array(
+                'item_url' => $this->_adminhtmlData->getUrl(
+                    'adminhtml/*/*',
+                    array('product' => $this->_getProduct()->getId())
+                ) . 'category',
+                'item_name' => $this->_getCategory()->getName(),
+                'label' => __('Category:')
+            )
+        );
     }
 
     /**
@@ -194,14 +202,19 @@ class Edit extends \Magento\Backend\Block\Urlrewrite\Edit
      */
     private function _addSkipCategoriesBlock()
     {
-        $this->addChild('skip_categories', 'Magento\Backend\Block\Widget\Button', array(
-            'label' => __('Skip Category Selection'),
-            'onclick' => 'window.location = \''
-                . $this->_adminhtmlData->getUrl('adminhtml/*/*', array('product' => $this->_getProduct()->getId()))
-                . '\'',
-            'class' => 'save',
-            'level' => -1
-        ));
+        $this->addChild(
+            'skip_categories',
+            'Magento\Backend\Block\Widget\Button',
+            array(
+                'label' => __('Skip Category Selection'),
+                'onclick' => 'window.location = \'' . $this->_adminhtmlData->getUrl(
+                    'adminhtml/*/*',
+                    array('product' => $this->_getProduct()->getId())
+                ) . '\'',
+                'class' => 'save',
+                'level' => -1
+            )
+        );
     }
 
     /**
@@ -211,12 +224,16 @@ class Edit extends \Magento\Backend\Block\Urlrewrite\Edit
      */
     protected function _createEditFormBlock()
     {
-        return $this->getLayout()->createBlock('Magento\Backend\Block\Urlrewrite\Catalog\Edit\Form', '', array(
-            'data' => array(
-                'product'     => $this->_getProduct(),
-                'category'    => $this->_getCategory(),
-                'url_rewrite' => $this->_getUrlRewrite()
+        return $this->getLayout()->createBlock(
+            'Magento\Backend\Block\Urlrewrite\Catalog\Edit\Form',
+            '',
+            array(
+                'data' => array(
+                    'product' => $this->_getProduct(),
+                    'category' => $this->_getCategory(),
+                    'url_rewrite' => $this->_getUrlRewrite()
+                )
             )
-        ));
+        );
     }
 }

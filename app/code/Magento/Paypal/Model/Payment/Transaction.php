@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Paypal
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -33,7 +31,7 @@ namespace Magento\Paypal\Model\Payment;
  * @method string getCreatedAt()
  * @method \Magento\Paypal\Model\Payment\Transaction setCreatedAt(string $value)
  */
-class Transaction extends \Magento\Core\Model\AbstractModel
+class Transaction extends \Magento\Framework\Model\AbstractModel
 {
     /**
      * Whether to throw exceptions on different operations
@@ -66,24 +64,24 @@ class Transaction extends \Magento\Core\Model\AbstractModel
     protected $_orderWebsiteId;
 
     /**
-     * @var \Magento\Stdlib\DateTime\DateTimeFactory
+     * @var \Magento\Framework\Stdlib\DateTime\DateTimeFactory
      */
     protected $_dateFactory;
 
     /**
-     * @param \Magento\Model\Context $context
-     * @param \Magento\Registry $registry
-     * @param \Magento\Stdlib\DateTime\DateTimeFactory $dateFactory
-     * @param \Magento\Core\Model\Resource\AbstractResource $resource
-     * @param \Magento\Data\Collection\Db $resourceCollection
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Stdlib\DateTime\DateTimeFactory $dateFactory
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\Db $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Magento\Model\Context $context,
-        \Magento\Registry $registry,
-        \Magento\Stdlib\DateTime\DateTimeFactory $dateFactory,
-        \Magento\Core\Model\Resource\AbstractResource $resource = null,
-        \Magento\Data\Collection\Db $resourceCollection = null,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Stdlib\DateTime\DateTimeFactory $dateFactory,
+        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\Db $resourceCollection = null,
         array $data = array()
     ) {
         $this->_dateFactory = $dateFactory;
@@ -137,9 +135,7 @@ class Transaction extends \Magento\Core\Model\AbstractModel
     public function loadByTxnId($txnId)
     {
         $this->_beforeLoadByTxnId($txnId);
-        $this->getResource()->loadObjectByTxnId(
-            $this, $txnId
-        );
+        $this->getResource()->loadObjectByTxnId($this, $txnId);
         $this->_afterLoadByTxnId();
         return $this;
     }
@@ -155,7 +151,6 @@ class Transaction extends \Magento\Core\Model\AbstractModel
         return $this;
     }
 
-
     /**
      * Additional information setter
      * Updates data inside the 'additional_information' array
@@ -164,12 +159,12 @@ class Transaction extends \Magento\Core\Model\AbstractModel
      * @param string $key
      * @param mixed $value
      * @return $this
-     * @throws \Magento\Core\Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     public function setAdditionalInformation($key, $value)
     {
         if (is_object($value)) {
-            throw new \Magento\Core\Exception(__('Payment transactions disallow storing objects.'));
+            throw new \Magento\Framework\Model\Exception(__('Payment transactions disallow storing objects.'));
         }
         $info = $this->_getData('additional_information');
         if (!$info) {
@@ -192,7 +187,7 @@ class Transaction extends \Magento\Core\Model\AbstractModel
             $info = array();
         }
         if ($key) {
-            return (isset($info[$key]) ? $info[$key] : null);
+            return isset($info[$key]) ? $info[$key] : null;
         }
         return $info;
     }
@@ -235,7 +230,7 @@ class Transaction extends \Magento\Core\Model\AbstractModel
      * Verify data required for saving
      *
      * @return $this
-     * @throws \Magento\Core\Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     protected function _beforeSave()
     {
@@ -250,12 +245,12 @@ class Transaction extends \Magento\Core\Model\AbstractModel
      *
      * @param string $txnId
      * @return void
-     * @throws \Magento\Core\Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     protected function _verifyTxnId($txnId)
     {
         if (null !== $txnId && 0 == strlen($txnId)) {
-            throw new \Magento\Core\Exception(__('You need to enter a transaction ID.'));
+            throw new \Magento\Framework\Model\Exception(__('You need to enter a transaction ID.'));
         }
     }
 
@@ -265,12 +260,12 @@ class Transaction extends \Magento\Core\Model\AbstractModel
      * TODO for more restriction we can check for data consistency
      *
      * @return void
-     * @throws \Magento\Core\Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     protected function _verifyThisTransactionExists()
     {
         if (!$this->getId()) {
-            throw new \Magento\Core\Exception(__('This operation requires an existing transaction object.'));
+            throw new \Magento\Framework\Model\Exception(__('This operation requires an existing transaction object.'));
         }
     }
 }

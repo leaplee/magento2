@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,24 +25,19 @@
 /**
  * Backend grid item renderer concat
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-
 namespace Magento\Backend\Block\Widget\Grid\Column\Renderer;
 
-class Concat
-    extends \Magento\Backend\Block\Widget\Grid\Column\Renderer\AbstractRenderer
+class Concat extends \Magento\Backend\Block\Widget\Grid\Column\Renderer\AbstractRenderer
 {
-
     /**
      * Renders grid column
      *
-     * @param   \Magento\Object $row
+     * @param   \Magento\Framework\Object $row
      * @return  string
      */
-    public function render(\Magento\Object $row)
+    public function render(\Magento\Framework\Object $row)
     {
         $dataArr = array();
         foreach ($this->getColumn()->getIndex() as $index) {
@@ -56,5 +49,4 @@ class Concat
         // TODO run column type renderer
         return $data;
     }
-
 }

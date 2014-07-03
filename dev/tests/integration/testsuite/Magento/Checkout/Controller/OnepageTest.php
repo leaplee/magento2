@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category Magento
- * @package Magento_Checkout
- * @subpackage integration_tests
  * @copyright Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Checkout\Controller;
 
 /**
@@ -35,11 +31,13 @@ class OnepageTest extends \Magento\TestFramework\TestCase\AbstractController
     protected function setUp()
     {
         parent::setUp();
-        $quote = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Sales\Model\Quote');
+        $quote = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create('Magento\Sales\Model\Quote');
         $quote->load('test01', 'reserved_order_id');
-        \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get('Magento\Checkout\Model\Session')
-            ->setQuoteId($quote->getId());
+        \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Checkout\Model\Session'
+        )->setQuoteId(
+            $quote->getId()
+        );
     }
 
     /**
@@ -64,20 +62,20 @@ class OnepageTest extends \Magento\TestFramework\TestCase\AbstractController
             'payment' => array('is_show' => true, 'complete' => true),
             'billing' => array('is_show' => true),
             'shipping' => array('is_show' => true),
-            'shipping_method' => array('is_show' => true),
+            'shipping_method' => array('is_show' => true)
         );
-        \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get('Magento\Checkout\Model\Session')
-            ->setSteps($steps);
+        \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Checkout\Model\Session'
+        )->setSteps(
+            $steps
+        );
 
         $this->dispatch('checkout/onepage/progress');
         $html = $this->getResponse()->getBody();
         $this->assertContains('Checkout', $html);
-        $methodTitle = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->get('Magento\Checkout\Model\Session')
-            ->getQuote()
-            ->getPayment()
-            ->getMethodInstance()
-            ->getTitle();
+        $methodTitle = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Checkout\Model\Session'
+        )->getQuote()->getPayment()->getMethodInstance()->getTitle();
         $this->assertContains('<dt class="title">' . $methodTitle . '</dt>', $html);
     }
 
@@ -102,7 +100,7 @@ class OnepageTest extends \Magento\TestFramework\TestCase\AbstractController
 
     public function testSaveOrderActionWithFormKey()
     {
-        $formKey = $this->_objectManager->get('\Magento\Data\Form\FormKey');
+        $formKey = $this->_objectManager->get('\Magento\Framework\Data\Form\FormKey');
         $this->getRequest()->setParam('form_key', $formKey->getFormKey());
         $this->dispatch('checkout/onepage/saveOrder');
         $html = $this->getResponse()->getBody();
@@ -113,5 +111,3 @@ class OnepageTest extends \Magento\TestFramework\TestCase\AbstractController
         );
     }
 }
-
-

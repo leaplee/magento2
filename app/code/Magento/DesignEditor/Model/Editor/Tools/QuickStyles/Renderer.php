@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_DesignEditor
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -73,8 +71,11 @@ class Renderer
             foreach ($data['components'] as $component) {
                 $this->_rendererCssRecursively($component, $content);
             }
-        } elseif ((!empty($data['value']) && $data['value'] != $data['default'] && !empty($data['attribute'])) ||
-                (empty($data['value']) && $this->_isBackgroundImage($data))) {
+        } elseif (!empty($data['value']) && $data['value'] != $data['default'] && !empty($data['attribute']) ||
+            empty($data['value']) && $this->_isBackgroundImage(
+                $data
+            )
+        ) {
             $content .= $this->_quickStyleFactory->get($data['attribute'])->toCss($data) . "\n";
         }
         return $this;
@@ -88,8 +89,11 @@ class Renderer
      */
     protected function _isBackgroundImage($data)
     {
-        return (!empty($data['attribute']) && $data['attribute'] === 'background-image' &&
-            !empty($data['type']) && $data['type'] === 'image-uploader' &&
-            !empty($data['selector']) && $data['selector'] === '.header');
+        return !empty($data['attribute']) &&
+            $data['attribute'] === 'background-image' &&
+            !empty($data['type']) &&
+            $data['type'] === 'image-uploader' &&
+            !empty($data['selector']) &&
+            $data['selector'] === '.header';
     }
 }

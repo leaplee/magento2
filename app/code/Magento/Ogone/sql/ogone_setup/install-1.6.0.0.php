@@ -18,14 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Ogone
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 $installer = $this;
-/* @var $installer \Magento\Core\Model\Resource\Setup */
+/* @var $installer \Magento\Framework\Module\Setup */
 
 $data = array();
 $statuses = array(
@@ -37,37 +35,22 @@ $statuses = array(
     'waiting_authorozation' => __('Waiting Authorization')
 );
 foreach ($statuses as $code => $info) {
-    $data[] = array(
-        'status' => $code,
-        'label'  => $info
-    );
+    $data[] = array('status' => $code, 'label' => $info);
 }
-$installer->getConnection()->insertArray(
-    $installer->getTable('sales_order_status'),
-    array('status', 'label'),
-    $data
-);
+$installer->getConnection()->insertArray($installer->getTable('sales_order_status'), array('status', 'label'), $data);
 
-$data   = array();
+$data = array();
 $states = array(
-    'pending_payment' => array(
-        'statuses' => array(
-            'pending_ogone' => array()
-        )
-    ),
-    'processing' => array(
-        'statuses' => array(
-            'processed_ogone' => array()
-        )
-    )
+    'pending_payment' => array('statuses' => array('pending_ogone' => array())),
+    'processing' => array('statuses' => array('processed_ogone' => array()))
 );
 
 foreach ($states as $code => $info) {
     if (isset($info['statuses'])) {
         foreach ($info['statuses'] as $status => $statusInfo) {
             $data[] = array(
-                'status'     => $status,
-                'state'      => $code,
+                'status' => $status,
+                'state' => $code,
                 'is_default' => is_array($statusInfo) && isset($statusInfo['default']) ? 1 : 0
             );
         }

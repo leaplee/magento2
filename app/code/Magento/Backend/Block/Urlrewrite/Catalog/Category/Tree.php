@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Backend\Block\Urlrewrite\Catalog\Category;
 /**
  * Categories tree block for URL rewrites editing process
  *
- * @category   Magento
- * @package    Magento_Adminhtml
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Tree extends \Magento\Catalog\Block\Adminhtml\Category\AbstractCategory
@@ -64,15 +60,15 @@ class Tree extends \Magento\Catalog\Block\Adminhtml\Category\AbstractCategory
     protected $_productFactory;
 
     /**
-     * @var \Magento\Json\EncoderInterface
+     * @var \Magento\Framework\Json\EncoderInterface
      */
     protected $_jsonEncoder;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Catalog\Model\Resource\Category\Tree $categoryTree
-     * @param \Magento\Registry $registry
-     * @param \Magento\Json\EncoderInterface $jsonEncoder
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
      * @param \Magento\Catalog\Model\ProductFactory $productFactory
      * @param \Magento\Catalog\Model\CategoryFactory $categoryFactory
      * @param \Magento\Backend\Helper\Data $adminhtmlData
@@ -81,10 +77,10 @@ class Tree extends \Magento\Catalog\Block\Adminhtml\Category\AbstractCategory
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Catalog\Model\Resource\Category\Tree $categoryTree,
-        \Magento\Registry $registry,
-        \Magento\Json\EncoderInterface $jsonEncoder,
-        \Magento\Catalog\Model\ProductFactory $productFactory,
+        \Magento\Framework\Registry $registry,
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
+        \Magento\Catalog\Model\ProductFactory $productFactory,
         \Magento\Backend\Helper\Data $adminhtmlData,
         array $data = array()
     ) {
@@ -92,7 +88,7 @@ class Tree extends \Magento\Catalog\Block\Adminhtml\Category\AbstractCategory
         $this->_categoryFactory = $categoryFactory;
         $this->_productFactory = $productFactory;
         $this->_adminhtmlData = $adminhtmlData;
-        parent::__construct($context, $categoryTree, $registry, $data);
+        parent::__construct($context, $categoryTree, $registry, $categoryFactory, $data);
     }
 
     /**
@@ -143,9 +139,11 @@ class Tree extends \Magento\Catalog\Block\Adminhtml\Category\AbstractCategory
     {
         $collection = $this->_getData('category_collection');
         if (is_null($collection)) {
-            $collection = $this->_categoryFactory->create()->getCollection()
-                ->addAttributeToSelect(array('name', 'is_active'))
-                ->setLoadProductCount(true);
+            $collection = $this->_categoryFactory->create()->getCollection()->addAttributeToSelect(
+                array('name', 'is_active')
+            )->setLoadProductCount(
+                true
+            );
             $this->setData('category_collection', $collection);
         }
 
@@ -155,19 +153,19 @@ class Tree extends \Magento\Catalog\Block\Adminhtml\Category\AbstractCategory
     /**
      * Convert categories tree to array recursively
      *
-     * @param  \Magento\Data\Tree\Node $node
+     * @param  \Magento\Framework\Data\Tree\Node $node
      * @return array
      */
     protected function _getNodesArray($node)
     {
         $result = array(
-            'id'             => (int)$node->getId(),
-            'parent_id'      => (int)$node->getParentId(),
+            'id' => (int)$node->getId(),
+            'parent_id' => (int)$node->getParentId(),
             'children_count' => (int)$node->getChildrenCount(),
-            'is_active'      => (bool)$node->getIsActive(),
-            'name'           => $node->getName(),
-            'level'          => (int)$node->getLevel(),
-            'product_count'  => (int)$node->getProductCount()
+            'is_active' => (bool)$node->getIsActive(),
+            'name' => $node->getName(),
+            'level' => (int)$node->getLevel(),
+            'product_count' => (int)$node->getProductCount()
         );
 
         if (is_array($this->_allowedCategoryIds) && !in_array($result['id'], $this->_allowedCategoryIds)) {
@@ -180,8 +178,8 @@ class Tree extends \Magento\Catalog\Block\Adminhtml\Category\AbstractCategory
                 $result['children'][] = $this->_getNodesArray($childNode);
             }
         }
-        $result['cls']      = ($result['is_active'] ? '' : 'no-') . 'active-category';
-        $result['expanded'] = (!empty($result['children']));
+        $result['cls'] = ($result['is_active'] ? '' : 'no-') . 'active-category';
+        $result['expanded'] = !empty($result['children']);
 
         return $result;
     }

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Bundle
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,14 +26,25 @@ $installer = $this;
 /** @var $installer \Magento\Catalog\Model\Resource\Setup */
 
 $fieldList = array(
-    'price','special_price','special_from_date','special_to_date',
-    'minimal_price','cost','tier_price','weight'
+    'price',
+    'special_price',
+    'special_from_date',
+    'special_to_date',
+    'minimal_price',
+    'cost',
+    'tier_price',
+    'weight'
 );
 foreach ($fieldList as $field) {
     $applyTo = explode(',', $installer->getAttribute(\Magento\Catalog\Model\Product::ENTITY, $field, 'apply_to'));
     if (!in_array('bundle', $applyTo)) {
         $applyTo[] = 'bundle';
-        $installer->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $field, 'apply_to', implode(',', $applyTo));
+        $installer->updateAttribute(
+            \Magento\Catalog\Model\Product::ENTITY,
+            $field,
+            'apply_to',
+            implode(',', $applyTo)
+        );
     }
 }
 

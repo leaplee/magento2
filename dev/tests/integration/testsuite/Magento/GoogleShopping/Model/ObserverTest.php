@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\GoogleShopping\Model;
 
 class ObserverTest extends \PHPUnit_Framework_TestCase
@@ -40,7 +39,7 @@ class ObserverTest extends \PHPUnit_Framework_TestCase
 
         /** @var \Magento\GoogleShopping\Model\Observer $observer */
         $observer = $objectManager->get('Magento\GoogleShopping\Model\Observer');
-        $dummyEventData = $this->getMock('\Magento\Event\Observer', array(), array(), '', false);
+        $dummyEventData = $this->getMock('\Magento\Framework\Event\Observer', array(), array(), '', false);
         $result = $observer->checkSynchronizationOperations($dummyEventData);
 
         $this->assertSame($observer, $result);

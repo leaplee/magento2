@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Backend\Block\Widget;
 /**
  * Magento_Backend page breadcrumbs
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Breadcrumbs extends \Magento\Backend\Block\Template
@@ -51,9 +47,7 @@ class Breadcrumbs extends \Magento\Backend\Block\Template
      */
     protected function _construct()
     {
-        $this->addLink(__('Home'),
-            __('Home'), $this->getUrl('*')
-        );
+        $this->addLink(__('Home'), __('Home'), $this->getUrl('*'));
     }
 
     /**
@@ -62,16 +56,12 @@ class Breadcrumbs extends \Magento\Backend\Block\Template
      * @param string|null $url
      * @return $this
      */
-    public function addLink($label, $title=null, $url=null)
+    public function addLink($label, $title = null, $url = null)
     {
         if (empty($title)) {
             $title = $label;
         }
-        $this->_links[] = array(
-            'label' => $label,
-            'title' => $title,
-            'url'   => $url
-        );
+        $this->_links[] = array('label' => $label, 'title' => $title, 'url' => $url);
         return $this;
     }
 

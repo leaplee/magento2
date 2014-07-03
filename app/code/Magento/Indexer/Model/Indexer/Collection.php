@@ -21,10 +21,9 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Indexer\Model\Indexer;
 
-class Collection extends \Magento\Data\Collection
+class Collection extends \Magento\Framework\Data\Collection
 {
     /**
      * Item object class name
@@ -44,12 +43,12 @@ class Collection extends \Magento\Data\Collection
     protected $statesFactory;
 
     /**
-     * @param \Magento\Data\Collection\EntityFactoryInterface $entityFactory
+     * @param \Magento\Framework\Data\Collection\EntityFactoryInterface $entityFactory
      * @param \Magento\Indexer\Model\ConfigInterface $config
      * @param \Magento\Indexer\Model\Resource\Indexer\State\CollectionFactory $statesFactory
      */
     public function __construct(
-        \Magento\Data\Collection\EntityFactoryInterface $entityFactory,
+        \Magento\Framework\Data\Collection\EntityFactoryInterface $entityFactory,
         \Magento\Indexer\Model\ConfigInterface $config,
         \Magento\Indexer\Model\Resource\Indexer\State\CollectionFactory $statesFactory
     ) {

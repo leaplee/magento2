@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Bundle
- * @subpackage  unit_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Bundle\Model\Product\Attribute\Source\Price;
 
 use Magento\TestFramework\Helper\ObjectManager;
@@ -46,12 +42,13 @@ class ViewTest extends \PHPUnit_Framework_TestCase
     {
         $abstractAttributeMock = $this->getMock(
             '\Magento\Eav\Model\Entity\Attribute\AbstractAttribute',
-            array('getAttributeCode', '__wakeup'), array(), '', false
+            array('getAttributeCode', '__wakeup'),
+            array(),
+            '',
+            false
         );
 
-        $abstractAttributeMock->expects($this->any())
-            ->method('getAttributeCode')
-            ->will($this->returnValue('code'));
+        $abstractAttributeMock->expects($this->any())->method('getAttributeCode')->will($this->returnValue('code'));
 
         $this->_model->setAttribute($abstractAttributeMock);
 

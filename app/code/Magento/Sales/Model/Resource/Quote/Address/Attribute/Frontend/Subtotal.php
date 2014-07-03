@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,12 +26,9 @@ namespace Magento\Sales\Model\Resource\Quote\Address\Attribute\Frontend;
 /**
  * Quote address attribute frontend subtotal resource model
  *
- * @category    Magento
- * @package     Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Subtotal
-    extends \Magento\Sales\Model\Resource\Quote\Address\Attribute\Frontend
+class Subtotal extends \Magento\Sales\Model\Resource\Quote\Address\Attribute\Frontend
 {
     /**
      * Add total
@@ -43,11 +38,7 @@ class Subtotal
      */
     public function fetchTotals(\Magento\Sales\Model\Quote\Address $address)
     {
-        $address->addTotal(array(
-            'code'  => 'subtotal',
-            'title' => __('Subtotal'),
-            'value' => $address->getSubtotal()
-        ));
+        $address->addTotal(array('code' => 'subtotal', 'title' => __('Subtotal'), 'value' => $address->getSubtotal()));
 
         return $this;
     }

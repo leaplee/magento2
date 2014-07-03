@@ -18,22 +18,15 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_CatalogInventory
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
+namespace Magento\CatalogInventory\Model\Resource\Indexer;
 
 /**
  * CatalogInventory Stock Status Indexer Resource Model
- *
- * @category    Magento
- * @package     Magento_CatalogInventory
- * @author      Magento Core Team <core@magentocommerce.com>
  */
-namespace Magento\CatalogInventory\Model\Resource\Indexer;
-
 class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractIndexer
 {
     /**
@@ -55,13 +48,13 @@ class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractInde
     protected $_productType;
 
     /**
-     * @param \Magento\App\Resource $resource
+     * @param \Magento\Framework\App\Resource $resource
      * @param \Magento\Eav\Model\Config $eavConfig
      * @param StockFactory $indexerFactory
      * @param \Magento\Catalog\Model\Product\Type $productType
      */
     public function __construct(
-        \Magento\App\Resource $resource,
+        \Magento\Framework\App\Resource $resource,
         \Magento\Eav\Model\Config $eavConfig,
         StockFactory $indexerFactory,
         \Magento\Catalog\Model\Product\Type $productType
@@ -121,10 +114,9 @@ class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractInde
         }
 
         // retrieve product types by processIds
-        $select = $adapter->select()
-            ->from($this->getTable('catalog_product_entity'), array('entity_id', 'type_id'))
+        $select = $adapter->select()->from($this->getTable('catalog_product_entity'), array('entity_id', 'type_id'))
             ->where('entity_id IN(?)', $processIds);
-        $pairs  = $adapter->fetchPairs($select);
+        $pairs = $adapter->fetchPairs($select);
 
         $byType = array();
         foreach ($pairs as $productId => $typeId) {
@@ -164,7 +156,7 @@ class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractInde
 
         $adapter = $this->_getWriteAdapter();
 
-        $parentIds  = array();
+        $parentIds = array();
         foreach ($data['reindex_stock_parent_ids'] as $parentId => $parentType) {
             $parentIds[$parentType][$parentId] = $parentId;
         }
@@ -200,8 +192,7 @@ class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractInde
 
         $adapter = $this->_getWriteAdapter();
         $processIds = $data['reindex_stock_product_ids'];
-        $select = $adapter->select()
-            ->from($this->getTable('catalog_product_entity'), 'COUNT(*)');
+        $select = $adapter->select()->from($this->getTable('catalog_product_entity'), 'COUNT(*)');
         $pCount = $adapter->fetchOne($select);
 
         // if affected more 30% of all products - run reindex all products
@@ -210,12 +201,10 @@ class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractInde
         }
 
         // calculate relations
-        $select = $adapter->select()
-            ->from($this->getTable('catalog_product_relation'), 'COUNT(DISTINCT parent_id)')
+        $select = $adapter->select()->from($this->getTable('catalog_product_relation'), 'COUNT(DISTINCT parent_id)')
             ->where('child_id IN(?)', $processIds);
         $aCount = $adapter->fetchOne($select);
-        $select = $adapter->select()
-            ->from($this->getTable('catalog_product_relation'), 'COUNT(DISTINCT child_id)')
+        $select = $adapter->select()->from($this->getTable('catalog_product_relation'), 'COUNT(DISTINCT child_id)')
             ->where('parent_id IN(?)', $processIds);
         $bCount = $adapter->fetchOne($select);
 
@@ -232,10 +221,9 @@ class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractInde
         }
 
         // retrieve products types
-        $select = $adapter->select()
-            ->from($this->getTable('catalog_product_entity'), array('entity_id', 'type_id'))
+        $select = $adapter->select()->from($this->getTable('catalog_product_entity'), array('entity_id', 'type_id'))
             ->where('entity_id IN(?)', $processIds);
-        $query  = $select->query(\Zend_Db::FETCH_ASSOC);
+        $query = $select->query(\Zend_Db::FETCH_ASSOC);
         $byType = array();
         while ($row = $query->fetch()) {
             $byType[$row['type_id']][] = $row['entity_id'];
@@ -298,7 +286,6 @@ class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractInde
                 $indexer = $this->_indexerFactory->create($indexerClassName)
                     ->setTypeId($typeId)
                     ->setIsComposite(!empty($typeInfo['composite']));
-
                 $this->_indexers[$typeId] = $indexer;
             }
         }
@@ -310,13 +297,13 @@ class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractInde
      *
      * @param string $productTypeId
      * @return \Magento\CatalogInventory\Model\Resource\Indexer\Stock\StockInterface
-     * @throws \Magento\Core\Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     protected function _getIndexer($productTypeId)
     {
         $types = $this->_getTypeIndexers();
         if (!isset($types[$productTypeId])) {
-            throw new \Magento\Core\Exception(__('Unsupported product type "%1".', $productTypeId));
+            throw new \Magento\Framework\Model\Exception(__('Unsupported product type "%1".', $productTypeId));
         }
         return $types[$productTypeId];
     }
@@ -331,13 +318,8 @@ class Stock extends \Magento\Catalog\Model\Resource\Product\Indexer\AbstractInde
     public function getProductParentsByChild($childId)
     {
         $write = $this->_getWriteAdapter();
-        $select = $write->select()
-            ->from(array('l' => $this->getTable('catalog_product_relation')), array('parent_id'))
-            ->join(
-                array('e' => $this->getTable('catalog_product_entity')),
-                'l.parent_id=e.entity_id',
-                array('e.type_id')
-            )
+        $select = $write->select()->from(['l' => $this->getTable('catalog_product_relation')], ['parent_id'])
+            ->join(['e' => $this->getTable('catalog_product_entity')], 'l.parent_id=e.entity_id', ['e.type_id'])
             ->where('l.child_id = :child_id');
         return $write->fetchPairs($select, array(':child_id' => $childId));
     }

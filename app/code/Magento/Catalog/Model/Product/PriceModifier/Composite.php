@@ -24,17 +24,16 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Product\PriceModifier;
 
 use Magento\Catalog\Model\Product\PriceModifierInterface;
 use Magento\Catalog\Model\Product;
-use Magento\ObjectManager;
+use Magento\Framework\ObjectManager;
 
 class Composite implements PriceModifierInterface
 {
     /**
-     * @var \Magento\ObjectManager
+     * @var \Magento\Framework\ObjectManager
      */
     protected $objectManager;
 

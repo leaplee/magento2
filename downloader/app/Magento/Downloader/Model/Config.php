@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Connect
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,8 +25,6 @@
 /**
  * Class config
  *
- * @category   Magento
- * @package    Magento_Connect
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Downloader\Model;
@@ -45,7 +41,7 @@ class Config extends \Magento\Downloader\Model\Config\AbstractConfig
         $channel = trim($this->get('root_channel'));
         if (!empty($channel)) {
             try {
-                return $this->controller()->model('config_'.$channel, true);
+                return $this->controller()->model('config_' . $channel, true);
             } catch (\Exception $e) {
                 throw new \Exception('Not valid config.ini file.');
             }
@@ -55,11 +51,11 @@ class Config extends \Magento\Downloader\Model\Config\AbstractConfig
     }
 
     /**
-    * Save post data to config
-    *
-    * @param array $p
-    * @return \Magento\Downloader\Model\Config
-    */
+     * Save post data to config
+     *
+     * @param array $p
+     * @return \Magento\Downloader\Model\Config
+     */
     public function saveConfigPost($p)
     {
         $configParams = array(
@@ -72,11 +68,11 @@ class Config extends \Magento\Downloader\Model\Config\AbstractConfig
             'downloader_path',
             'root_channel_uri',
             'root_channel',
-            'ftp',
+            'ftp'
         );
-        foreach ($configParams as $paramName){
+        foreach ($configParams as $paramName) {
             if (isset($p[$paramName])) {
-               $this->set($paramName, $p[$paramName]);
+                $this->set($paramName, $p[$paramName]);
             }
         }
         $this->save();

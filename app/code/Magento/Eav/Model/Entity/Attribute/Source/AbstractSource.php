@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Eav
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,12 +26,11 @@ namespace Magento\Eav\Model\Entity\Attribute\Source;
 /**
  * Entity/Attribute/Model - attribute selection source abstract
  *
- * @category   Magento
- * @package    Magento_Eav
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-abstract class AbstractSource
-    implements \Magento\Eav\Model\Entity\Attribute\Source\SourceInterface, \Magento\Option\ArrayInterface
+abstract class AbstractSource implements
+    \Magento\Eav\Model\Entity\Attribute\Source\SourceInterface,
+    \Magento\Framework\Option\ArrayInterface
 {
     /**
      * Reference to the attribute instance
@@ -47,7 +44,7 @@ abstract class AbstractSource
      *
      * @var array
      */
-    protected $_options                 = null;
+    protected $_options = null;
 
     /**
      * Set attribute instance
@@ -81,11 +78,14 @@ abstract class AbstractSource
     {
         $options = $this->getAllOptions();
         // Fixed for tax_class_id and custom_design
-        if (sizeof($options) > 0) foreach($options as $option) {
-            if (isset($option['value']) && $option['value'] == $value) {
-                return isset($option['label']) ? $option['label'] : $option['value'];
+        if (sizeof($options) > 0) {
+            foreach ($options as $option) {
+                if (isset($option['value']) && $option['value'] == $value) {
+                    return isset($option['label']) ? $option['label'] : $option['value'];
+                }
             }
-        } // End
+        }
+        // End
         if (isset($options[$value])) {
             return $options[$value];
         }
@@ -99,7 +99,7 @@ abstract class AbstractSource
     public function getOptionId($value)
     {
         foreach ($this->getAllOptions() as $option) {
-            if (strcasecmp($option['label'], $value)==0 || $option['value'] == $value) {
+            if (strcasecmp($option['label'], $value) == 0 || $option['value'] == $value) {
                 return $option['value'];
             }
         }
@@ -113,7 +113,8 @@ abstract class AbstractSource
      * @param string $dir direction
      * @return $this
      */
-    public function addValueSortToCollection($collection, $dir = \Magento\Data\Collection::SORT_ORDER_DESC) {
+    public function addValueSortToCollection($collection, $dir = \Magento\Framework\Data\Collection::SORT_ORDER_DESC)
+    {
         return $this;
     }
 
@@ -141,7 +142,7 @@ abstract class AbstractSource
      * Retrieve Select For Flat Attribute update
      *
      * @param int $store
-     * @return \Magento\DB\Select|null
+     * @return \Magento\Framework\DB\Select|null
      */
     public function getFlatUpdateSelect($store)
     {

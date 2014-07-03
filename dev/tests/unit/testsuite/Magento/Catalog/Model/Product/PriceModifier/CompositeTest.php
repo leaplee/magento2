@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Product\PriceModifier;
 
 class CompositeTest extends \PHPUnit_Framework_TestCase
@@ -48,7 +47,7 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->objectManagerMock = $this->getMock('Magento\ObjectManager');
+        $this->objectManagerMock = $this->getMock('Magento\Framework\ObjectManager');
         $this->productMock = $this->getMock('Magento\Catalog\Model\Product', array(), array(), '', false);
         $this->priceModifierMock = $this->getMock('Magento\Catalog\Model\Product\PriceModifierInterface');
     }
@@ -59,16 +58,25 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
             $this->objectManagerMock,
             array('some_class_name')
         );
-        $this->objectManagerMock
-            ->expects($this->once())
-            ->method('get')
-            ->with('some_class_name')
-            ->will($this->returnValue($this->priceModifierMock));
-        $this->priceModifierMock
-            ->expects($this->once())
-            ->method('modifyPrice')
-            ->with(100, $this->productMock)
-            ->will($this->returnValue(150));
+        $this->objectManagerMock->expects(
+            $this->once()
+        )->method(
+            'get'
+        )->with(
+            'some_class_name'
+        )->will(
+            $this->returnValue($this->priceModifierMock)
+        );
+        $this->priceModifierMock->expects(
+            $this->once()
+        )->method(
+            'modifyPrice'
+        )->with(
+            100,
+            $this->productMock
+        )->will(
+            $this->returnValue(150)
+        );
         $this->assertEquals(150, $this->compositeModel->modifyPrice(100, $this->productMock));
     }
 
@@ -78,9 +86,7 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
             $this->objectManagerMock,
             array()
         );
-        $this->objectManagerMock
-            ->expects($this->never())
-            ->method('get');
+        $this->objectManagerMock->expects($this->never())->method('get');
         $this->assertEquals(100, $this->compositeModel->modifyPrice(100, $this->productMock));
     }
 }

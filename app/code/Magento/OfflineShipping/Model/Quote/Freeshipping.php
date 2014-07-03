@@ -18,13 +18,11 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_SalesRule
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\OfflineShipping\Model\Quote;
+
 use Magento\Sales\Model\Quote\Address;
 
 class Freeshipping extends \Magento\Sales\Model\Quote\Address\Total\AbstractTotal
@@ -37,16 +35,16 @@ class Freeshipping extends \Magento\Sales\Model\Quote\Address\Total\AbstractTota
     protected $_calculator;
 
     /**
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
     /**
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\OfflineShipping\Model\SalesRule\Calculator $calculator
      */
     public function __construct(
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\OfflineShipping\Model\SalesRule\Calculator $calculator
     ) {
         $this->setCode('discount');
@@ -97,7 +95,6 @@ class Freeshipping extends \Magento\Sales\Model\Quote\Address\Total\AbstractTota
                         if ($isItemFree) {
                             $child->setFreeShipping($isItemFree);
                         }
-
                     }
                 }
             }
@@ -108,13 +105,13 @@ class Freeshipping extends \Magento\Sales\Model\Quote\Address\Total\AbstractTota
         return $this;
     }
 
-   /**
-    * Add information about free shipping for all address items to address object
-    * By default we not present such information
-    *
-    * @param   \Magento\Sales\Model\Quote\Address $address
-    * @return  \Magento\OfflineShipping\Model\Quote\Freeshipping
-    */
+    /**
+     * Add information about free shipping for all address items to address object
+     * By default we not present such information
+     *
+     * @param   \Magento\Sales\Model\Quote\Address $address
+     * @return  \Magento\OfflineShipping\Model\Quote\Freeshipping
+     */
     public function fetch(Address $address)
     {
         return $this;

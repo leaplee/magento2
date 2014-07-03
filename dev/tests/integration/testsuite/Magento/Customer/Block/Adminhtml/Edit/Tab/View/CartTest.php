@@ -43,7 +43,7 @@ class CartTest extends \PHPUnit_Framework_TestCase
     /**
      * Core registry.
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     private $coreRegistry;
 
@@ -53,20 +53,18 @@ class CartTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $objectManager = Bootstrap::getObjectManager();
-        $objectManager->get('Magento\App\State')->setAreaCode('adminhtml');
+        $objectManager->get('Magento\Framework\App\State')->setAreaCode('adminhtml');
 
-        $this->coreRegistry = $objectManager->get('Magento\Registry');
+        $this->coreRegistry = $objectManager->get('Magento\Framework\Registry');
         $this->coreRegistry->register(RegistryConstants::CURRENT_CUSTOMER_ID, 1);
 
-        $this->block = $objectManager->get('Magento\View\LayoutInterface')
-            ->createBlock(
-                'Magento\Customer\Block\Adminhtml\Edit\Tab\View\Cart',
-                '',
-                [
-                    'coreRegistry' => $this->coreRegistry,
-                    'data' => ['website_id' => 1]
-                ]
-            );
+        $this->block = $objectManager->get(
+            'Magento\Framework\View\LayoutInterface'
+        )->createBlock(
+            'Magento\Customer\Block\Adminhtml\Edit\Tab\View\Cart',
+            '',
+            array('coreRegistry' => $this->coreRegistry, 'data' => array('website_id' => 1))
+        );
         $this->block->getPreparedCollection();
     }
 
@@ -83,7 +81,7 @@ class CartTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRowUrl()
     {
-        $row = new \Magento\Object(['product_id' => 1]);
+        $row = new \Magento\Framework\Object(array('product_id' => 1));
         $this->assertContains('catalog/product/edit/id/1', $this->block->getRowUrl($row));
     }
 
@@ -114,10 +112,7 @@ class CartTest extends \PHPUnit_Framework_TestCase
     public function testToHtmlEmptyCart()
     {
         $this->assertEquals(0, $this->block->getCollection()->getSize());
-        $this->assertContains(
-            "There are no items in customer's shopping cart at the moment",
-            $this->block->toHtml()
-        );
+        $this->assertContains("There are no items in customer's shopping cart at the moment", $this->block->toHtml());
     }
 
     /**

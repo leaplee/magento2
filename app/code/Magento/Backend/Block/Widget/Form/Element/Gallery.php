@@ -18,24 +18,19 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Backend\Block\Widget\Form\Element;
 
-use Magento\Data\Form\Element\AbstractElement;
+use Magento\Framework\Data\Form\Element\AbstractElement;
 
 /**
  * Backend image gallery item renderer
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Gallery extends \Magento\Backend\Block\Template
-    implements \Magento\Data\Form\Element\Renderer\RendererInterface
+class Gallery extends \Magento\Backend\Block\Template implements \Magento\Framework\Data\Form\Element\Renderer\RendererInterface
 {
     /**
      * @var AbstractElement|null
@@ -88,17 +83,17 @@ class Gallery extends \Magento\Backend\Block\Template
      */
     protected function _prepareLayout()
     {
-        $this->addChild('delete_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Delete'),
-            'onclick'   => "deleteImage(#image#)",
-            'class' => 'delete'
-        ));
+        $this->addChild(
+            'delete_button',
+            'Magento\Backend\Block\Widget\Button',
+            array('label' => __('Delete'), 'onclick' => "deleteImage(#image#)", 'class' => 'delete')
+        );
 
-        $this->addChild('add_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Add New Image'),
-            'onclick'   => 'addNewImage()',
-            'class' => 'add'
-        ));
+        $this->addChild(
+            'add_button',
+            'Magento\Backend\Block\Widget\Button',
+            array('label' => __('Add New Image'), 'onclick' => 'addNewImage()', 'class' => 'add')
+        );
         return parent::_prepareLayout();
     }
 
@@ -118,6 +113,4 @@ class Gallery extends \Magento\Backend\Block\Template
     {
         return str_replace('#image#', $image, $this->getChildHtml('delete_button'));
     }
-
 }
-

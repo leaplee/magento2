@@ -21,20 +21,12 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Customer\Block\Account;
 
 use Magento\Customer\Service\V1\CustomerAccountServiceInterface;
 
-class Customer extends \Magento\View\Element\Template
+class Customer extends \Magento\Framework\View\Element\Template
 {
-    /**
-     * Customer session
-     *
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $_customerSession;
-
     /** @var CustomerAccountServiceInterface */
     protected $_customerAccountService;
 
@@ -42,23 +34,36 @@ class Customer extends \Magento\View\Element\Template
     protected $_viewHelper;
 
     /**
-     * @param \Magento\View\Element\Template\Context $context
-     * @param \Magento\Customer\Model\Session $session
-     * @param CustomerAccountServiceInterface $customerService
+     * @var \Magento\Framework\App\Http\Context
+     */
+    protected $httpContext;
+
+    /**
+     * @var \Magento\Customer\Helper\Session\CurrentCustomer
+     */
+    protected $currentCustomer;
+
+    /**
+     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param CustomerAccountServiceInterface $customerAccountService
      * @param \Magento\Customer\Helper\View $viewHelper
+     * @param \Magento\Framework\App\Http\Context $httpContext
+     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Template\Context $context,
-        \Magento\Customer\Model\Session $session,
+        \Magento\Framework\View\Element\Template\Context $context,
         CustomerAccountServiceInterface $customerAccountService,
         \Magento\Customer\Helper\View $viewHelper,
+        \Magento\Framework\App\Http\Context $httpContext,
+        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
         array $data = array()
     ) {
         parent::__construct($context, $data);
-        $this->_customerSession = $session;
         $this->_customerAccountService = $customerAccountService;
         $this->_viewHelper = $viewHelper;
+        $this->httpContext = $httpContext;
+        $this->currentCustomer = $currentCustomer;
         $this->_isScopePrivate = true;
     }
 
@@ -69,7 +74,7 @@ class Customer extends \Magento\View\Element\Template
      */
     public function customerLoggedIn()
     {
-        return (bool)$this->_customerSession->isLoggedIn();
+        return (bool)$this->httpContext->getValue(\Magento\Customer\Helper\Data::CONTEXT_AUTH);
     }
 
     /**
@@ -80,9 +85,9 @@ class Customer extends \Magento\View\Element\Template
     public function getCustomerName()
     {
         try {
-            $customer = $this->_customerAccountService->getCustomer($this->_customerSession->getCustomerId());
+            $customer = $this->_customerAccountService->getCustomer($this->currentCustomer->getCustomerId());
             return $this->escapeHtml($this->_viewHelper->getCustomerName($customer));
-        } catch (\Magento\Exception\NoSuchEntityException $e) {
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             return null;
         }
     }

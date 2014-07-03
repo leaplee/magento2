@@ -18,14 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Core
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Core\Model\Layout;
 
-use Magento\Simplexml\Element;
+use Magento\Framework\Simplexml\Element;
 
 class Translator
 {
@@ -50,7 +48,7 @@ class Translator
              */
             // @var $argumentHierarchy array - path to translatable item in $args array
             $argumentHierarchy = explode('.', $translatableArg);
-            $argumentStack = &$args;
+            $argumentStack =& $args;
             $canTranslate = true;
             while (is_array($argumentStack) && count($argumentStack) > 0) {
                 $argumentName = array_shift($argumentHierarchy);
@@ -59,7 +57,7 @@ class Translator
                      * Move to the next element in arguments hierarchy
                      * in order to find target translatable argument
                      */
-                    $argumentStack = &$argumentStack[$argumentName];
+                    $argumentStack =& $argumentStack[$argumentName];
                 } else {
                     // Target argument cannot be found
                     $canTranslate = false;

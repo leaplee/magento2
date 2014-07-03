@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,8 +25,9 @@ namespace Magento\Catalog\Model\Product;
 
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Resource\Product\Option\Value\Collection;
-use Magento\Core\Exception;
-use Magento\Core\Model\AbstractModel;
+use Magento\Catalog\Pricing\Price\BasePrice;
+use Magento\Framework\Model\Exception;
+use Magento\Framework\Model\AbstractModel;
 
 /**
  * Catalog product option model
@@ -53,28 +52,37 @@ use Magento\Core\Model\AbstractModel;
  * @method int getSortOrder()
  * @method \Magento\Catalog\Model\Product\Option setSortOrder(int $value)
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-
 class Option extends AbstractModel
 {
-    const OPTION_GROUP_TEXT   = 'text';
-    const OPTION_GROUP_FILE   = 'file';
-    const OPTION_GROUP_SELECT = 'select';
-    const OPTION_GROUP_DATE   = 'date';
+    const OPTION_GROUP_TEXT = 'text';
 
-    const OPTION_TYPE_FIELD     = 'field';
-    const OPTION_TYPE_AREA      = 'area';
-    const OPTION_TYPE_FILE      = 'file';
+    const OPTION_GROUP_FILE = 'file';
+
+    const OPTION_GROUP_SELECT = 'select';
+
+    const OPTION_GROUP_DATE = 'date';
+
+    const OPTION_TYPE_FIELD = 'field';
+
+    const OPTION_TYPE_AREA = 'area';
+
+    const OPTION_TYPE_FILE = 'file';
+
     const OPTION_TYPE_DROP_DOWN = 'drop_down';
-    const OPTION_TYPE_RADIO     = 'radio';
-    const OPTION_TYPE_CHECKBOX  = 'checkbox';
-    const OPTION_TYPE_MULTIPLE  = 'multiple';
-    const OPTION_TYPE_DATE      = 'date';
+
+    const OPTION_TYPE_RADIO = 'radio';
+
+    const OPTION_TYPE_CHECKBOX = 'checkbox';
+
+    const OPTION_TYPE_MULTIPLE = 'multiple';
+
+    const OPTION_TYPE_DATE = 'date';
+
     const OPTION_TYPE_DATE_TIME = 'date_time';
-    const OPTION_TYPE_TIME      = 'time';
+
+    const OPTION_TYPE_TIME = 'time';
 
     /**
      * @var Product
@@ -106,28 +114,28 @@ class Option extends AbstractModel
     protected $_optionFactory;
 
     /**
-     * @var \Magento\Stdlib\String
+     * @var \Magento\Framework\Stdlib\String
      */
     protected $string;
 
     /**
-     * @param \Magento\Model\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
      * @param Option\Value $productOptionValue
      * @param \Magento\Catalog\Model\Product\Option\Type\Factory $optionFactory
-     * @param \Magento\Stdlib\String $string
-     * @param \Magento\Core\Model\Resource\AbstractResource $resource
-     * @param \Magento\Data\Collection\Db $resourceCollection
+     * @param \Magento\Framework\Stdlib\String $string
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\Db $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Magento\Model\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
         Option\Value $productOptionValue,
         \Magento\Catalog\Model\Product\Option\Type\Factory $optionFactory,
-        \Magento\Stdlib\String $string,
-        \Magento\Core\Model\Resource\AbstractResource $resource = null,
-        \Magento\Data\Collection\Db $resourceCollection = null,
+        \Magento\Framework\Stdlib\String $string,
+        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\Db $resourceCollection = null,
         array $data = array()
     ) {
         $this->_productOptionValue = $productOptionValue;
@@ -139,7 +147,7 @@ class Option extends AbstractModel
     /**
      * Get resource instance
      *
-     * @return \Magento\Core\Model\Resource\Db\AbstractDb
+     * @return \Magento\Framework\Model\Resource\Db\AbstractDb
      */
     protected function _getResource()
     {
@@ -288,10 +296,10 @@ class Option extends AbstractModel
             self::OPTION_TYPE_MULTIPLE => self::OPTION_GROUP_SELECT,
             self::OPTION_TYPE_DATE => self::OPTION_GROUP_DATE,
             self::OPTION_TYPE_DATE_TIME => self::OPTION_GROUP_DATE,
-            self::OPTION_TYPE_TIME => self::OPTION_GROUP_DATE,
+            self::OPTION_TYPE_TIME => self::OPTION_GROUP_DATE
         );
 
-        return isset($optionGroupsToTypes[$type])?$optionGroupsToTypes[$type]:'';
+        return isset($optionGroupsToTypes[$type]) ? $optionGroupsToTypes[$type] : '';
     }
 
     /**
@@ -320,16 +328,22 @@ class Option extends AbstractModel
     public function saveOptions()
     {
         foreach ($this->getOptions() as $option) {
-            $this->setData($option)
-                ->setData('product_id', $this->getProduct()->getId())
-                ->setData('store_id', $this->getProduct()->getStoreId());
+            $this->setData(
+                $option
+            )->setData(
+                'product_id',
+                $this->getProduct()->getId()
+            )->setData(
+                'store_id',
+                $this->getProduct()->getStoreId()
+            );
 
             if ($this->getData('option_id') == '0') {
                 $this->unsetData('option_id');
             } else {
                 $this->setId($this->getData('option_id'));
             }
-            $isEdit = (bool)$this->getId()? true:false;
+            $isEdit = (bool)$this->getId() ? true : false;
 
             if ($this->getData('is_delete') == '1') {
                 if ($isEdit) {
@@ -378,13 +392,14 @@ class Option extends AbstractModel
                 }
                 $this->save();
             }
-        }//eof foreach()
+        }
+        //eof foreach()
         return $this;
     }
 
     /**
      * @return AbstractModel
-     * @throws Exception
+     * @throws \Magento\Framework\Model\Exception
      */
     protected function _afterSave()
     {
@@ -394,8 +409,7 @@ class Option extends AbstractModel
                 $this->getValueInstance()->addValue($value);
             }
 
-            $this->getValueInstance()->setOption($this)
-                ->saveValues();
+            $this->getValueInstance()->setOption($this)->saveValues();
         } elseif ($this->getGroupByType($this->getType()) == self::OPTION_GROUP_SELECT) {
             throw new Exception(__('Select type options required values rows.'));
         }
@@ -410,11 +424,11 @@ class Option extends AbstractModel
      * @param bool $flag
      * @return float
      */
-    public function getPrice($flag=false)
+    public function getPrice($flag = false)
     {
         if ($flag && $this->getPriceType() == 'percent') {
-            $basePrice = $this->getProduct()->getFinalPrice();
-            $price = $basePrice*($this->_getData('price')/100);
+            $basePrice = $this->getProduct()->getPriceInfo()->getPrice(BasePrice::PRICE_CODE)->getValue();
+            $price = $basePrice * ($this->_getData('price') / 100);
             return $price;
         }
         return $this->_getData('price');
@@ -452,12 +466,20 @@ class Option extends AbstractModel
      */
     public function getProductOptionCollection(Product $product)
     {
-        $collection = $this->getCollection()
-            ->addFieldToFilter('product_id', $product->getId())
-            ->addTitleToResult($product->getStoreId())
-            ->addPriceToResult($product->getStoreId())
-            ->setOrder('sort_order', 'asc')
-            ->setOrder('title', 'asc');
+        $collection = $this->getCollection()->addFieldToFilter(
+            'product_id',
+            $product->getId()
+        )->addTitleToResult(
+            $product->getStoreId()
+        )->addPriceToResult(
+            $product->getStoreId()
+        )->setOrder(
+            'sort_order',
+            'asc'
+        )->setOrder(
+            'title',
+            'asc'
+        );
 
         if ($this->getAddRequiredFilter()) {
             $collection->addRequiredFilter($this->getAddRequiredFilterValue());
@@ -474,8 +496,7 @@ class Option extends AbstractModel
      */
     public function getValuesCollection()
     {
-        $collection = $this->getValueInstance()
-            ->getValuesCollection($this);
+        $collection = $this->getValueInstance()->getValuesCollection($this);
 
         return $collection;
     }
@@ -492,27 +513,6 @@ class Option extends AbstractModel
         $collection = $this->_productOptionValue->getValuesByOption($optionIds, $this->getId(), $store_id);
 
         return $collection;
-    }
-
-    /**
-     * Prepare array of options for duplicate
-     *
-     * @return array
-     */
-    public function prepareOptionForDuplicate()
-    {
-        $this->setProductId(null);
-        $this->setOptionId(null);
-        $newOption = $this->__toArray();
-        if ($_values = $this->getValues()) {
-            $newValuesArray = array();
-            foreach ($_values as $_value) {
-                $newValuesArray[] = $_value->prepareValueForDuplicate();
-            }
-            $newOption['values'] = $newValuesArray;
-        }
-
-        return $newOption;
     }
 
     /**

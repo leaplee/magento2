@@ -22,9 +22,7 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Backend\App\Action\Plugin;
-
 
 class Authentication
 {
@@ -50,33 +48,33 @@ class Authentication
     protected $_url;
 
     /**
-     * @var \Magento\App\ResponseInterface
+     * @var \Magento\Framework\App\ResponseInterface
      */
     protected $_response;
 
     /**
-     * @var \Magento\App\ActionFlag
+     * @var \Magento\Framework\App\ActionFlag
      */
     protected $_actionFlag;
 
     /**
-     * @var \Magento\Message\ManagerInterface
+     * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $messageManager;
 
     /**
      * @param \Magento\Backend\Model\Auth $auth
      * @param \Magento\Backend\Model\UrlInterface $url
-     * @param \Magento\App\ResponseInterface $response
-     * @param \Magento\App\ActionFlag $actionFlag
-     * @param \Magento\Message\ManagerInterface $messageManager
+     * @param \Magento\Framework\App\ResponseInterface $response
+     * @param \Magento\Framework\App\ActionFlag $actionFlag
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
      */
     public function __construct(
         \Magento\Backend\Model\Auth $auth,
         \Magento\Backend\Model\UrlInterface $url,
-        \Magento\App\ResponseInterface $response,
-        \Magento\App\ActionFlag $actionFlag,
-        \Magento\Message\ManagerInterface $messageManager
+        \Magento\Framework\App\ResponseInterface $response,
+        \Magento\Framework\App\ActionFlag $actionFlag,
+        \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->_auth = $auth;
         $this->_url = $url;
@@ -88,7 +86,7 @@ class Authentication
     /**
      * @param \Magento\Backend\App\AbstractAction $subject
      * @param callable $proceed
-     * @param \Magento\App\RequestInterface $request
+     * @param \Magento\Framework\App\RequestInterface $request
      *
      * @return mixed
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -96,7 +94,7 @@ class Authentication
     public function aroundDispatch(
         \Magento\Backend\App\AbstractAction $subject,
         \Closure $proceed,
-        \Magento\App\RequestInterface $request
+        \Magento\Framework\App\RequestInterface $request
     ) {
         $requestedActionName = $request->getActionName();
         if (in_array($requestedActionName, $this->_openActions)) {
@@ -107,6 +105,8 @@ class Authentication
             }
             if (!$this->_auth->isLoggedIn()) {
                 $this->_processNotLoggedInUser($request);
+            } else {
+                $this->_auth->getAuthStorage()->prolong();
             }
         }
         $this->_auth->getAuthStorage()->refreshAcl();
@@ -116,10 +116,10 @@ class Authentication
     /**
      * Process not logged in user data
      *
-     * @param \Magento\App\RequestInterface $request
+     * @param \Magento\Framework\App\RequestInterface $request
      * @return void
      */
-    protected function _processNotLoggedInUser(\Magento\App\RequestInterface $request)
+    protected function _processNotLoggedInUser(\Magento\Framework\App\RequestInterface $request)
     {
         $isRedirectNeeded = false;
         if ($request->getPost('login') && $this->_performLogin($request)) {
@@ -127,23 +127,44 @@ class Authentication
         }
         if (!$isRedirectNeeded && !$request->getParam('forwarded')) {
             if ($request->getParam('isIframe')) {
-                $request->setParam('forwarded', true)
-                    ->setRouteName('adminhtml')
-                    ->setControllerName('auth')
-                    ->setActionName('deniedIframe')
-                    ->setDispatched(false);
+                $request->setParam(
+                    'forwarded',
+                    true
+                )->setRouteName(
+                    'adminhtml'
+                )->setControllerName(
+                    'auth'
+                )->setActionName(
+                    'deniedIframe'
+                )->setDispatched(
+                    false
+                );
             } elseif ($request->getParam('isAjax')) {
-                $request->setParam('forwarded', true)
-                    ->setRouteName('adminhtml')
-                    ->setControllerName('auth')
-                    ->setActionName('deniedJson')
-                    ->setDispatched(false);
+                $request->setParam(
+                    'forwarded',
+                    true
+                )->setRouteName(
+                    'adminhtml'
+                )->setControllerName(
+                    'auth'
+                )->setActionName(
+                    'deniedJson'
+                )->setDispatched(
+                    false
+                );
             } else {
-                $request->setParam('forwarded', true)
-                    ->setRouteName('adminhtml')
-                    ->setControllerName('auth')
-                    ->setActionName('login')
-                    ->setDispatched(false);
+                $request->setParam(
+                    'forwarded',
+                    true
+                )->setRouteName(
+                    'adminhtml'
+                )->setControllerName(
+                    'auth'
+                )->setActionName(
+                    'login'
+                )->setDispatched(
+                    false
+                );
             }
         }
     }
@@ -151,15 +172,15 @@ class Authentication
     /**
      * Performs login, if user submitted login form
      *
-     * @param \Magento\App\RequestInterface $request
+     * @param \Magento\Framework\App\RequestInterface $request
      * @return bool
      */
-    protected function _performLogin(\Magento\App\RequestInterface $request)
+    protected function _performLogin(\Magento\Framework\App\RequestInterface $request)
     {
         $outputValue = true;
-        $postLogin  = $request->getPost('login');
-        $username   = isset($postLogin['username']) ? $postLogin['username'] : '';
-        $password   = isset($postLogin['password']) ? $postLogin['password'] : '';
+        $postLogin = $request->getPost('login');
+        $username = isset($postLogin['username']) ? $postLogin['username'] : '';
+        $password = isset($postLogin['password']) ? $postLogin['password'] : '';
         $request->setPost('login', null);
 
         try {
@@ -177,10 +198,10 @@ class Authentication
     /**
      * Checks, whether Magento requires redirection after successful admin login, and redirects user, if needed
      *
-     * @param \Magento\App\RequestInterface $request
+     * @param \Magento\Framework\App\RequestInterface $request
      * @return bool
      */
-    protected function _redirectIfNeededAfterLogin(\Magento\App\RequestInterface $request)
+    protected function _redirectIfNeededAfterLogin(\Magento\Framework\App\RequestInterface $request)
     {
         $requestUri = null;
 
@@ -196,7 +217,7 @@ class Authentication
         }
 
         $this->_response->setRedirect($requestUri);
-        $this->_actionFlag->set('', \Magento\App\Action\Action::FLAG_NO_DISPATCH, true);
+        $this->_actionFlag->set('', \Magento\Framework\App\Action\Action::FLAG_NO_DISPATCH, true);
         return true;
     }
 }

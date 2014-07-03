@@ -23,7 +23,7 @@
  */
 namespace Magento\Multishipping\Controller;
 
-use Magento\App\RequestInterface;
+use Magento\Framework\App\RequestInterface;
 use Magento\Multishipping\Model\Checkout\Type\Multishipping\State;
 use Magento\Customer\Service\V1\CustomerAccountServiceInterface as CustomerAccountService;
 use Magento\Customer\Service\V1\CustomerMetadataServiceInterface as CustomerMetadataService;
@@ -31,27 +31,22 @@ use Magento\Customer\Service\V1\CustomerMetadataServiceInterface as CustomerMeta
 /**
  * Multishipping checkout controller
  */
-class Checkout extends \Magento\Checkout\Controller\Action
-    implements  \Magento\Checkout\Controller\Express\RedirectLoginInterface
+class Checkout extends \Magento\Checkout\Controller\Action implements
+    \Magento\Checkout\Controller\Express\RedirectLoginInterface
 {
     /**
-     * @param \Magento\App\Action\Context $context
+     * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Customer\Model\Session $customerSession
      * @param CustomerAccountService $customerAccountService
      * @param CustomerMetadataService $customerMetadataService
      */
     public function __construct(
-        \Magento\App\Action\Context $context,
+        \Magento\Framework\App\Action\Context $context,
         \Magento\Customer\Model\Session $customerSession,
         CustomerAccountService $customerAccountService,
         CustomerMetadataService $customerMetadataService
     ) {
-        parent::__construct(
-            $context,
-            $customerSession,
-            $customerAccountService,
-            $customerMetadataService
-        );
+        parent::__construct($context, $customerSession, $customerAccountService, $customerMetadataService);
     }
 
     /**
@@ -98,7 +93,7 @@ class Checkout extends \Magento\Checkout\Controller\Action
      * Dispatch request
      *
      * @param RequestInterface $request
-     * @return \Magento\App\ResponseInterface
+     * @return \Magento\Framework\App\ResponseInterface
      */
     public function dispatch(RequestInterface $request)
     {
@@ -115,11 +110,11 @@ class Checkout extends \Magento\Checkout\Controller\Action
          */
         if ($action == 'index') {
             $checkoutSessionQuote->setIsMultiShipping(true);
-            $this->_getCheckoutSession()->setCheckoutState(
-                \Magento\Checkout\Model\Session::CHECKOUT_STATE_BEGIN
-            );
-        } elseif (!$checkoutSessionQuote->getIsMultiShipping()
-            && !in_array($action, array('login', 'register', 'success'))
+            $this->_getCheckoutSession()->setCheckoutState(\Magento\Checkout\Model\Session::CHECKOUT_STATE_BEGIN);
+        } elseif (!$checkoutSessionQuote->getIsMultiShipping() && !in_array(
+            $action,
+            array('login', 'register', 'success')
+        )
         ) {
             $this->_redirect('*/*/index');
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
@@ -145,8 +140,12 @@ class Checkout extends \Magento\Checkout\Controller\Action
             return $this->getResponse();
         }
 
-        if ($this->_getCheckoutSession()->getCartWasUpdated(true)
-            && !in_array($action, array('index', 'login', 'register', 'addresses', 'success'))
+        if ($this->_getCheckoutSession()->getCartWasUpdated(
+            true
+        ) && !in_array(
+            $action,
+            array('index', 'login', 'register', 'addresses', 'success')
+        )
         ) {
             $this->getResponse()->setRedirect($this->_getHelper()->getCartUrl());
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
@@ -217,10 +216,15 @@ class Checkout extends \Magento\Checkout\Controller\Action
 
         $registerForm = $this->_view->getLayout()->getBlock('customer_form_register');
         if ($registerForm) {
-            $registerForm->setShowAddressFields(true)
-                ->setBackUrl($this->_getHelper()->getMSLoginUrl())
-                ->setSuccessUrl($this->_getHelper()->getMSShippingAddressSavedUrl())
-                ->setErrorUrl($this->_url->getCurrentUrl());
+            $registerForm->setShowAddressFields(
+                true
+            )->setBackUrl(
+                $this->_getHelper()->getMSLoginUrl()
+            )->setSuccessUrl(
+                $this->_getHelper()->getMSShippingAddressSavedUrl()
+            )->setErrorUrl(
+                $this->_url->getCurrentUrl()
+            );
         }
 
         $this->_view->renderLayout();
@@ -276,14 +280,11 @@ class Checkout extends \Magento\Checkout\Controller\Action
             if ($shipToInfo = $this->getRequest()->getPost('ship')) {
                 $this->_getCheckout()->setShippingItemsInformation($shipToInfo);
             }
-        } catch (\Magento\Core\Exception $e) {
+        } catch (\Magento\Framework\Model\Exception $e) {
             $this->messageManager->addError($e->getMessage());
             $this->_redirect('*/*/addresses');
         } catch (\Exception $e) {
-            $this->messageManager->addException(
-                $e,
-                __('Data saving problem')
-            );
+            $this->messageManager->addException($e, __('Data saving problem'));
             $this->_redirect('*/*/addresses');
         }
     }
@@ -305,8 +306,8 @@ class Checkout extends \Magento\Checkout\Controller\Action
      */
     public function removeItemAction()
     {
-        $itemId     = $this->getRequest()->getParam('id');
-        $addressId  = $this->getRequest()->getParam('address');
+        $itemId = $this->getRequest()->getParam('id');
+        $addressId = $this->getRequest()->getParam('address');
         if ($addressId && $itemId) {
             $this->_getCheckout()->setCollectRatesFlag(true);
             $this->_getCheckout()->removeAddressItem($addressId, $itemId);
@@ -370,7 +371,7 @@ class Checkout extends \Magento\Checkout\Controller\Action
         try {
             $this->_eventManager->dispatch(
                 'checkout_controller_multishipping_shipping_post',
-                array('request'=>$this->getRequest(), 'quote'=>$this->_getCheckout()->getQuote())
+                array('request' => $this->getRequest(), 'quote' => $this->_getCheckout()->getQuote())
             );
             $this->_getCheckout()->setShippingMethods($shippingMethods);
             $this->_getState()->setActiveStep(State::STEP_BILLING);
@@ -448,12 +449,12 @@ class Checkout extends \Magento\Checkout\Controller\Action
 
         try {
             $payment = $this->getRequest()->getPost('payment', array());
-            $payment['checks'] = [
+            $payment['checks'] = array(
                 \Magento\Payment\Model\Method\AbstractMethod::CHECK_USE_FOR_COUNTRY,
                 \Magento\Payment\Model\Method\AbstractMethod::CHECK_USE_FOR_CURRENCY,
                 \Magento\Payment\Model\Method\AbstractMethod::CHECK_ORDER_TOTAL_MIN_MAX,
                 \Magento\Payment\Model\Method\AbstractMethod::CHECK_ZERO_TOTAL
-            ];
+            );
             $this->_getCheckout()->setPaymentMethod($payment);
 
             $this->_getState()->setCompleteStep(State::STEP_BILLING);
@@ -461,11 +462,11 @@ class Checkout extends \Magento\Checkout\Controller\Action
             $this->_view->loadLayout();
             $this->_view->getLayout()->initMessages();
             $this->_view->renderLayout();
-        } catch (\Magento\Core\Exception $e) {
+        } catch (\Magento\Framework\Model\Exception $e) {
             $this->messageManager->addError($e->getMessage());
             $this->_redirect('*/*/billing');
         } catch (\Exception $e) {
-            $this->_objectManager->get('Magento\Logger')->logException($e);
+            $this->_objectManager->get('Magento\Framework\Logger')->logException($e);
             $this->messageManager->addException($e, __('We cannot open the overview page.'));
             $this->_redirect('*/*/billing');
         }
@@ -483,17 +484,13 @@ class Checkout extends \Magento\Checkout\Controller\Action
         }
 
         try {
-            $requiredAgreements = $this->_objectManager->get('Magento\Checkout\Helper\Data')->getRequiredAgreementIds();
-            if ($requiredAgreements) {
-                $postedAgreements = array_keys($this->getRequest()->getPost('agreement', array()));
-                $diff = array_diff($requiredAgreements, $postedAgreements);
-                if ($diff) {
-                    $this->messageManager->addError(
-                        __('Please agree to all Terms and Conditions before placing the order.')
-                    );
-                    $this->_redirect('*/*/billing');
-                    return;
-                }
+            $agreementsValidator = $this->_objectManager->get('Magento\Checkout\Model\Agreements\AgreementsValidator');
+            if (!$agreementsValidator->isValid(array_keys($this->getRequest()->getPost('agreement', array())))) {
+                $this->messageManager->addError(
+                    __('Please agree to all Terms and Conditions before placing the order.')
+                );
+                $this->_redirect('*/*/billing');
+                return;
             }
 
             $payment = $this->getRequest()->getPost('payment');
@@ -517,20 +514,35 @@ class Checkout extends \Magento\Checkout\Controller\Action
             }
             $this->_redirect('*/*/billing');
         } catch (\Magento\Checkout\Exception $e) {
-            $this->_objectManager->get('Magento\Checkout\Helper\Data')
-                ->sendPaymentFailedEmail($this->_getCheckout()->getQuote(), $e->getMessage(), 'multi-shipping');
+            $this->_objectManager->get(
+                'Magento\Checkout\Helper\Data'
+            )->sendPaymentFailedEmail(
+                $this->_getCheckout()->getQuote(),
+                $e->getMessage(),
+                'multi-shipping'
+            );
             $this->_getCheckout()->getCheckoutSession()->clearQuote();
             $this->messageManager->addError($e->getMessage());
             $this->_redirect('*/cart');
-        } catch (\Magento\Core\Exception $e) {
-            $this->_objectManager->get('Magento\Checkout\Helper\Data')
-                ->sendPaymentFailedEmail($this->_getCheckout()->getQuote(), $e->getMessage(), 'multi-shipping');
+        } catch (\Magento\Framework\Model\Exception $e) {
+            $this->_objectManager->get(
+                'Magento\Checkout\Helper\Data'
+            )->sendPaymentFailedEmail(
+                $this->_getCheckout()->getQuote(),
+                $e->getMessage(),
+                'multi-shipping'
+            );
             $this->messageManager->addError($e->getMessage());
             $this->_redirect('*/*/billing');
         } catch (\Exception $e) {
-            $this->_objectManager->get('Magento\Logger')->logException($e);
-            $this->_objectManager->get('Magento\Checkout\Helper\Data')
-                ->sendPaymentFailedEmail($this->_getCheckout()->getQuote(), $e->getMessage(), 'multi-shipping');
+            $this->_objectManager->get('Magento\Framework\Logger')->logException($e);
+            $this->_objectManager->get(
+                'Magento\Checkout\Helper\Data'
+            )->sendPaymentFailedEmail(
+                $this->_getCheckout()->getQuote(),
+                $e->getMessage(),
+                'multi-shipping'
+            );
             $this->messageManager->addError(__('Order place error'));
             $this->_redirect('*/*/billing');
         }
@@ -562,8 +574,7 @@ class Checkout extends \Magento\Checkout\Controller\Action
      */
     public function getCustomerBeforeAuthUrl()
     {
-        return $this->_objectManager->create('Magento\UrlInterface')
-            ->getUrl('*/*', array('_secure' => true));
+        return $this->_objectManager->create('Magento\Framework\UrlInterface')->getUrl('*/*', array('_secure' => true));
     }
 
     /**

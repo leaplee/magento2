@@ -18,24 +18,21 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Payment
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Payment\Block\Form;
 
 use Magento\Payment\Model\Method\AbstractMethod;
+
 /**
  * Base container block for payment methods forms
  *
  * @method \Magento\Sales\Model\Quote getQuote()
  *
- * @category   Magento
- * @package    Magento_Payment
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Container extends \Magento\View\Element\Template
+class Container extends \Magento\Framework\View\Element\Template
 {
     /**
      * @var \Magento\Payment\Helper\Data
@@ -46,13 +43,13 @@ class Container extends \Magento\View\Element\Template
     protected $methodSpecificationFactory;
 
     /**
-     * @param \Magento\View\Element\Template\Context $context
+     * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Payment\Helper\Data $paymentHelper
      * @param \Magento\Payment\Model\Checks\SpecificationFactory $methodSpecificationFactory
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Template\Context $context,
+        \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Payment\Helper\Data $paymentHelper,
         \Magento\Payment\Model\Checks\SpecificationFactory $methodSpecificationFactory,
         array $data = array()
@@ -74,8 +71,8 @@ class Container extends \Magento\View\Element\Template
          */
         foreach ($this->getMethods() as $method) {
             $this->setChild(
-               'payment.method.'.$method->getCode(),
-               $this->_paymentHelper->getMethodFormBlock($method)
+                'payment.method.' . $method->getCode(),
+                $this->_paymentHelper->getMethodFormBlock($method)
             );
         }
 
@@ -91,12 +88,15 @@ class Container extends \Magento\View\Element\Template
     protected function _canUseMethod($method)
     {
         return $this->methodSpecificationFactory->create(
-            [
+            array(
                 AbstractMethod::CHECK_USE_FOR_COUNTRY,
                 AbstractMethod::CHECK_USE_FOR_CURRENCY,
                 AbstractMethod::CHECK_ORDER_TOTAL_MIN_MAX
-            ]
-        )->isApplicable($method, $this->getQuote());
+            )
+        )->isApplicable(
+            $method,
+            $this->getQuote()
+        );
     }
 
     /**
@@ -120,10 +120,10 @@ class Container extends \Magento\View\Element\Template
      * @param string $template
      * @return $this
      */
-    public function setMethodFormTemplate($method='', $template='')
+    public function setMethodFormTemplate($method = '', $template = '')
     {
         if (!empty($method) && !empty($template)) {
-            if ($block = $this->getChildBlock('payment.method.'.$method)) {
+            if ($block = $this->getChildBlock('payment.method.' . $method)) {
                 $block->setTemplate($template);
             }
         }
@@ -142,11 +142,9 @@ class Container extends \Magento\View\Element\Template
             $quote = $this->getQuote();
             $store = $quote ? $quote->getStoreId() : null;
             $methods = array();
-            $specification = $this->methodSpecificationFactory->create([AbstractMethod::CHECK_ZERO_TOTAL]);
+            $specification = $this->methodSpecificationFactory->create(array(AbstractMethod::CHECK_ZERO_TOTAL));
             foreach ($this->_paymentHelper->getStoreMethods($store, $quote) as $method) {
-                if ($this->_canUseMethod($method)
-                    && $specification->isApplicable($method, $this->getQuote())
-                ) {
+                if ($this->_canUseMethod($method) && $specification->isApplicable($method, $this->getQuote())) {
                     $this->_assignMethod($method);
                     $methods[] = $method;
                 }

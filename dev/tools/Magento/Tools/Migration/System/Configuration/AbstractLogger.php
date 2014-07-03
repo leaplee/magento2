@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category   Magento
- * @package    Tools
  * @copyright  Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,18 +28,16 @@ namespace Magento\Tools\Migration\System\Configuration;
  */
 abstract class AbstractLogger
 {
-    CONST FILE_KEY_VALID = 'valid';
-    CONST FILE_KEY_INVALID = 'invalid';
+    const FILE_KEY_VALID = 'valid';
+
+    const FILE_KEY_INVALID = 'invalid';
 
     /**
      * List of logs
      *
      * @var array
      */
-    protected $_logs = array(
-        self::FILE_KEY_VALID => array(),
-        self::FILE_KEY_INVALID => array()
-    );
+    protected $_logs = array(self::FILE_KEY_VALID => array(), self::FILE_KEY_INVALID => array());
 
     /**
      * Add log data
@@ -75,7 +71,7 @@ abstract class AbstractLogger
             }
 
             $result[] = '------------------------------';
-            $result[] =  $type . ':';
+            $result[] = $type . ':';
             foreach ($data as $fileName) {
                 $result[] = $fileName;
             }
@@ -91,5 +87,5 @@ abstract class AbstractLogger
      *
      * @return void
      */
-    public abstract function report();
+    abstract public function report();
 }

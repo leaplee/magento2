@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento
- * @subpackage  static_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\TestFramework\Dependency;
 
 class DbRuleTest extends \PHPUnit_Framework_TestCase
@@ -36,7 +32,7 @@ class DbRuleTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->model = new DbRule(['some_table' => 'SomeModule']);
+        $this->model = new DbRule(array('some_table' => 'SomeModule'));
     }
 
     /**
@@ -53,36 +49,38 @@ class DbRuleTest extends \PHPUnit_Framework_TestCase
 
     public function getDependencyInfoDataProvider()
     {
-        return [
-            ['any', 'non-resource-file-path.php', 'any', []],
-            [
+        return array(
+            array('any', 'non-resource-file-path.php', 'any', array()),
+            array(
                 'any',
                 '/app/some/path/sql/some-file.php',
                 '$install->getTableName("unknown_table")',
-                [['module' => 'Unknown', 'source' => 'unknown_table']]
-            ],
-            [
+                array(array('module' => 'Unknown', 'source' => 'unknown_table'))
+            ),
+            array(
                 'any',
                 '/app/some/path/data/some-file.php',
                 '$install->getTableName("unknown_table")',
-                [['module' => 'Unknown', 'source' => 'unknown_table']]
-            ],
-            [
+                array(array('module' => 'Unknown', 'source' => 'unknown_table'))
+            ),
+            array(
                 'SomeModule',
                 '/app/some/path/resource/some-file.php',
                 '$install->getTableName("some_table")',
-                []
-            ],
-            [
+                array()
+            ),
+            array(
                 'any',
                 '/app/some/path/resource/some-file.php',
                 '$install->getTableName(\'some_table\')',
-                [[
-                    'module' => 'SomeModule',
-                    'type'   => \Magento\TestFramework\Dependency\RuleInterface::TYPE_HARD,
-                    'source' => 'some_table'
-                ]]
-            ],
-        ];
+                array(
+                    array(
+                        'module' => 'SomeModule',
+                        'type' => \Magento\TestFramework\Dependency\RuleInterface::TYPE_HARD,
+                        'source' => 'some_table'
+                    )
+                )
+            )
+        );
     }
 }

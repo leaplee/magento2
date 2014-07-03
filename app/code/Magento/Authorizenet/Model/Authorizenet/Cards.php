@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Authorizenet
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,9 +26,13 @@ namespace Magento\Authorizenet\Model\Authorizenet;
 class Cards
 {
     const CARDS_NAMESPACE = 'authorize_cards';
+
     const CARD_ID_KEY = 'id';
+
     const CARD_PROCESSED_AMOUNT_KEY = 'processed_amount';
+
     const CARD_CAPTURED_AMOUNT_KEY = 'captured_amount';
+
     const CARD_REFUNDED_AMOUNT_KEY = 'refunded_amount';
 
     /**
@@ -99,7 +101,7 @@ class Cards
     /**
      * Save data from card object in cards storage
      *
-     * @param \Magento\Object $card
+     * @param \Magento\Framework\Object $card
      * @return $this
      */
     public function updateCard($card)
@@ -116,12 +118,12 @@ class Cards
      * Retrieve card by ID
      *
      * @param string $cardId
-     * @return \Magento\Object|false
+     * @return \Magento\Framework\Object|false
      */
     public function getCard($cardId)
     {
         if (isset($this->_cards[$cardId])) {
-            $card = new \Magento\Object($this->_cards[$cardId]);
+            $card = new \Magento\Framework\Object($this->_cards[$cardId]);
             return $card;
         }
         return false;

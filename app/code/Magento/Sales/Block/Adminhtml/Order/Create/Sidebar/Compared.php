@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Sales\Block\Adminhtml\Order\Create\Sidebar;
 /**
  * Adminhtml sales order create sidebar compared block
  *
- * @category   Magento
- * @package    Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Compared extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\AbstractSidebar
@@ -66,16 +62,23 @@ class Compared extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\Abstr
         $collection = $this->getData('item_collection');
         if (is_null($collection)) {
             if ($collection = $this->getCreateOrderModel()->getCustomerCompareList()) {
-                $collection = $collection->getItemCollection()
-                    ->useProductItem(true)
-                    ->setStoreId($this->getQuote()->getStoreId())
-                    ->addStoreFilter($this->getQuote()->getStoreId())
-                    ->setCustomerId($this->getCustomerId())
-                    ->addAttributeToSelect('name')
-                    ->addAttributeToSelect('price')
-                    ->addAttributeToSelect('image')
-                    ->addAttributeToSelect('status')
-                    ->load();
+                $collection = $collection->getItemCollection()->useProductItem(
+                    true
+                )->setStoreId(
+                    $this->getQuote()->getStoreId()
+                )->addStoreFilter(
+                    $this->getQuote()->getStoreId()
+                )->setCustomerId(
+                    $this->getCustomerId()
+                )->addAttributeToSelect(
+                    'name'
+                )->addAttributeToSelect(
+                    'price'
+                )->addAttributeToSelect(
+                    'image'
+                )->addAttributeToSelect(
+                    'status'
+                )->load();
             }
             $this->setData('item_collection', $collection);
         }
@@ -85,7 +88,7 @@ class Compared extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\Abstr
     /**
      * Get item id
      *
-     * @param \Magento\Object $item
+     * @param \Magento\Framework\Object $item
      * @return int
      */
     public function getItemId($item)

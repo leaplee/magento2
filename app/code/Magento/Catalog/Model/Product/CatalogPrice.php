@@ -21,9 +21,9 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Product;
-use Magento\ObjectManager;
+
+use Magento\Framework\ObjectManager;
 
 /**
  * Price model for external catalogs
@@ -45,10 +45,8 @@ class CatalogPrice implements CatalogPriceInterface
      * @param CatalogPriceFactory $priceModelFactory
      * @param array $priceModelPool
      */
-    public function __construct(
-        CatalogPriceFactory $priceModelFactory,
-        array $priceModelPool
-    ) {
+    public function __construct(CatalogPriceFactory $priceModelFactory, array $priceModelPool)
+    {
         $this->priceModelFactory = $priceModelFactory;
         $this->priceModelPool = $priceModelPool;
     }
@@ -57,7 +55,7 @@ class CatalogPrice implements CatalogPriceInterface
      * Minimal price for "regular" user
      *
      * @param \Magento\Catalog\Model\Product $product
-     * @param null|\Magento\Core\Model\Store $store Store view
+     * @param null|\Magento\Store\Model\Store $store Store view
      * @param bool $inclTax
      * @throws \UnexpectedValueException
      * @return null|float
@@ -88,5 +86,4 @@ class CatalogPrice implements CatalogPriceInterface
 
         return $product->getPrice();
     }
-
 }

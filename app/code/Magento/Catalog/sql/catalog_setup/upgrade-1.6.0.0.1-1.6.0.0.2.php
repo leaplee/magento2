@@ -18,30 +18,32 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 $installer = $this;
-$installer->addAttribute(\Magento\Catalog\Model\Product::ENTITY, 'country_of_manufacture', array(
-    'group'             => 'General',
-    'type'              => 'varchar',
-    'backend'           => '',
-    'frontend'          => '',
-    'label'             => 'Country of Manufacture',
-    'input'             => 'select',
-    'class'             => '',
-    'source'            => 'Magento\Catalog\Model\Product\Attribute\Source\Countryofmanufacture',
-    'global'            => \Magento\Catalog\Model\Resource\Eav\Attribute::SCOPE_WEBSITE,
-    'visible'           => true,
-    'required'          => false,
-    'user_defined'      => false,
-    'searchable'        => false,
-    'filterable'        => false,
-    'comparable'        => false,
-    'visible_on_front'  => false,
-    'unique'            => false,
-    'apply_to'          => 'simple,bundle',
-));
+$installer->addAttribute(
+    \Magento\Catalog\Model\Product::ENTITY,
+    'country_of_manufacture',
+    array(
+        'group' => 'General',
+        'type' => 'varchar',
+        'backend' => '',
+        'frontend' => '',
+        'label' => 'Country of Manufacture',
+        'input' => 'select',
+        'class' => '',
+        'source' => 'Magento\Catalog\Model\Product\Attribute\Source\Countryofmanufacture',
+        'global' => \Magento\Catalog\Model\Resource\Eav\Attribute::SCOPE_WEBSITE,
+        'visible' => true,
+        'required' => false,
+        'user_defined' => false,
+        'searchable' => false,
+        'filterable' => false,
+        'comparable' => false,
+        'visible_on_front' => false,
+        'unique' => false,
+        'apply_to' => 'simple,bundle'
+    )
+);

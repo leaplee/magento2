@@ -21,13 +21,12 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Multishipping\Block\Checkout;
 
 /**
  * Multishipping cart link
  */
-class Link extends \Magento\View\Element\Template
+class Link extends \Magento\Framework\View\Element\Template
 {
     /**
      * Multishipping helper
@@ -37,12 +36,12 @@ class Link extends \Magento\View\Element\Template
     protected $helper;
 
     /**
-     * @param \Magento\View\Element\Template\Context $context
+     * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Multishipping\Helper\Data $helper
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Template\Context $context,
+        \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Multishipping\Helper\Data $helper,
         array $data = array()
     ) {
@@ -56,7 +55,7 @@ class Link extends \Magento\View\Element\Template
      */
     public function getCheckoutUrl()
     {
-        return $this->getUrl('multishipping/checkout', array('_secure'=>true));
+        return $this->getUrl('multishipping/checkout', array('_secure' => true));
     }
 
     /**

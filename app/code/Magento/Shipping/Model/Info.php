@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Shipping
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,7 +25,7 @@ namespace Magento\Shipping\Model;
 
 use Magento\Sales\Model\Order\Shipment;
 
-class Info extends \Magento\Object
+class Info extends \Magento\Framework\Object
 {
     /**
      * Tracking info
@@ -104,7 +102,7 @@ class Info extends \Magento\Object
 
             if ($this->getOrderId() > 0) {
                 $this->getTrackingInfoByOrder();
-            } elseif($this->getShipId() > 0) {
+            } elseif ($this->getShipId() > 0) {
                 $this->getTrackingInfoByShip();
             } else {
                 $this->getTrackingInfoByTrackId();
@@ -168,12 +166,12 @@ class Info extends \Magento\Object
         $order = $this->_initOrder();
         if ($order) {
             $shipments = $order->getShipmentsCollection();
-            foreach ($shipments as $shipment){
+            foreach ($shipments as $shipment) {
                 $increment_id = $shipment->getIncrementId();
                 $tracks = $this->_getTracksCollection($shipment);
 
-                $trackingInfos=array();
-                foreach ($tracks as $track){
+                $trackingInfos = array();
+                foreach ($tracks as $track) {
                     $trackingInfos[] = $track->getNumberDetail();
                 }
                 $shipTrack[$increment_id] = $trackingInfos;
@@ -196,12 +194,11 @@ class Info extends \Magento\Object
             $increment_id = $shipment->getIncrementId();
             $tracks = $this->_getTracksCollection($shipment);
 
-            $trackingInfos=array();
-            foreach ($tracks as $track){
+            $trackingInfos = array();
+            foreach ($tracks as $track) {
                 $trackingInfos[] = $track->getNumberDetail();
             }
             $shipTrack[$increment_id] = $trackingInfos;
-
         }
         $this->_trackingInfo = $shipTrack;
         return $this->_trackingInfo;

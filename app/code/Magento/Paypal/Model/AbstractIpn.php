@@ -55,20 +55,20 @@ class AbstractIpn
     protected $_configFactory;
 
     /**
-     * @var \Magento\HTTP\Adapter\CurlFactory
+     * @var \Magento\Framework\HTTP\Adapter\CurlFactory
      */
     protected $_curlFactory;
 
     /**
      * @param \Magento\Paypal\Model\ConfigFactory $configFactory
-     * @param \Magento\Logger\AdapterFactory $logAdapterFactory
-     * @param \Magento\HTTP\Adapter\CurlFactory $curlFactory
+     * @param \Magento\Framework\Logger\AdapterFactory $logAdapterFactory
+     * @param \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory
      * @param array $data
      */
     public function __construct(
         \Magento\Paypal\Model\ConfigFactory $configFactory,
-        \Magento\Logger\AdapterFactory $logAdapterFactory,
-        \Magento\HTTP\Adapter\CurlFactory $curlFactory,
+        \Magento\Framework\Logger\AdapterFactory $logAdapterFactory,
+        \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory,
         array $data = array()
     ) {
         $this->_configFactory = $configFactory;
@@ -104,7 +104,7 @@ class AbstractIpn
         $postbackUrl = $this->_config->getPaypalUrl();
         $this->_addDebugData('postback_to', $postbackUrl);
 
-        $httpAdapter->setConfig(array('verifypeer' => $this->_config->verifyPeer));
+        $httpAdapter->setConfig(array('verifypeer' => $this->_config->getConfigValue('verifyPeer')));
         $httpAdapter->write(\Zend_Http_Client::POST, $postbackUrl, '1.1', array('Connection: close'), $postbackQuery);
         try {
             $postbackResult = $httpAdapter->read();
@@ -131,18 +131,30 @@ class AbstractIpn
     protected function _filterPaymentStatus($ipnPaymentStatus)
     {
         switch ($ipnPaymentStatus) {
-            case 'Created': // break is intentionally omitted
-            case 'Completed': return Info::PAYMENTSTATUS_COMPLETED;
-            case 'Denied':    return Info::PAYMENTSTATUS_DENIED;
-            case 'Expired':   return Info::PAYMENTSTATUS_EXPIRED;
-            case 'Failed':    return Info::PAYMENTSTATUS_FAILED;
-            case 'Pending':   return Info::PAYMENTSTATUS_PENDING;
-            case 'Refunded':  return Info::PAYMENTSTATUS_REFUNDED;
-            case 'Reversed':  return Info::PAYMENTSTATUS_REVERSED;
-            case 'Canceled_Reversal': return Info::PAYMENTSTATUS_UNREVERSED;
-            case 'Processed': return Info::PAYMENTSTATUS_PROCESSED;
-            case 'Voided':    return Info::PAYMENTSTATUS_VOIDED;
-            default:          return '';
+            case 'Created':
+                // break is intentionally omitted
+            case 'Completed':
+                return Info::PAYMENTSTATUS_COMPLETED;
+            case 'Denied':
+                return Info::PAYMENTSTATUS_DENIED;
+            case 'Expired':
+                return Info::PAYMENTSTATUS_EXPIRED;
+            case 'Failed':
+                return Info::PAYMENTSTATUS_FAILED;
+            case 'Pending':
+                return Info::PAYMENTSTATUS_PENDING;
+            case 'Refunded':
+                return Info::PAYMENTSTATUS_REFUNDED;
+            case 'Reversed':
+                return Info::PAYMENTSTATUS_REVERSED;
+            case 'Canceled_Reversal':
+                return Info::PAYMENTSTATUS_UNREVERSED;
+            case 'Processed':
+                return Info::PAYMENTSTATUS_PROCESSED;
+            case 'Voided':
+                return Info::PAYMENTSTATUS_VOIDED;
+            default:
+                return '';
         }
         // documented in NVP, but not documented in IPN:
         //Info::PAYMENTSTATUS_NONE
@@ -157,10 +169,11 @@ class AbstractIpn
      */
     protected function _debug()
     {
-        if ($this->_config && $this->_config->debug) {
-            $file = $this->_config->getMethodCode()
-                ? "payment_{$this->_config->getMethodCode()}.log"
-                : self::DEFAULT_LOG_FILE;
+        if ($this->_config && $this->_config->getConfigValue('debug')) {
+            $file = $this->_config
+                ->getMethodCode() ? "payment_{$this
+                ->_config
+                ->getMethodCode()}.log" : self::DEFAULT_LOG_FILE;
             $this->_logAdapterFactory->create(array('fileName' => $file))->log($this->_debugData);
         }
     }

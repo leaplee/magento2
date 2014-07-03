@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -79,10 +77,14 @@ class Auth extends AbstractAction
      */
     protected function _getDeniedJson()
     {
-        return $this->_objectManager->get('Magento\Core\Helper\Data')->jsonEncode(array(
-            'ajaxExpired' => 1,
-            'ajaxRedirect' => $this->_objectManager->get('Magento\Backend\Helper\Data')->getHomePageUrl()
-        ));
+        return $this->_objectManager->get(
+            'Magento\Core\Helper\Data'
+        )->jsonEncode(
+            array(
+                'ajaxExpired' => 1,
+                'ajaxRedirect' => $this->_objectManager->get('Magento\Backend\Helper\Data')->getHomePageUrl()
+            )
+        );
     }
 
     /**
@@ -102,8 +104,9 @@ class Auth extends AbstractAction
      */
     protected function _getDeniedIframe()
     {
-        return '<script type="text/javascript">parent.window.location = \''
-            . $this->_objectManager->get('Magento\Backend\Helper\Data')->getHomePageUrl() . '\';</script>';
+        return '<script type="text/javascript">parent.window.location = \'' . $this->_objectManager->get(
+            'Magento\Backend\Helper\Data'
+        )->getHomePageUrl() . '\';</script>';
     }
 
     /**

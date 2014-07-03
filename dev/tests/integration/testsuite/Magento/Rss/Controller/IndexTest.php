@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Rss
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Rss\Controller;
 
 class IndexTest extends \Magento\TestFramework\TestCase\AbstractController
@@ -59,15 +55,15 @@ class IndexTest extends \Magento\TestFramework\TestCase\AbstractController
      */
     public function testWishlistAction()
     {
-        $wishlist = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Wishlist\Model\Wishlist');
+        $wishlist = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Wishlist\Model\Wishlist'
+        );
         $wishlist->load('fixture_unique_code', 'sharing_code');
-        $this->getRequest()->setParam('wishlist_id', $wishlist->getId())
-            ->setParam('data', base64_encode('1'))
-        ;
+        $this->getRequest()->setParam('wishlist_id', $wishlist->getId())->setParam('data', base64_encode('1'));
         $session = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get('Magento\Customer\Model\Session');
-        $service = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Customer\Service\V1\CustomerAccountService');
+        $service = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Customer\Service\V1\CustomerAccountService'
+        );
         $customer = $service->authenticate('customer@example.com', 'password');
         $session->setCustomerDataAsLoggedIn($customer);
 

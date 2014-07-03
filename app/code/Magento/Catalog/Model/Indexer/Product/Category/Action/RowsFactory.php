@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Indexer\Product\Category\Action;
 
 /**
@@ -32,11 +31,11 @@ class RowsFactory extends \Magento\Catalog\Model\Indexer\Category\Product\Action
     /**
      * Factory constructor
      *
-     * @param \Magento\ObjectManager $objectManager
+     * @param \Magento\Framework\ObjectManager $objectManager
      * @param string $instanceName
      */
     public function __construct(
-        \Magento\ObjectManager $objectManager,
+        \Magento\Framework\ObjectManager $objectManager,
         $instanceName = 'Magento\Catalog\Model\Indexer\Product\Category\Action\Rows'
     ) {
         parent::__construct($objectManager, $instanceName);

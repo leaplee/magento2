@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Authorizenet
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,7 +28,7 @@ namespace Magento\Authorizenet\Model\Directpost;
  *
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Request extends \Magento\Object
+class Request extends \Magento\Framework\Object
 {
     /**
      * @var string
@@ -72,14 +70,18 @@ class Request extends \Magento\Object
      * @param string $fpTimestamp
      * @return string The fingerprint.
      */
-    public function generateRequestSign($merchantApiLoginId, $merchantTransactionKey, $amount, $currencyCode, $fpSequence, $fpTimestamp)
-    {
-        return hash_hmac("md5",
-            $merchantApiLoginId . "^" .
-            $fpSequence . "^" .
-            $fpTimestamp . "^" .
-            $amount . "^" .
-            $currencyCode, $merchantTransactionKey
+    public function generateRequestSign(
+        $merchantApiLoginId,
+        $merchantTransactionKey,
+        $amount,
+        $currencyCode,
+        $fpSequence,
+        $fpTimestamp
+    ) {
+        return hash_hmac(
+            "md5",
+            $merchantApiLoginId . "^" . $fpSequence . "^" . $fpTimestamp . "^" . $amount . "^" . $currencyCode,
+            $merchantTransactionKey
         );
     }
 
@@ -91,16 +93,19 @@ class Request extends \Magento\Object
      */
     public function setConstantData(\Magento\Authorizenet\Model\Directpost $paymentMethod)
     {
-        $this->setXVersion('3.1')
-            ->setXDelimData('FALSE')
-            ->setXRelayResponse('TRUE');
+        $this->setXVersion('3.1')->setXDelimData('FALSE')->setXRelayResponse('TRUE');
 
         $this->setXTestRequest($paymentMethod->getConfigData('test') ? 'TRUE' : 'FALSE');
 
-        $this->setXLogin($paymentMethod->getConfigData('login'))
-            ->setXType('AUTH_ONLY')
-            ->setXMethod(\Magento\Authorizenet\Model\Authorizenet::REQUEST_METHOD_CC)
-            ->setXRelayUrl($paymentMethod->getRelayUrl());
+        $this->setXLogin(
+            $paymentMethod->getConfigData('login')
+        )->setXType(
+            'AUTH_ONLY'
+        )->setXMethod(
+            \Magento\Authorizenet\Model\Authorizenet::REQUEST_METHOD_CC
+        )->setXRelayUrl(
+            $paymentMethod->getRelayUrl()
+        );
 
         $this->_setTransactionKey($paymentMethod->getConfigData('trans_key'));
         return $this;
@@ -113,48 +118,79 @@ class Request extends \Magento\Object
      * @param \Magento\Authorizenet\Model\Directpost $paymentMethod
      * @return $this
      */
-    public function setDataFromOrder(\Magento\Sales\Model\Order $order, \Magento\Authorizenet\Model\Directpost $paymentMethod)
-    {
+    public function setDataFromOrder(
+        \Magento\Sales\Model\Order $order,
+        \Magento\Authorizenet\Model\Directpost $paymentMethod
+    ) {
         $payment = $order->getPayment();
 
         $this->setXFpSequence($order->getQuoteId());
         $this->setXInvoiceNum($order->getIncrementId());
         $this->setXAmount($payment->getBaseAmountAuthorized());
         $this->setXCurrencyCode($order->getBaseCurrencyCode());
-        $this->setXTax(sprintf('%.2F', $order->getBaseTaxAmount()))
-            ->setXFreight(sprintf('%.2F', $order->getBaseShippingAmount()));
+        $this->setXTax(
+            sprintf('%.2F', $order->getBaseTaxAmount())
+        )->setXFreight(
+            sprintf('%.2F', $order->getBaseShippingAmount())
+        );
 
         //need to use strval() because NULL values IE6-8 decodes as "null" in JSON in JavaScript, but we need "" for null values.
         $billing = $order->getBillingAddress();
         if (!empty($billing)) {
-            $this->setXFirstName(strval($billing->getFirstname()))
-                ->setXLastName(strval($billing->getLastname()))
-                ->setXCompany(strval($billing->getCompany()))
-                ->setXAddress(strval($billing->getStreet(1)))
-                ->setXCity(strval($billing->getCity()))
-                ->setXState(strval($billing->getRegion()))
-                ->setXZip(strval($billing->getPostcode()))
-                ->setXCountry(strval($billing->getCountry()))
-                ->setXPhone(strval($billing->getTelephone()))
-                ->setXFax(strval($billing->getFax()))
-                ->setXCustId(strval($billing->getCustomerId()))
-                ->setXCustomerIp(strval($order->getRemoteIp()))
-                ->setXCustomerTaxId(strval($billing->getTaxId()))
-                ->setXEmail(strval($order->getCustomerEmail()))
-                ->setXEmailCustomer(strval($paymentMethod->getConfigData('email_customer')))
-                ->setXMerchantEmail(strval($paymentMethod->getConfigData('merchant_email')));
+            $this->setXFirstName(
+                strval($billing->getFirstname())
+            )->setXLastName(
+                strval($billing->getLastname())
+            )->setXCompany(
+                strval($billing->getCompany())
+            )->setXAddress(
+                strval($billing->getStreet(1))
+            )->setXCity(
+                strval($billing->getCity())
+            )->setXState(
+                strval($billing->getRegion())
+            )->setXZip(
+                strval($billing->getPostcode())
+            )->setXCountry(
+                strval($billing->getCountry())
+            )->setXPhone(
+                strval($billing->getTelephone())
+            )->setXFax(
+                strval($billing->getFax())
+            )->setXCustId(
+                strval($billing->getCustomerId())
+            )->setXCustomerIp(
+                strval($order->getRemoteIp())
+            )->setXCustomerTaxId(
+                strval($billing->getTaxId())
+            )->setXEmail(
+                strval($order->getCustomerEmail())
+            )->setXEmailCustomer(
+                strval($paymentMethod->getConfigData('email_customer'))
+            )->setXMerchantEmail(
+                strval($paymentMethod->getConfigData('merchant_email'))
+            );
         }
 
         $shipping = $order->getShippingAddress();
         if (!empty($shipping)) {
-            $this->setXShipToFirstName(strval($shipping->getFirstname()))
-                ->setXShipToLastName(strval($shipping->getLastname()))
-                ->setXShipToCompany(strval($shipping->getCompany()))
-                ->setXShipToAddress(strval($shipping->getStreet(1)))
-                ->setXShipToCity(strval($shipping->getCity()))
-                ->setXShipToState(strval($shipping->getRegion()))
-                ->setXShipToZip(strval($shipping->getPostcode()))
-                ->setXShipToCountry(strval($shipping->getCountry()));
+            $this->setXShipToFirstName(
+                strval($shipping->getFirstname())
+            )->setXShipToLastName(
+                strval($shipping->getLastname())
+            )->setXShipToCompany(
+                strval($shipping->getCompany())
+            )->setXShipToAddress(
+                strval($shipping->getStreet(1))
+            )->setXShipToCity(
+                strval($shipping->getCity())
+            )->setXShipToState(
+                strval($shipping->getRegion())
+            )->setXShipToZip(
+                strval($shipping->getPostcode())
+            )->setXShipToCountry(
+                strval($shipping->getCountry())
+            );
         }
 
         $this->setXPoNum(strval($payment->getPoNumber()));

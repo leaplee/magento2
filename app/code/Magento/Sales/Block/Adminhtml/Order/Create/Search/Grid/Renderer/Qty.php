@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,12 +26,9 @@ namespace Magento\Sales\Block\Adminhtml\Order\Create\Search\Grid\Renderer;
 /**
  * Renderer for Qty field in sales create new order search grid
  *
- * @category   Magento
- * @package    Magento_Sales
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Qty
-    extends \Magento\Backend\Block\Widget\Grid\Column\Renderer\Input
+class Qty extends \Magento\Backend\Block\Widget\Grid\Column\Renderer\Input
 {
     /**
      * Type config
@@ -59,7 +54,7 @@ class Qty
     /**
      * Returns whether this qty field must be inactive
      *
-     * @param \Magento\Object $row
+     * @param \Magento\Framework\Object $row
      * @return bool
      */
     protected function _isInactive($row)
@@ -70,10 +65,10 @@ class Qty
     /**
      * Render product qty field
      *
-     * @param \Magento\Object $row
+     * @param \Magento\Framework\Object $row
      * @return string
      */
-    public function render(\Magento\Object $row)
+    public function render(\Magento\Framework\Object $row)
     {
         // Prepare values
         $disabled = '';

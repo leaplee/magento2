@@ -21,7 +21,6 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Webapi\Model\Plugin;
 
 use Magento\Authz\Model\UserIdentifier;
@@ -29,7 +28,7 @@ use Magento\Integration\Model\Integration;
 use Magento\Webapi\Model\IntegrationConfig;
 
 /**
- * Plugin for Magento\Core\Model\Resource\Setup model to manage resource permissions of
+ * Plugin for Magento\Framework\Module\Setup model to manage resource permissions of
  * integration installed from config file
  */
 class Setup
@@ -44,7 +43,7 @@ class Setup
     /**
      * Integration service
      *
-     * @var \Magento\Integration\Service\IntegrationV1Interface
+     * @var \Magento\Integration\Service\V1\IntegrationInterface
      */
     protected $_integrationService;
 
@@ -62,19 +61,18 @@ class Setup
      */
     protected $_userIdentifierFactory;
 
-
     /**
      * Construct Setup plugin instance
      *
      * @param IntegrationConfig $integrationConfig
      * @param \Magento\Authz\Service\AuthorizationV1 $authzService
-     * @param \Magento\Integration\Service\IntegrationV1Interface $integrationService
+     * @param \Magento\Integration\Service\V1\IntegrationInterface $integrationService
      * @param \Magento\Authz\Model\UserIdentifier\Factory $userIdentifierFactory
      */
     public function __construct(
         IntegrationConfig $integrationConfig,
         \Magento\Authz\Service\AuthorizationV1 $authzService,
-        \Magento\Integration\Service\IntegrationV1Interface $integrationService,
+        \Magento\Integration\Service\V1\IntegrationInterface $integrationService,
         \Magento\Authz\Model\UserIdentifier\Factory $userIdentifierFactory
     ) {
         $this->_integrationConfig = $integrationConfig;
@@ -109,10 +107,7 @@ class Setup
                         UserIdentifier::USER_TYPE_INTEGRATION,
                         $integration->getId()
                     );
-                    $this->_authzService->grantPermissions(
-                        $userIdentifier,
-                        $integrations[$name]['resources']
-                    );
+                    $this->_authzService->grantPermissions($userIdentifier, $integrations[$name]['resources']);
                 }
             }
         }

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Sales\Block\Adminhtml\Order\Totals;
 /**
  * Adminhtml order tax totals block
  *
- * @category    Magento
- * @package     Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Tax extends \Magento\Tax\Block\Sales\Order\Tax
@@ -99,11 +95,11 @@ class Tax extends \Magento\Tax\Block\Sales\Order\Tax
         $taxClassAmount = array();
         if ($source instanceof \Magento\Sales\Model\Order) {
             $taxClassAmount = $this->_taxHelper->getCalculatedTaxes($source);
-            $shippingTax    = $this->_taxHelper->getShippingTax($source);
+            $shippingTax = $this->_taxHelper->getShippingTax($source);
             $taxClassAmount = array_merge($taxClassAmount, $shippingTax);
             if (empty($taxClassAmount)) {
                 $rates = $this->_taxOrderFactory->create()->getCollection()->loadByOrder($source)->toArray();
-                $taxClassAmount =  $this->_taxCalculation->reproduceProcess($rates['items']);
+                $taxClassAmount = $this->_taxCalculation->reproduceProcess($rates['items']);
             }
         }
         return $taxClassAmount;
@@ -118,15 +114,13 @@ class Tax extends \Magento\Tax\Block\Sales\Order\Tax
      */
     public function displayAmount($amount, $baseAmount)
     {
-        return $this->_salesAdminHelper->displayPrices(
-            $this->getSource(), $baseAmount, $amount, false, '<br />'
-        );
+        return $this->_salesAdminHelper->displayPrices($this->getSource(), $baseAmount, $amount, false, '<br />');
     }
 
     /**
      * Get store object for process configuration settings
      *
-     * @return \Magento\Core\Model\Store
+     * @return \Magento\Store\Model\Store
      */
     public function getStore()
     {

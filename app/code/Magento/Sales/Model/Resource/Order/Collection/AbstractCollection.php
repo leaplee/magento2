@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Sales\Model\Resource\Order\Collection;
 /**
  * Flat sales order collection
  *
- * @category    Magento
- * @package     Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 abstract class AbstractCollection extends \Magento\Sales\Model\Resource\Collection\AbstractCollection
@@ -39,14 +35,14 @@ abstract class AbstractCollection extends \Magento\Sales\Model\Resource\Collecti
      *
      * @var \Magento\Sales\Model\Order
      */
-    protected $_salesOrder   = null;
+    protected $_salesOrder = null;
 
     /**
      * Order field for setOrderFilter
      *
      * @var string
      */
-    protected $_orderField   = 'parent_id';
+    protected $_orderField = 'parent_id';
 
     /**
      * Set sales order model as parent collection object
@@ -58,11 +54,10 @@ abstract class AbstractCollection extends \Magento\Sales\Model\Resource\Collecti
     {
         $this->_salesOrder = $order;
         if ($this->_eventPrefix && $this->_eventObject) {
-            $this->_eventManager->dispatch($this->_eventPrefix . '_set_sales_order', array(
-                'collection' => $this,
-                $this->_eventObject => $this,
-                'order' => $order
-            ));
+            $this->_eventManager->dispatch(
+                $this->_eventPrefix . '_set_sales_order',
+                array('collection' => $this, $this->_eventObject => $this, 'order' => $order)
+            );
         }
 
         return $this;

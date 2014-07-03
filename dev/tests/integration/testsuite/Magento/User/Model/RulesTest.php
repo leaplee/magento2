@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_User
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\User\Model;
 
 /**
@@ -39,8 +35,9 @@ class RulesTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\User\Model\Rules');
+        $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\User\Model\Rules'
+        );
     }
 
     /**
@@ -48,7 +45,8 @@ class RulesTest extends \PHPUnit_Framework_TestCase
      */
     public function testCRUD()
     {
-        $this->_model->setRoleType('G')
+        $this->_model
+            ->setRoleType('G')
             ->setResourceId('Magento_Adminhtml::all')
             ->setPrivileges("")
             ->setAssertId(0)
@@ -64,15 +62,8 @@ class RulesTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitialUserPermissions()
     {
-        $adapter = $this->_model->getResource()->getReadConnection();
-        $ruleSelect = $adapter->select()
-            ->from($this->_model->getResource()->getMainTable());
-
-        $rules = $ruleSelect->query()->fetchAll();
-        $this->assertEquals(1, count($rules));
-        $this->assertEquals('Magento_Adminhtml::all', $rules[0]['resource_id']);
-        $this->assertEquals(1, $rules[0]['role_id']);
-        $this->assertEquals('allow', $rules[0]['permission']);
+        $expectedDefaultPermissions = ['Magento_Adminhtml::all'];
+        $this->_checkExistingPermissions($expectedDefaultPermissions);
     }
 
     /**
@@ -81,21 +72,31 @@ class RulesTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetAllowForAllResources()
     {
-        $adapter = $this->_model->getResource()->getReadConnection();
-        $ruleSelect = $adapter->select()
-            ->from($this->_model->getResource()->getMainTable());
-
         $resources = array('Magento_Adminhtml::all');
+        $this->_model->setRoleId(1)->setResources($resources)->saveRel();
+        $expectedPermissions = ['Magento_Adminhtml::all'];
+        $this->_checkExistingPermissions($expectedPermissions);
+    }
 
-        $this->_model->setRoleId(1)
-            ->setResources($resources)
-            ->saveRel();
+    /**
+     * Ensure that only expected permissions are set.
+     */
+    protected function _checkExistingPermissions($expectedDefaultPermissions)
+    {
+        $adapter = $this->_model->getResource()->getReadConnection();
+        $ruleSelect = $adapter->select()->from($this->_model->getResource()->getMainTable());
 
         $rules = $ruleSelect->query()->fetchAll();
         $this->assertEquals(1, count($rules));
-        $this->assertEquals('Magento_Adminhtml::all', $rules[0]['resource_id']);
-        $this->assertEquals(1, $rules[0]['role_id']);
-        $this->assertEquals('allow', $rules[0]['permission']);
+        $actualPermissions = [];
+        foreach ($rules as $rule) {
+            $actualPermissions[] = $rule['resource_id'];
+            $this->assertEquals(
+                'allow',
+                $rule['permission'],
+                "Permission for '{$rule['resource_id']}' resource should be 'allow'"
+            );
+        }
+        $this->assertEquals($expectedDefaultPermissions, $actualPermissions, 'Default permissions are invalid');
     }
 }
-

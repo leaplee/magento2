@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Connect
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Downloader\Model;
 /**
  * Class session
  *
- * @category   Magento
- * @package    Magento_Connect
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Session extends \Magento\Downloader\Model
@@ -104,8 +100,12 @@ class Session extends \Magento\Downloader\Model
         }
 
         try {
-            if ( (isset($_POST['username']) && empty($_POST['username']))
-                || (isset($_POST['password']) && empty($_POST['password']))) {
+            if (isset(
+                $_POST['username']
+            ) && empty($_POST['username']) || isset(
+                $_POST['password']
+            ) && empty($_POST['password'])
+            ) {
                 $this->addMessage('error', 'Invalid user name or password');
             }
             if (empty($_POST['username']) || empty($_POST['password'])) {
@@ -121,11 +121,7 @@ class Session extends \Magento\Downloader\Model
             $this->addMessage('error', $e->getMessage());
         }
 
-        $this->controller()
-            ->redirect(
-                $this->controller()->url('loggedin'),
-                true
-        );
+        $this->controller()->redirect($this->controller()->url('loggedin'), true);
     }
 
     /**
@@ -139,8 +135,8 @@ class Session extends \Magento\Downloader\Model
         if ($user && !$user->getId()) {
             $this->addMessage('error', 'Invalid user name or password');
             $this->controller()->setAction('login');
-        } elseif ($this->getUserId() || ($user && $user->getId())) {
-            if (\Mage::getSingleton('Magento\AuthorizationInterface')->isAllowed('Magento_Adminhtml::all')) {
+        } elseif ($this->getUserId() || $user && $user->getId()) {
+            if (\Mage::getSingleton('Magento\Framework\AuthorizationInterface')->isAllowed('Magento_Adminhtml::all')) {
                 return true;
             } else {
                 $this->logout();

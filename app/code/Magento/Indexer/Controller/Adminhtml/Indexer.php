@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Index
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -55,14 +53,17 @@ class Indexer extends \Magento\Backend\App\Action
             try {
                 foreach ($indexerIds as $indexer_id) {
                     /** @var \Magento\Indexer\Model\IndexerInterface $model */
-                    $model = $this->_objectManager->create('Magento\Indexer\Model\IndexerInterface')
-                        ->load($indexer_id);
+                    $model = $this->_objectManager->create(
+                        'Magento\Indexer\Model\IndexerInterface'
+                    )->load(
+                        $indexer_id
+                    );
                     $model->setScheduled(false);
                 }
                 $this->messageManager->addSuccess(
                     __('A total of %1 indexer(s) have been turned Update on Save mode on.', count($indexerIds))
                 );
-            } catch (\Magento\Core\Exception $e) {
+            } catch (\Magento\Framework\Model\Exception $e) {
                 $this->messageManager->addError($e->getMessage());
             } catch (\Exception $e) {
                 $this->messageManager->addException(
@@ -88,14 +89,17 @@ class Indexer extends \Magento\Backend\App\Action
             try {
                 foreach ($indexerIds as $indexer_id) {
                     /** @var \Magento\Indexer\Model\IndexerInterface $model */
-                    $model = $this->_objectManager->create('Magento\Indexer\Model\IndexerInterface')
-                        ->load($indexer_id);
+                    $model = $this->_objectManager->create(
+                        'Magento\Indexer\Model\IndexerInterface'
+                    )->load(
+                        $indexer_id
+                    );
                     $model->setScheduled(true);
                 }
                 $this->messageManager->addSuccess(
                     __('A total of %1 indexer(s) have been turned Update by Schedule mode on.', count($indexerIds))
                 );
-            } catch (\Magento\Core\Exception $e) {
+            } catch (\Magento\Framework\Model\Exception $e) {
                 $this->messageManager->addError($e->getMessage());
             } catch (\Exception $e) {
                 $this->messageManager->addException(

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Backend\Block\Dashboard;
 /**
  * Adminhtml dashboard bar block
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Bar extends \Magento\Backend\Block\Dashboard\AbstractDashboard
@@ -47,7 +43,7 @@ class Bar extends \Magento\Backend\Block\Dashboard\AbstractDashboard
     /**
      * @return array
      */
-    protected function getTotals()
+    public function getTotals()
     {
         return $this->_totals;
     }
@@ -58,25 +54,21 @@ class Bar extends \Magento\Backend\Block\Dashboard\AbstractDashboard
      * @param bool $isQuantity
      * @return $this
      */
-    public function addTotal($label, $value, $isQuantity=false)
+    public function addTotal($label, $value, $isQuantity = false)
     {
         /*if (!$isQuantity) {
-            $value = $this->format($value);
-            $decimals = substr($value, -2);
-            $value = substr($value, 0, -2);
-        } else {
-            $value = ($value != '')?$value:0;
-            $decimals = '';
-        }*/
+          $value = $this->format($value);
+          $decimals = substr($value, -2);
+          $value = substr($value, 0, -2);
+          } else {
+          $value = ($value != '')?$value:0;
+          $decimals = '';
+          }*/
         if (!$isQuantity) {
             $value = $this->format($value);
         }
         $decimals = '';
-        $this->_totals[] = array(
-            'label' => $label,
-            'value' => $value,
-            'decimals' => $decimals,
-        );
+        $this->_totals[] = array('label' => $label, 'value' => $value, 'decimals' => $decimals);
 
         return $this;
     }
@@ -112,15 +104,17 @@ class Bar extends \Magento\Backend\Block\Dashboard\AbstractDashboard
     {
         if (is_null($this->_currentCurrencyCode)) {
             if ($this->getRequest()->getParam('store')) {
-                $this->_currentCurrencyCode = $this->_storeManager->getStore($this->getRequest()->getParam('store'))
-                    ->getBaseCurrency();
+                $this->_currentCurrencyCode = $this->_storeManager->getStore(
+                    $this->getRequest()->getParam('store')
+                )->getBaseCurrency();
             } elseif ($this->getRequest()->getParam('website')) {
-                $this->_currentCurrencyCode = $this->_storeManager->getWebsite($this->getRequest()->getParam('website'))
-                    ->getBaseCurrency();
+                $this->_currentCurrencyCode = $this->_storeManager->getWebsite(
+                    $this->getRequest()->getParam('website')
+                )->getBaseCurrency();
             } elseif ($this->getRequest()->getParam('group')) {
-                $this->_currentCurrencyCode =  $this->_storeManager->getGroup($this->getRequest()->getParam('group'))
-                    ->getWebsite()
-                    ->getBaseCurrency();
+                $this->_currentCurrencyCode = $this->_storeManager->getGroup(
+                    $this->getRequest()->getParam('group')
+                )->getWebsite()->getBaseCurrency();
             } else {
                 $this->_currentCurrencyCode = $this->_storeManager->getStore()->getBaseCurrency();
             }

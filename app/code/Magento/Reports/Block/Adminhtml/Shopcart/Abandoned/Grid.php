@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Reports
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -93,8 +91,8 @@ class Grid extends \Magento\Reports\Block\Adminhtml\Grid\Shopcart
      */
     protected function _addColumnFilterToCollection($column)
     {
-        $field = ( $column->getFilterIndex() ) ? $column->getFilterIndex() : $column->getIndex();
-        $skip = array('subtotal', 'customer_name', 'email'/*, 'created_at', 'updated_at'*/);
+        $field = $column->getFilterIndex() ? $column->getFilterIndex() : $column->getIndex();
+        $skip = array('subtotal', 'customer_name', 'email');
 
         if (in_array($field, $skip)) {
             return $this;
@@ -109,39 +107,51 @@ class Grid extends \Magento\Reports\Block\Adminhtml\Grid\Shopcart
      */
     protected function _prepareColumns()
     {
-        $this->addColumn('customer_name', array(
-            'header'    => __('Customer'),
-            'index'     => 'customer_name',
-            'sortable'  => false,
-            'header_css_class'  => 'col-name',
-            'column_css_class'  => 'col-name'
-        ));
+        $this->addColumn(
+            'customer_name',
+            array(
+                'header' => __('Customer'),
+                'index' => 'customer_name',
+                'sortable' => false,
+                'header_css_class' => 'col-name',
+                'column_css_class' => 'col-name'
+            )
+        );
 
-        $this->addColumn('email', array(
-            'header'    => __('Email'),
-            'index'     => 'email',
-            'sortable'  => false,
-            'header_css_class'  => 'col-email',
-            'column_css_class'  => 'col-email'
-        ));
+        $this->addColumn(
+            'email',
+            array(
+                'header' => __('Email'),
+                'index' => 'email',
+                'sortable' => false,
+                'header_css_class' => 'col-email',
+                'column_css_class' => 'col-email'
+            )
+        );
 
-        $this->addColumn('items_count', array(
-            'header'    => __('Products'),
-            'index'     => 'items_count',
-            'sortable'  => false,
-            'type'      => 'number',
-            'header_css_class'  => 'col-number',
-            'column_css_class'  => 'col-number'
-        ));
+        $this->addColumn(
+            'items_count',
+            array(
+                'header' => __('Products'),
+                'index' => 'items_count',
+                'sortable' => false,
+                'type' => 'number',
+                'header_css_class' => 'col-number',
+                'column_css_class' => 'col-number'
+            )
+        );
 
-        $this->addColumn('items_qty', array(
-            'header'    => __('Quantity'),
-            'index'     => 'items_qty',
-            'sortable'  => false,
-            'type'      => 'number',
-            'header_css_class'  => 'col-qty',
-            'column_css_class'  => 'col-qty'
-        ));
+        $this->addColumn(
+            'items_qty',
+            array(
+                'header' => __('Quantity'),
+                'index' => 'items_qty',
+                'sortable' => false,
+                'type' => 'number',
+                'header_css_class' => 'col-qty',
+                'column_css_class' => 'col-qty'
+            )
+        );
 
         if ($this->getRequest()->getParam('website')) {
             $storeIds = $this->_storeManager->getWebsite($this->getRequest()->getParam('website'))->getStoreIds();
@@ -155,53 +165,68 @@ class Grid extends \Magento\Reports\Block\Adminhtml\Grid\Shopcart
         $this->setStoreIds($storeIds);
         $currencyCode = $this->getCurrentCurrencyCode();
 
-        $this->addColumn('subtotal', array(
-            'header'        => __('Subtotal'),
-            'type'          => 'currency',
-            'currency_code' => $currencyCode,
-            'index'         => 'subtotal',
-            'sortable'      => false,
-            'renderer'      => 'Magento\Reports\Block\Adminhtml\Grid\Column\Renderer\Currency',
-            'rate'          => $this->getRate($currencyCode),
-            'header_css_class'  => 'col-subtotal',
-            'column_css_class'  => 'col-subtotal'
-        ));
+        $this->addColumn(
+            'subtotal',
+            array(
+                'header' => __('Subtotal'),
+                'type' => 'currency',
+                'currency_code' => $currencyCode,
+                'index' => 'subtotal',
+                'sortable' => false,
+                'renderer' => 'Magento\Reports\Block\Adminhtml\Grid\Column\Renderer\Currency',
+                'rate' => $this->getRate($currencyCode),
+                'header_css_class' => 'col-subtotal',
+                'column_css_class' => 'col-subtotal'
+            )
+        );
 
-        $this->addColumn('coupon_code', array(
-            'header'    => __('Applied Coupon'),
-            'index'     => 'coupon_code',
-            'sortable'  => false,
-            'header_css_class'  => 'col-coupon',
-            'column_css_class'  => 'col-coupon'
-        ));
+        $this->addColumn(
+            'coupon_code',
+            array(
+                'header' => __('Applied Coupon'),
+                'index' => 'coupon_code',
+                'sortable' => false,
+                'header_css_class' => 'col-coupon',
+                'column_css_class' => 'col-coupon'
+            )
+        );
 
-        $this->addColumn('created_at', array(
-            'header'    => __('Created'),
-            'type'      => 'datetime',
-            'index'     => 'created_at',
-            'filter_index'=> 'main_table.created_at',
-            'sortable'  => false,
-            'header_css_class'  => 'col-created',
-            'column_css_class'  => 'col-created'
-        ));
+        $this->addColumn(
+            'created_at',
+            array(
+                'header' => __('Created'),
+                'type' => 'datetime',
+                'index' => 'created_at',
+                'filter_index' => 'main_table.created_at',
+                'sortable' => false,
+                'header_css_class' => 'col-created',
+                'column_css_class' => 'col-created'
+            )
+        );
 
-        $this->addColumn('updated_at', array(
-            'header'    => __('Updated'),
-            'type'      => 'datetime',
-            'index'     => 'updated_at',
-            'filter_index'=> 'main_table.updated_at',
-            'sortable'  => false,
-            'header_css_class'  => 'col-updated',
-            'column_css_class'  => 'col-updated'
-        ));
+        $this->addColumn(
+            'updated_at',
+            array(
+                'header' => __('Updated'),
+                'type' => 'datetime',
+                'index' => 'updated_at',
+                'filter_index' => 'main_table.updated_at',
+                'sortable' => false,
+                'header_css_class' => 'col-updated',
+                'column_css_class' => 'col-updated'
+            )
+        );
 
-        $this->addColumn('remote_ip', array(
-            'header'    => __('IP Address'),
-            'index'     => 'remote_ip',
-            'sortable'  => false,
-            'header_css_class'  => 'col-ip',
-            'column_css_class'  => 'col-ip'
-        ));
+        $this->addColumn(
+            'remote_ip',
+            array(
+                'header' => __('IP Address'),
+                'index' => 'remote_ip',
+                'sortable' => false,
+                'header_css_class' => 'col-ip',
+                'column_css_class' => 'col-ip'
+            )
+        );
 
         $this->addExportType('*/*/exportAbandonedCsv', __('CSV'));
         $this->addExportType('*/*/exportAbandonedExcel', __('Excel XML'));
@@ -210,12 +235,12 @@ class Grid extends \Magento\Reports\Block\Adminhtml\Grid\Shopcart
     }
 
     /**
-     * @param \Magento\Object $row
+     * @param \Magento\Framework\Object $row
      *
      * @return string
      */
     public function getRowUrl($row)
     {
-        return $this->getUrl('customer/index/edit', array('id'=>$row->getCustomerId(), 'active_tab'=>'cart'));
+        return $this->getUrl('customer/index/edit', array('id' => $row->getCustomerId(), 'active_tab' => 'cart'));
     }
 }

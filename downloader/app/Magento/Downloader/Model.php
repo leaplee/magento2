@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Connect
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Downloader;
 /**
  * Class Model
  *
- * @category   Magento
- * @package    Magento_Connect
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Model
@@ -62,7 +58,6 @@ class Model
      */
     protected function _construct()
     {
-
     }
 
     /**
@@ -76,12 +71,12 @@ class Model
     }
 
     /**
-    * Set value for key
-    *
-    * @param string $key
-    * @param mixed $value
-    * @return \Magento\Downloader\Model
-    */
+     * Set value for key
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return \Magento\Downloader\Model
+     */
     public function set($key, $value)
     {
         $this->_data[$key] = $value;
@@ -89,11 +84,11 @@ class Model
     }
 
     /**
-    * Get value by key
-    *
-    * @param string $key
-    * @return mixed
-    */
+     * Get value by key
+     *
+     * @param string $key
+     * @return mixed
+     */
     public function get($key)
     {
         return isset($this->_data[$key]) ? $this->_data[$key] : null;

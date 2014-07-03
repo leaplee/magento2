@@ -18,14 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Newsletter
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Newsletter\Block\Adminhtml\Queue;
 
-use Magento\View\Element\AbstractBlock;
+use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Newsletter\Model\Queue as ModelQueue;
 
 /**
@@ -41,7 +39,7 @@ class Edit extends \Magento\Backend\Block\Template
     /**
      * Core registry
      *
-     * @var \Magento\Registry
+     * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
 
@@ -53,13 +51,13 @@ class Edit extends \Magento\Backend\Block\Template
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Cms\Model\Wysiwyg\Config $wysiwygConfig
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Registry $registry
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Cms\Model\Wysiwyg\Config $wysiwygConfig,
-        \Magento\Registry $registry,
+        \Magento\Framework\Registry $registry,
         array $data = array()
     ) {
         $this->_coreRegistry = $registry;
@@ -94,10 +92,11 @@ class Edit extends \Magento\Backend\Block\Template
      *
      * @return AbstractBlock
      */
-    protected  function _beforeToHtml()
+    protected function _beforeToHtml()
     {
-        $this->setChild('form',
-            $this->getLayout()->createBlock('Magento\Newsletter\Block\Adminhtml\Queue\Edit\Form','form')
+        $this->setChild(
+            'form',
+            $this->getLayout()->createBlock('Magento\Newsletter\Block\Adminhtml\Queue\Edit\Form', 'form')
         );
         return parent::_beforeToHtml();
     }
@@ -129,51 +128,59 @@ class Edit extends \Magento\Backend\Block\Template
             $this->getLayout()->getBlock('head')->setCanLoadTinyMce(true);
         }
 
-        $this->addChild('preview_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Preview Template'),
-            'onclick'   => 'queueControl.preview();',
-            'class'     => 'preview'
-        ));
+        $this->getToolbar()->addChild(
+            'back_button',
+            'Magento\Backend\Block\Widget\Button',
+            array(
+                'label' => __('Back'),
+                'onclick' => "window.location.href = '" . $this->getUrl(
+                    $this->getTemplateId() ? '*/template' : '*/*'
+                ) . "'",
+                'class' => 'action-back'
+            )
+        );
 
-        $this->addChild('save_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Save Newsletter'),
-            'class'     => 'save primary',
-            'data_attribute'  => array(
-                'mage-init' => array(
-                    'button' => array('event' => 'save', 'target' => '#queue_edit_form'),
-                ),
-            ),
-        ));
+        $this->getToolbar()->addChild(
+            'reset_button',
+            'Magento\Backend\Block\Widget\Button',
+            array('label' => __('Reset'), 'class' => 'reset', 'onclick' => 'window.location = window.location')
+        );
 
-        $this->addChild('save_and_resume', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Save and Resume'),
-            'class'     => 'save',
-            'data_attribute' => array(
-                'mage-init' => array(
-                    'button' => array(
-                        'event' => 'save',
-                        'target' => '#queue_edit_form',
-                        'eventData' => array(
-                            'action' => array(
-                                'args' => array('_resume' => 1),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ));
+        $this->getToolbar()->addChild(
+            'preview_button',
+            'Magento\Backend\Block\Widget\Button',
+            array('label' => __('Preview Template'), 'onclick' => 'queueControl.preview();', 'class' => 'preview')
+        );
 
-        $this->addChild('reset_button', 'Magento\Backend\Block\Widget\Button', array(
-            'label'     => __('Reset'),
-            'onclick'   => 'window.location = window.location'
-        ));
+        $this->getToolbar()->addChild(
+            'save_button',
+            'Magento\Backend\Block\Widget\Button',
+            array(
+                'label' => __('Save Newsletter'),
+                'class' => 'save primary',
+                'data_attribute' => array(
+                    'mage-init' => array('button' => array('event' => 'save', 'target' => '#queue_edit_form'))
+                )
+            )
+        );
 
-        $this->addChild('back_button','Magento\Backend\Block\Widget\Button', array(
-            'label'   => __('Back'),
-            'onclick' => "window.location.href = '" . $this->getUrl((
-                $this->getTemplateId() ? '*/template' : '*/*')) . "'",
-            'class'   => 'action-back'
-        ));
+        $this->getToolbar()->addChild(
+            'save_and_resume',
+            'Magento\Backend\Block\Widget\Button',
+            array(
+                'label' => __('Save and Resume'),
+                'class' => 'save',
+                'data_attribute' => array(
+                    'mage-init' => array(
+                        'button' => array(
+                            'event' => 'save',
+                            'target' => '#queue_edit_form',
+                            'eventData' => array('action' => array('args' => array('_resume' => 1)))
+                        )
+                    )
+                )
+            )
+        );
 
         return parent::_prepareLayout();
     }
@@ -245,10 +252,10 @@ class Edit extends \Magento\Backend\Block\Template
      */
     public function getIsPreview()
     {
-        return !in_array($this->getQueue()->getQueueStatus(), array(
-            ModelQueue::STATUS_NEVER,
-            ModelQueue::STATUS_PAUSE
-        ));
+        return !in_array(
+            $this->getQueue()->getQueueStatus(),
+            array(ModelQueue::STATUS_NEVER, ModelQueue::STATUS_PAUSE)
+        );
     }
 
     /**
@@ -288,9 +295,7 @@ class Edit extends \Magento\Backend\Block\Template
      */
     public function getCanResume()
     {
-        return in_array($this->getQueue()->getQueueStatus(), array(
-            ModelQueue::STATUS_PAUSE
-        ));
+        return in_array($this->getQueue()->getQueueStatus(), array(ModelQueue::STATUS_PAUSE));
     }
 
     /**
@@ -300,6 +305,6 @@ class Edit extends \Magento\Backend\Block\Template
      */
     public function getHeaderText()
     {
-        return ( $this->getIsPreview() ? __('View Newsletter') : __('Edit Newsletter'));
+        return $this->getIsPreview() ? __('View Newsletter') : __('Edit Newsletter');
     }
 }

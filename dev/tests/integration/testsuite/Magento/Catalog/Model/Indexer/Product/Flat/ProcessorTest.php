@@ -18,18 +18,13 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Indexer\Product\Flat;
 
 /**
  * Class FullTest
- * @package Magento\Catalog\Model\Product\Flat\Action
  */
 class ProcessorTest extends \Magento\TestFramework\Indexer\TestCase
 {
@@ -45,10 +40,12 @@ class ProcessorTest extends \Magento\TestFramework\Indexer\TestCase
 
     protected function setUp()
     {
-        $this->_state = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->get('Magento\Catalog\Model\Indexer\Product\Flat\State');
-        $this->_processor = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->get('Magento\Catalog\Model\Indexer\Product\Flat\Processor');
+        $this->_state = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Catalog\Model\Indexer\Product\Flat\State'
+        );
+        $this->_processor = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Catalog\Model\Indexer\Product\Flat\Processor'
+        );
     }
 
     /**
@@ -73,8 +70,9 @@ class ProcessorTest extends \Magento\TestFramework\Indexer\TestCase
     public function testSaveAttribute()
     {
         /** @var $product \Magento\Catalog\Model\Product */
-        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Product');
+        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Catalog\Model\Product'
+        );
 
         /** @var \Magento\Catalog\Model\Resource\Product $productResource */
         $productResource = $product->getResource();
@@ -93,8 +91,9 @@ class ProcessorTest extends \Magento\TestFramework\Indexer\TestCase
     public function testDeleteAttribute()
     {
         /** @var $product \Magento\Catalog\Model\Product */
-        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Product');
+        $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Catalog\Model\Product'
+        );
 
         /** @var \Magento\Catalog\Model\Resource\Product $productResource */
         $productResource = $product->getResource();
@@ -123,15 +122,11 @@ class ProcessorTest extends \Magento\TestFramework\Indexer\TestCase
      */
     public function testAddNewStoreGroup()
     {
-        /** @var \Magento\Core\Model\Store\Group $storeGroup */
-        $storeGroup = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Core\Model\Store\Group');
-        $storeGroup->setData(array(
-            'website_id' => 1,
-            'name' => 'New Store Group',
-            'root_category_id' => 2,
-            'group_id' => null,
-        ));
+        /** @var \Magento\Store\Model\Group $storeGroup */
+        $storeGroup = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create('Magento\Store\Model\Group');
+        $storeGroup->setData(
+            array('website_id' => 1, 'name' => 'New Store Group', 'root_category_id' => 2, 'group_id' => null)
+        );
         $storeGroup->save();
         $this->assertTrue($this->_processor->getIndexer()->isInvalid());
     }

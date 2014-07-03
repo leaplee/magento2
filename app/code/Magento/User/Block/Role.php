@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_User
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\User\Block;
 /**
  * Magento_User role block
  *
- * @category   Magento
- * @package    Magento_User
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Role extends \Magento\Backend\Block\Widget\Grid\Container
@@ -74,8 +70,10 @@ class Role extends \Magento\Backend\Block\Widget\Grid\Container
                 'grid',
                 $this->getLayout()->createBlock(
                     $this->_blockGroup . '\\Block\\Role\\Grid',
-                    $this->_controller . '.grid')
-                    ->setSaveParametersInSession(true)
+                    $this->_controller . '.grid'
+                )->setSaveParametersInSession(
+                    true
+                )
             );
         }
         return \Magento\Backend\Block\Widget\Container::_prepareLayout();

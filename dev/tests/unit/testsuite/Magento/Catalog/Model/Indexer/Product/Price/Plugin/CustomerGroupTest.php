@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
- * @subpackage  unit_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Indexer\Product\Price\Plugin;
 
 class CustomerGroupTest extends \PHPUnit_Framework_TestCase
@@ -40,7 +36,7 @@ class CustomerGroupTest extends \PHPUnit_Framework_TestCase
     protected $_model;
 
     /**
-     * @var \Magento\Customer\Model\Resource\Group|\PHPUnit_Framework_MockObject_MockObject
+     * @var \Magento\Customer\Service\V1\CustomerGroupServiceInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $_subjectMock;
 
@@ -49,11 +45,15 @@ class CustomerGroupTest extends \PHPUnit_Framework_TestCase
         $this->_objectManager = new \Magento\TestFramework\Helper\ObjectManager($this);
 
         $this->_subjectMock = $this->getMock(
-            'Magento\Customer\Model\Resource\Group', array(), array(), '', false
+            '\Magento\Customer\Service\V1\CustomerGroupServiceInterface', array(), array(), '', false
         );
 
         $indexerMock = $this->getMock(
-            'Magento\Indexer\Model\Indexer', array('getId', 'invalidate'), array(), '', false
+            'Magento\Indexer\Model\Indexer',
+            array('getId', 'invalidate'),
+            array(),
+            '',
+            false
         );
         $indexerMock->expects($this->any())->method('getId')->will($this->returnValue(1));
         $indexerMock->expects($this->once())->method('invalidate');
@@ -66,11 +66,11 @@ class CustomerGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testAroundDelete()
     {
-        $this->assertEquals('return_value', $this->_model->afterDelete($this->_subjectMock, 'return_value'));
+        $this->assertEquals('return_value', $this->_model->afterDeleteGroup($this->_subjectMock, 'return_value'));
     }
 
     public function testAroundSave()
     {
-        $this->assertEquals('return_value', $this->_model->afterSave($this->_subjectMock, 'return_value'));
+        $this->assertEquals('return_value', $this->_model->afterSaveGroup($this->_subjectMock, 'return_value'));
     }
 }

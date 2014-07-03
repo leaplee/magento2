@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Reports
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -80,11 +78,14 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
             $storeId = '';
         }
 
-        $collection = $this->_downloadsFactory->create()
-            ->addAttributeToSelect('*')
-            ->setStoreId($storeId)
-            ->addAttributeToFilter('type_id', array(\Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE))
-            ->addSummary();
+        $collection = $this->_downloadsFactory->create()->addAttributeToSelect(
+            '*'
+        )->setStoreId(
+            $storeId
+        )->addAttributeToFilter(
+            'type_id',
+            array(\Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE)
+        )->addSummary();
 
         if ($storeId) {
             $collection->addStoreFilter($storeId);
@@ -99,49 +100,64 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
      */
     protected function _prepareColumns()
     {
-        $this->addColumn('name', array(
-            'header'    => __('Product'),
-            'index'     => 'name',
-            'header_css_class'  => 'col-product',
-            'column_css_class'  => 'col-product'
-        ));
+        $this->addColumn(
+            'name',
+            array(
+                'header' => __('Product'),
+                'index' => 'name',
+                'header_css_class' => 'col-product',
+                'column_css_class' => 'col-product'
+            )
+        );
 
-        $this->addColumn('link_title', array(
-            'header'    => __('Link'),
-            'index'     => 'link_title',
-            'header_css_class'  => 'col-link',
-            'column_css_class'  => 'col-link'
-        ));
+        $this->addColumn(
+            'link_title',
+            array(
+                'header' => __('Link'),
+                'index' => 'link_title',
+                'header_css_class' => 'col-link',
+                'column_css_class' => 'col-link'
+            )
+        );
 
-        $this->addColumn('sku', array(
-            'header'    =>__('SKU'),
-            'index'     =>'sku',
-            'header_css_class'  => 'col-sku',
-            'column_css_class'  => 'col-sku'
-        ));
+        $this->addColumn(
+            'sku',
+            array(
+                'header' => __('SKU'),
+                'index' => 'sku',
+                'header_css_class' => 'col-sku',
+                'column_css_class' => 'col-sku'
+            )
+        );
 
-        $this->addColumn('purchases', array(
-            'header'    => __('Purchases'),
-            'width'     => '215px',
-            'align'     => 'right',
-            'filter'    => false,
-            'index'     => 'purchases',
-            'type'      => 'number',
-            'renderer'  => 'Magento\Reports\Block\Adminhtml\Product\Downloads\Renderer\Purchases',
-            'header_css_class'  => 'col-purchases',
-            'column_css_class'  => 'col-purchases'
-        ));
+        $this->addColumn(
+            'purchases',
+            array(
+                'header' => __('Purchases'),
+                'width' => '215px',
+                'align' => 'right',
+                'filter' => false,
+                'index' => 'purchases',
+                'type' => 'number',
+                'renderer' => 'Magento\Reports\Block\Adminhtml\Product\Downloads\Renderer\Purchases',
+                'header_css_class' => 'col-purchases',
+                'column_css_class' => 'col-purchases'
+            )
+        );
 
-        $this->addColumn('downloads', array(
-            'header'    => __('Downloads'),
-            'width'     => '215px',
-            'align'     => 'right',
-            'filter'    => false,
-            'index'     => 'downloads',
-            'type'      => 'number',
-            'header_css_class'  => 'col-qty',
-            'column_css_class'  => 'col-qty'
-        ));
+        $this->addColumn(
+            'downloads',
+            array(
+                'header' => __('Downloads'),
+                'width' => '215px',
+                'align' => 'right',
+                'filter' => false,
+                'index' => 'downloads',
+                'type' => 'number',
+                'header_css_class' => 'col-qty',
+                'column_css_class' => 'col-qty'
+            )
+        );
 
         $this->addExportType('*/*/exportDownloadsCsv', __('CSV'));
         $this->addExportType('*/*/exportDownloadsExcel', __('Excel XML'));

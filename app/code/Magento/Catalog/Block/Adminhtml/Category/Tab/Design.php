@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Adminhtml
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -58,11 +56,11 @@ class Design extends \Magento\Catalog\Block\Adminhtml\Form
     public function _prepareLayout()
     {
         parent::_prepareLayout();
-        /** @var \Magento\Data\Form $form */
+        /** @var \Magento\Framework\Data\Form $form */
         $form = $this->_formFactory->create();
         $form->setDataObject($this->getCategory());
 
-        $fieldset = $form->addFieldset('base_fieldset', array('legend'=>__('Custom Design')));
+        $fieldset = $form->addFieldset('base_fieldset', array('legend' => __('Custom Design')));
 
 
         $this->_setFieldset($this->getCategory()->getDesignAttributes(), $fieldset);
@@ -71,5 +69,4 @@ class Design extends \Magento\Catalog\Block\Adminhtml\Form
         $form->setFieldNameSuffix('general');
         $this->setForm($form);
     }
-
 }

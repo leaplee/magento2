@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Backend\Block;
 /**
  * Base widget class
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author     Magento Core Team <core@magentocommerce.com>
  *
  * @SuppressWarnings(PHPMD.NumberOfChildren)
@@ -86,7 +82,7 @@ class Widget extends \Magento\Backend\Block\Template
      * @param string|null $link
      * @return void
      */
-    protected function _addBreadcrumb($label, $title=null, $link=null)
+    protected function _addBreadcrumb($label, $title = null, $link = null)
     {
         $this->getLayout()->getBlock('breadcrumbs')->addLink($label, $title, $link);
     }
@@ -103,16 +99,13 @@ class Widget extends \Magento\Backend\Block\Template
      */
     public function getButtonHtml($label, $onclick, $class = '', $buttonId = null, $dataAttr = array())
     {
-        return $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')
-            ->setData(array(
-                'label'     => $label,
-                'onclick'   => $onclick,
-                'class'     => $class,
-                'type'      => 'button',
-                'id'        => $buttonId,
-            ))
-            ->setDataAttribute($dataAttr)
-            ->toHtml();
+        return $this->getLayout()->createBlock(
+            'Magento\Backend\Block\Widget\Button'
+        )->setData(
+            array('label' => $label, 'onclick' => $onclick, 'class' => $class, 'type' => 'button', 'id' => $buttonId)
+        )->setDataAttribute(
+            $dataAttr
+        )->toHtml();
     }
 
     /**
@@ -120,10 +113,12 @@ class Widget extends \Magento\Backend\Block\Template
      */
     public function getGlobalIcon()
     {
-        return '<img src="' . $this->getViewFileUrl('images/fam_link.gif')
-            . '" alt="' . __('Global Attribute')
-            . '" title="' . __('This attribute shares the same value in all stores.')
-            . '" class="attribute-global"/>';
+        return '<img src="' . $this->getViewFileUrl(
+            'images/fam_link.gif'
+        ) . '" alt="' . __(
+            'Global Attribute'
+        ) . '" title="' . __(
+            'This attribute shares the same value in all stores.'
+        ) . '" class="attribute-global"/>';
     }
 }
-

@@ -18,20 +18,16 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Eav
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Eav\Model\Attribute\Data;
 
-use Magento\App\RequestInterface;
+use Magento\Framework\App\RequestInterface;
 
 /**
  * EAV Entity Attribute Multiply line Data Model
  *
- * @category    Magento
- * @package     Magento_Eav
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Multiline extends \Magento\Eav\Model\Attribute\Data\Text
@@ -62,8 +58,8 @@ class Multiline extends \Magento\Eav\Model\Attribute\Data\Text
      */
     public function validateValue($value)
     {
-        $errors     = array();
-        $attribute  = $this->getAttribute();
+        $errors = array();
+        $attribute = $this->getAttribute();
 
         if ($value === false) {
             // try to load original value and validate it
@@ -76,7 +72,7 @@ class Multiline extends \Magento\Eav\Model\Attribute\Data\Text
         if (!is_array($value)) {
             $value = array($value);
         }
-        for ($i = 0; $i < $attribute->getMultilineCount(); $i ++) {
+        for ($i = 0; $i < $attribute->getMultilineCount(); $i++) {
             if (!isset($value[$i])) {
                 $value[$i] = null;
             }

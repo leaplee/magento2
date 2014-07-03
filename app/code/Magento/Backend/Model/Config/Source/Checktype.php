@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,13 +26,11 @@
 /**
  * Send to a Friend Limit sending by Source
  *
- * @category    Magento
- * @package     Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Backend\Model\Config\Source;
 
-class Checktype implements \Magento\Option\ArrayInterface
+class Checktype implements \Magento\Framework\Option\ArrayInterface
 {
     /**
      * Retrieve Check Type Option array
@@ -44,14 +40,8 @@ class Checktype implements \Magento\Option\ArrayInterface
     public function toOptionArray()
     {
         return array(
-            array(
-                'value' => \Magento\Sendfriend\Helper\Data::CHECK_IP,
-                'label' => __('IP Address')
-            ),
-            array(
-                'value' => \Magento\Sendfriend\Helper\Data::CHECK_COOKIE,
-                'label' => __('Cookie (unsafe)')
-            ),
+            array('value' => \Magento\Sendfriend\Helper\Data::CHECK_IP, 'label' => __('IP Address')),
+            array('value' => \Magento\Sendfriend\Helper\Data::CHECK_COOKIE, 'label' => __('Cookie (unsafe)'))
         );
     }
 }

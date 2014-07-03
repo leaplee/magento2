@@ -18,16 +18,13 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Core
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
-$cmsPageId     = 1;
-$rewriteUrl    = 'test_rewrite_path';
+$cmsPageId = 1;
+$rewriteUrl = 'test_rewrite_path';
 
 // get CMS page
 /** @var $cmsPage \Magento\Cms\Model\Page */
@@ -39,9 +36,12 @@ if ($cmsPage->isObjectNew()) {
 }
 
 // create URL rewrite
-/** @var $rewrite \Magento\Core\Model\Url\Rewrite */
-$rewrite = $objectManager->create('Magento\Core\Model\Url\Rewrite');
-$rewrite->setIdPath('cms_page/' . $cmsPage->getId())
-    ->setRequestPath($rewriteUrl)
-    ->setTargetPath('cms/page/view/page_id/' . $cmsPage->getId())
-    ->save();
+/** @var $rewrite \Magento\UrlRewrite\Model\UrlRewrite */
+$rewrite = $objectManager->create('Magento\UrlRewrite\Model\UrlRewrite');
+$rewrite->setIdPath(
+    'cms_page/' . $cmsPage->getId()
+)->setRequestPath(
+    $rewriteUrl
+)->setTargetPath(
+    'cms/page/view/page_id/' . $cmsPage->getId()
+)->save();

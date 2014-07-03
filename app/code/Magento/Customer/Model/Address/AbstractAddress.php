@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Customer
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -39,12 +37,13 @@ namespace Magento\Customer\Model\Address;
  * @method string getPostcode()
  * @method bool getShouldIgnoreValidation()
  */
-class AbstractAddress extends \Magento\Core\Model\AbstractModel
+class AbstractAddress extends \Magento\Framework\Model\AbstractModel
 {
     /**
      * Possible customer address types
      */
-    const TYPE_BILLING  = 'billing';
+    const TYPE_BILLING = 'billing';
+
     const TYPE_SHIPPING = 'shipping';
 
     /**
@@ -66,14 +65,14 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
      *
      * @var \Magento\Directory\Model\Country[]
      */
-    static protected $_countryModels = array();
+    protected static $_countryModels = array();
 
     /**
      * Directory region models
      *
      * @var \Magento\Directory\Model\Region[]
      */
-    static protected $_regionModels = array();
+    protected static $_regionModels = array();
 
     /**
      * Directory data
@@ -103,27 +102,27 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
     protected $_countryFactory;
 
     /**
-     * @param \Magento\Model\Context $context
-     * @param \Magento\Registry $registry
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
      * @param \Magento\Directory\Helper\Data $directoryData
      * @param \Magento\Eav\Model\Config $eavConfig
      * @param Config $addressConfig
      * @param \Magento\Directory\Model\RegionFactory $regionFactory
      * @param \Magento\Directory\Model\CountryFactory $countryFactory
-     * @param \Magento\Core\Model\Resource\AbstractResource $resource
-     * @param \Magento\Data\Collection\Db $resourceCollection
+     * @param \Magento\Framework\Model\Resource\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\Db $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Magento\Model\Context $context,
-        \Magento\Registry $registry,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
         \Magento\Directory\Helper\Data $directoryData,
         \Magento\Eav\Model\Config $eavConfig,
         Config $addressConfig,
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Directory\Model\CountryFactory $countryFactory,
-        \Magento\Core\Model\Resource\AbstractResource $resource = null,
-        \Magento\Data\Collection\Db $resourceCollection = null,
+        \Magento\Framework\Model\Resource\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\Db $resourceCollection = null,
         array $data = array()
     ) {
         $this->_directoryData = $directoryData;
@@ -143,16 +142,17 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
     public function getName()
     {
         $name = '';
-        $config = $this->_eavConfig;
-        if ($config->getAttribute('customer_address', 'prefix')->getIsVisible() && $this->getPrefix()) {
+        if ($this->_eavConfig->getAttribute('customer_address', 'prefix')->getIsVisible() && $this->getPrefix()) {
             $name .= $this->getPrefix() . ' ';
         }
         $name .= $this->getFirstname();
-        if ($config->getAttribute('customer_address', 'middlename')->getIsVisible() && $this->getMiddlename()) {
+        if ($this->_eavConfig->getAttribute('customer_address', 'middlename')->getIsVisible()
+            && $this->getMiddlename()
+        ) {
             $name .= ' ' . $this->getMiddlename();
         }
-        $name .=  ' ' . $this->getLastname();
-        if ($config->getAttribute('customer_address', 'suffix')->getIsVisible() && $this->getSuffix()) {
+        $name .= ' ' . $this->getLastname();
+        if ($this->_eavConfig->getAttribute('customer_address', 'suffix')->getIsVisible() && $this->getSuffix()) {
             $name .= ' ' . $this->getSuffix();
         }
         return $name;
@@ -171,7 +171,7 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
         $lines = explode("\n", $this->getStreetFull());
         if (0 === $line || $line === null) {
             return $lines;
-        } else if (isset($lines[$line - 1])) {
+        } elseif (isset($lines[$line - 1])) {
             return $lines[$line - 1];
         } else {
             return '';
@@ -248,13 +248,13 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
      *
      * @param array|string $key
      * @param null $value
-     * @return \Magento\Object
+     * @return \Magento\Framework\Object
      */
     public function setData($key, $value = null)
     {
         if (is_array($key)) {
             $key = $this->_implodeStreetField($key);
-        } else if ($key == 'street') {
+        } elseif ($key == 'street') {
             $value = $this->_implodeStreetValue($value);
         }
         return parent::setData($key, $value);
@@ -299,7 +299,7 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
     {
         $streetLines = $this->getStreet();
         foreach ($streetLines as $i => $line) {
-            $this->setData('street' . ($i+1), $line);
+            $this->setData('street' . ($i + 1), $line);
         }
         return $this;
     }
@@ -312,26 +312,19 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
     public function getRegion()
     {
         $regionId = $this->getData('region_id');
-        $region   = $this->getData('region');
+        $region = $this->getData('region');
 
-        if ($regionId) {
-            if ($this->getRegionModel($regionId)->getCountryId() == $this->getCountryId()) {
-                $region = $this->getRegionModel($regionId)->getName();
-                $this->setData('region', $region);
-            }
-        }
-
-        if (!empty($region) && is_string($region)) {
-            $this->setData('region', $region);
-        } elseif (!$regionId && is_numeric($region)) {
+        if (!$regionId && is_numeric($region)) {
             if ($this->getRegionModel($region)->getCountryId() == $this->getCountryId()) {
                 $this->setData('region', $this->getRegionModel($region)->getName());
                 $this->setData('region_id', $region);
             }
-        } elseif ($regionId && !$region) {
+        } elseif ($regionId) {
             if ($this->getRegionModel($regionId)->getCountryId() == $this->getCountryId()) {
                 $this->setData('region', $this->getRegionModel($regionId)->getName());
             }
+        } elseif (is_string($region)) {
+            $this->setData('region', $region);
         }
 
         return $this->getData('region');
@@ -345,7 +338,7 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
     public function getRegionCode()
     {
         $regionId = $this->getData('region_id');
-        $region   = $this->getData('region');
+        $region = $this->getData('region');
 
         if (!$regionId && is_numeric($region)) {
             if ($this->getRegionModel($region)->getCountryId() == $this->getCountryId()) {
@@ -367,15 +360,17 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
     public function getRegionId()
     {
         $regionId = $this->getData('region_id');
-        $region   = $this->getData('region');
+        $region = $this->getData('region');
         if (!$regionId) {
             if (is_numeric($region)) {
                 $this->setData('region_id', $region);
                 //@TODO method unsRegion() is neither defined in abstract model nor in it's children
                 $this->unsRegion();
             } else {
-                $regionModel = $this->_createRegionInstance()
-                    ->loadByCode($this->getRegionCode(), $this->getCountryId());
+                $regionModel = $this->_createRegionInstance()->loadByCode(
+                    $this->getRegionCode(),
+                    $this->getCountryId()
+                );
                 $this->setData('region_id', $regionModel->getId());
             }
         }
@@ -442,8 +437,7 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
      */
     public function format($type)
     {
-        if (!($formatType = $this->getConfig()->getFormatByCode($type))
-            || !$formatType->getRenderer()) {
+        if (!($formatType = $this->getConfig()->getFormatByCode($type)) || !$formatType->getRenderer()) {
             return null;
         }
         $this->_eventManager->dispatch('customer_address_format', array('type' => $formatType, 'address' => $this));
@@ -499,8 +493,13 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
         }
 
         $_havingOptionalZip = $this->_directoryData->getCountriesWithOptionalZip();
-        if (!in_array($this->getCountryId(), $_havingOptionalZip)
-            && !\Zend_Validate::is($this->getPostcode(), 'NotEmpty')
+        if (!in_array(
+            $this->getCountryId(),
+            $_havingOptionalZip
+        ) && !\Zend_Validate::is(
+            $this->getPostcode(),
+            'NotEmpty'
+        )
         ) {
             $errors[] = __('Please enter the zip/postal code.');
         }
@@ -509,9 +508,12 @@ class AbstractAddress extends \Magento\Core\Model\AbstractModel
             $errors[] = __('Please enter the country.');
         }
 
-        if ($this->getCountryModel()->getRegionCollection()->getSize()
-               && !\Zend_Validate::is($this->getRegionId(), 'NotEmpty')
-               && $this->_directoryData->isRegionRequired($this->getCountryId())
+        if ($this->getCountryModel()->getRegionCollection()->getSize() && !\Zend_Validate::is(
+            $this->getRegionId(),
+            'NotEmpty'
+        ) && $this->_directoryData->isRegionRequired(
+            $this->getCountryId()
+        )
         ) {
             $errors[] = __('Please enter the state/province.');
         }

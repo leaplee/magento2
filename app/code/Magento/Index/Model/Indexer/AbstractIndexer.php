@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Index
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -33,8 +31,7 @@ namespace Magento\Index\Model\Indexer;
 use Magento\Index\Model\Event;
 use Magento\Index\Model\IndexerInterface;
 
-abstract class AbstractIndexer extends \Magento\Core\Model\AbstractModel
-    implements IndexerInterface
+abstract class AbstractIndexer extends \Magento\Framework\Model\AbstractModel implements IndexerInterface
 {
     /**
      * @var array
@@ -118,7 +115,7 @@ abstract class AbstractIndexer extends \Magento\Core\Model\AbstractModel
     public function matchEvent(Event $event)
     {
         $entity = $event->getEntity();
-        $type   = $event->getType();
+        $type = $event->getType();
         return $this->matchEntityAndType($entity, $type);
     }
 
@@ -150,7 +147,7 @@ abstract class AbstractIndexer extends \Magento\Core\Model\AbstractModel
     }
 
     /**
-     * Try dynamicly detect and call event hanler from resource model.
+     * Try dynamicly detect and call event handler from resource model.
      * Handler name will be generated from event entity and type code
      *
      * @param   Event $event
@@ -167,7 +164,7 @@ abstract class AbstractIndexer extends \Magento\Core\Model\AbstractModel
 
         $resourceModel = $this->_getResource();
         if (method_exists($resourceModel, $method)) {
-            $resourceModel->$method($event);
+            $resourceModel->{$method}($event);
         }
         return $this;
     }

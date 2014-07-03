@@ -20,8 +20,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_AdminNotification
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -32,7 +30,7 @@ class Window extends \Magento\Backend\Block\Template
     /**
      * XML path of Severity icons url
      */
-    const XML_SEVERITY_ICONS_URL_PATH  = 'system/adminnotification/severity_icons_url';
+    const XML_SEVERITY_ICONS_URL_PATH = 'system/adminnotification/severity_icons_url';
 
     /**
      * Severity icons url

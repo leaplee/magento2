@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
- * @subpackage  unit_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Model\Resource\Product\Option;
 
 class ValueStub extends \Magento\Catalog\Model\Resource\Product\Option\Value
@@ -34,20 +30,15 @@ class ValueStub extends \Magento\Catalog\Model\Resource\Product\Option\Value
      */
     public function __construct()
     {
-        $this->_connections = array(
-            'read' =>
-            new MysqlStub(),
-            'write' =>
-            new MysqlStub(),
-        );
+        $this->_connections = array('read' => new MysqlStub(), 'write' => new MysqlStub());
     }
 
     /**
      * Save option value price data
      *
-     * @param \Magento\Core\Model\AbstractModel $object
+     * @param \Magento\Framework\Model\AbstractModel $object
      */
-    public function saveValueTitles(\Magento\Core\Model\AbstractModel $object)
+    public function saveValueTitles(\Magento\Framework\Model\AbstractModel $object)
     {
         $this->_saveValueTitles($object);
     }

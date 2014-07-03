@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Catalog
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Catalog\Helper;
 
 class ImageTest extends \PHPUnit_Framework_TestCase
@@ -48,9 +44,12 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     {
         $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         $config = $objectManager->get('Magento\Catalog\Model\Product\Media\Config');
-        /** @var \Magento\Filesystem\Directory\WriteInterface $mediaDirectory */
-        $mediaDirectory = $objectManager->get('Magento\App\Filesystem')
-            ->getDirectoryWrite(\Magento\App\Filesystem::MEDIA_DIR);
+        /** @var \Magento\Framework\Filesystem\Directory\WriteInterface $mediaDirectory */
+        $mediaDirectory = $objectManager->get(
+            'Magento\Framework\App\Filesystem'
+        )->getDirectoryWrite(
+            \Magento\Framework\App\Filesystem::MEDIA_DIR
+        );
 
         // image fixtures
         $fixtureMediaDir = $mediaDirectory->getAbsolutePath($config->getBaseMediaPath());
@@ -63,27 +62,28 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
         // watermark fixture
         mkdir(
-            $fixtureMediaDir . '/watermark/stores/' . $objectManager
-                ->get('Magento\Core\Model\StoreManagerInterface')->getStore()->getId(),
+            $fixtureMediaDir . '/watermark/stores/' . $objectManager->get(
+                'Magento\Store\Model\StoreManagerInterface'
+            )->getStore()->getId(),
             0777,
             true
         );
         copy(
             "{$fixtureDir}/watermark.jpg",
-            $fixtureMediaDir . '/watermark/stores/' . $objectManager
-                ->get('Magento\Core\Model\StoreManagerInterface')->getStore()->getId() . '/watermark.jpg'
+            $fixtureMediaDir . '/watermark/stores/' . $objectManager->get(
+                'Magento\Store\Model\StoreManagerInterface'
+            )->getStore()->getId() . '/watermark.jpg'
         );
 
         // sample product with images
-        self::$_product = $objectManager
-            ->create('Magento\Catalog\Model\Product');
-        self::$_product
-            ->addData(array(
-                'image'       => '/m/a/magento_image.jpg',
+        self::$_product = $objectManager->create('Magento\Catalog\Model\Product');
+        self::$_product->addData(
+            array(
+                'image' => '/m/a/magento_image.jpg',
                 'small_image' => '/m/a/magento_small_image.jpg',
-                'thumbnail'   => '/m/a/magento_thumbnail.jpg',
-            ))
-        ;
+                'thumbnail' => '/m/a/magento_thumbnail.jpg'
+            )
+        );
 
         // sample image cached URL
         $helper = $objectManager->get('Magento\Catalog\Helper\Image');
@@ -94,9 +94,12 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     {
         $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         $config = $objectManager->get('Magento\Catalog\Model\Product\Media\Config');
-        /** @var \Magento\Filesystem\Directory\WriteInterface $mediaDirectory */
-        $mediaDirectory = $objectManager->get('Magento\App\Filesystem')
-            ->getDirectoryWrite(\Magento\App\Filesystem::MEDIA_DIR);
+        /** @var \Magento\Framework\Filesystem\Directory\WriteInterface $mediaDirectory */
+        $mediaDirectory = $objectManager->get(
+            'Magento\Framework\App\Filesystem'
+        )->getDirectoryWrite(
+            \Magento\Framework\App\Filesystem::MEDIA_DIR
+        );
 
         $mediaDirectory->delete($config->getBaseMediaPath());
         $mediaDirectory->delete($config->getBaseTmpMediaPath());
@@ -108,8 +111,9 @@ class ImageTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->_helper = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->get('Magento\Catalog\Helper\Image');
+        $this->_helper = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Catalog\Helper\Image'
+        );
     }
 
     /**
@@ -125,9 +129,9 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function initDataProvider()
     {
         return array(
-            array('image',       '/m/a/magento_image.jpg'),
+            array('image', '/m/a/magento_image.jpg'),
             array('small_image', '/m/a/magento_small_image.jpg'),
-            array('thumbnail',   '/m/a/magento_thumbnail.jpg'),
+            array('thumbnail', '/m/a/magento_thumbnail.jpg')
         );
     }
 
@@ -182,7 +186,8 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function testWatermark()
     {
         $this->assertNotEquals(
-            (string)$this->_init()->watermark('/watermark.jpg', 0, '15x15', 50), self::$_sampleCachedUrl
+            (string)$this->_init()->watermark('/watermark.jpg', 0, '15x15', 50),
+            self::$_sampleCachedUrl
         );
     }
 
@@ -211,8 +216,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
     public function testGetPlaceholder()
     {
         /** @var $model \Magento\Catalog\Model\Product */
-        $model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Catalog\Model\Product');
+        $model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create('Magento\Catalog\Model\Product');
         $this->_helper->init($model, 'image');
         $placeholder = $this->_helper->getPlaceholder();
         $this->assertEquals('Magento_Catalog::images/product/placeholder/image.jpg', $placeholder);

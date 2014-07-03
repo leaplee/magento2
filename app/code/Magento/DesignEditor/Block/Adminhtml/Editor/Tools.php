@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_DesignEditor
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -66,37 +64,37 @@ class Tools extends \Magento\Backend\Block\Template
     {
         return array(
             array(
-                'is_hidden'     => false,
-                'is_disabled'   => false,
-                'id'            => 'vde-tab-quick-styles',
-                'label'         => __('Quick Styles'),
+                'is_hidden' => false,
+                'is_disabled' => false,
+                'id' => 'vde-tab-quick-styles',
+                'label' => __('Quick Styles'),
                 'content_block' => 'design_editor_tools_quick-styles',
-                'class'         => 'item-design'
+                'class' => 'item-design'
             ),
             array(
-                'is_hidden'     => true,
-                'is_disabled'   => false,
-                'id'            => 'vde-tab-block',
-                'label'         => __('Block'),
+                'is_hidden' => true,
+                'is_disabled' => false,
+                'id' => 'vde-tab-block',
+                'label' => __('Block'),
                 'content_block' => 'design_editor_tools_block',
-                'class'         => 'item-block'
+                'class' => 'item-block'
             ),
             array(
-                'is_hidden'     => true,
-                'is_disabled'   => false,
-                'id'            => 'vde-tab-settings',
-                'label'         => __('Settings'),
+                'is_hidden' => true,
+                'is_disabled' => false,
+                'id' => 'vde-tab-settings',
+                'label' => __('Settings'),
                 'content_block' => 'design_editor_tools_settings',
-                'class'         => 'item-settings'
+                'class' => 'item-settings'
             ),
             array(
-                'is_hidden'     => false,
-                'is_disabled'   => false,
-                'id'            => 'vde-tab-code',
-                'label'         => __('Advanced'),
+                'is_hidden' => false,
+                'is_disabled' => false,
+                'id' => 'vde-tab-code',
+                'label' => __('Advanced'),
                 'content_block' => 'design_editor_tools_code',
-                'class'         => 'item-code'
-            ),
+                'class' => 'item-code'
+            )
         );
     }
 
@@ -126,13 +124,19 @@ class Tools extends \Magento\Backend\Block\Template
         $handles = array();
         foreach ($this->getTabs() as $tab) {
             $href = '#' . $tab['id'];
-            $handles[] = $tabHandleBlock->setIsHidden($tab['is_hidden'])
-                ->setIsDisabled($tab['is_disabled'])
-                ->setHref($href)
-                ->setClass($tab['class'])
-                ->setTitle($tab['label'])
-                ->setLabel($tab['label'])
-                ->toHtml();
+            $handles[] = $tabHandleBlock->setIsHidden(
+                $tab['is_hidden']
+            )->setIsDisabled(
+                $tab['is_disabled']
+            )->setHref(
+                $href
+            )->setClass(
+                $tab['class']
+            )->setTitle(
+                $tab['label']
+            )->setLabel(
+                $tab['label']
+            )->toHtml();
         }
 
         return $handles;
@@ -145,7 +149,8 @@ class Tools extends \Magento\Backend\Block\Template
      */
     public function getSaveUrl()
     {
-        return $this->getUrl('adminhtml/system_design_editor_tools/saveQuickStyles',
+        return $this->getUrl(
+            'adminhtml/system_design_editor_tools/saveQuickStyles',
             array('theme_id' => $this->_themeContext->getEditableTheme()->getId())
         );
     }

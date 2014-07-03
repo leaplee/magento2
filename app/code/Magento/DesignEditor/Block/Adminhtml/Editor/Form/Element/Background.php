@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_DesignEditor
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -29,8 +27,7 @@
  */
 namespace Magento\DesignEditor\Block\Adminhtml\Editor\Form\Element;
 
-class Background
-    extends \Magento\DesignEditor\Block\Adminhtml\Editor\Form\Element\Composite\AbstractComposite
+class Background extends \Magento\DesignEditor\Block\Adminhtml\Editor\Form\Element\Composite\AbstractComposite
 {
     /**
      * Control type
@@ -47,25 +44,22 @@ class Background
         $colorData = $this->getComponent('color-picker');
         $uploaderData = $this->getComponent('background-uploader');
 
-        $colorTitle = $this->_escape(sprintf("%s {%s: %s}",
-            $colorData['selector'],
-            $colorData['attribute'],
-            $colorData['value']
-        ));
+        $colorTitle = $this->_escape(
+            sprintf("%s {%s: %s}", $colorData['selector'], $colorData['attribute'], $colorData['value'])
+        );
         $colorHtmlId = $this->getComponentId('color-picker');
-        $this->addField($colorHtmlId, 'color-picker', array(
-            'name'  => $colorHtmlId,
-            'value' => $colorData['value'],
-            'title' => $colorTitle,
-            'label' => null,
-        ));
+        $this->addField(
+            $colorHtmlId,
+            'color-picker',
+            array('name' => $colorHtmlId, 'value' => $colorData['value'], 'title' => $colorTitle, 'label' => null)
+        );
 
         $uploaderId = $this->getComponentId('background-uploader');
-        $this->addField($uploaderId, 'background-uploader', array(
-            'components' => $uploaderData['components'],
-            'name'       => $uploaderId,
-            'label'      => null
-        ));
+        $this->addField(
+            $uploaderId,
+            'background-uploader',
+            array('components' => $uploaderData['components'], 'name' => $uploaderId, 'label' => null)
+        );
 
         return $this;
     }
@@ -78,7 +72,8 @@ class Background
     protected function _addElementTypes()
     {
         $this->addType('color-picker', 'Magento\DesignEditor\Block\Adminhtml\Editor\Form\Element\ColorPicker');
-        $this->addType('background-uploader',
+        $this->addType(
+            'background-uploader',
             'Magento\DesignEditor\Block\Adminhtml\Editor\Form\Element\BackgroundUploader'
         );
 

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Connect
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Downloader;
 /**
  * Class for viewer
  *
- * @category   Magento
- * @package    Magento_Connect
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class View
@@ -46,14 +42,13 @@ class View
      */
     public function __construct()
     {
-
     }
 
     /**
-    * Retrieve Controller as singleton
-    *
-    * @return \Magento\Downloader\Controller
-    */
+     * Retrieve Controller as singleton
+     *
+     * @return \Magento\Downloader\Controller
+     */
     public function controller()
     {
         return \Magento\Downloader\Controller::singleton();
@@ -66,7 +61,7 @@ class View
      * @param mixed $params
      * @return string
      */
-    public function url($action='', $params=array())
+    public function url($action = '', $params = array())
     {
         return $this->controller()->url($action, $params);
     }
@@ -100,17 +95,17 @@ class View
     public function template($name)
     {
         ob_start();
-        include $this->controller()->filepath('template/'.$name);
+        include $this->controller()->filepath('template/' . $name);
         return ob_get_clean();
     }
 
     /**
-    * Set value for key
-    *
-    * @param string $key
-    * @param mixed $value
-    * @return \Magento\Downloader\Controller
-    */
+     * Set value for key
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return \Magento\Downloader\Controller
+     */
     public function set($key, $value)
     {
         $this->_data[$key] = $value;
@@ -136,8 +131,8 @@ class View
      */
     public function getNavLinkParams($action)
     {
-        $params = 'href="'.$this->url($action).'"';
-        if ($this->controller()->getAction()==$action) {
+        $params = 'href="' . $this->url($action) . '"';
+        if ($this->controller()->getAction() == $action) {
             $params .= ' class="active"';
         }
         return $params;

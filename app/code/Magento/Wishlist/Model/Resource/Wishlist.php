@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Wishlist
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,13 +26,11 @@
 /**
  * Wishlist resource model
  *
- * @category    Magento
- * @package     Magento_Wishlist
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Wishlist\Model\Resource;
 
-class Wishlist extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Wishlist extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
      * Store wishlist items count
@@ -65,15 +61,14 @@ class Wishlist extends \Magento\Core\Model\Resource\Db\AbstractDb
      *
      * @param string $field
      * @param mixed $value
-     * @param \Magento\Core\Model\AbstractModel $object
+     * @param \Magento\Framework\Model\AbstractModel $object
      * @return \Zend_Db_Select
      */
     protected function _getLoadSelect($field, $value, $object)
     {
         $select = parent::_getLoadSelect($field, $value, $object);
         if ($field == $this->_customerIdFieldName) {
-            $select->order('wishlist_id ' . \Zend_Db_Select::SQL_ASC)
-                ->limit(1);
+            $select->order('wishlist_id ' . \Zend_Db_Select::SQL_ASC)->limit(1);
         }
         return $select;
     }

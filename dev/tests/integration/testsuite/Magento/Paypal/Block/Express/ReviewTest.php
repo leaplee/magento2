@@ -18,9 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Paypal
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -37,15 +34,19 @@ class ReviewTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderAddress()
     {
-        $quote = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Sales\Model\Quote');
+        $quote = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create('Magento\Sales\Model\Quote');
         $quote->load('test01', 'reserved_order_id');
 
-        $block = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get('Magento\View\LayoutInterface')
-            ->createBlock('Magento\Paypal\Block\Express\Review');
-        $addressData = include(__DIR__ . '/../../../Sales/_files/address_data.php');
-        $address = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Sales\Model\Quote\Address', array('data' => $addressData));
+        $block = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+            'Magento\Framework\View\LayoutInterface'
+        )->createBlock(
+            'Magento\Paypal\Block\Express\Review'
+        );
+        $addressData = include __DIR__ . '/../../../Sales/_files/address_data.php';
+        $address = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Sales\Model\Quote\Address',
+            array('data' => $addressData)
+        );
         $address->setAddressType('billing');
         $address->setQuote($quote);
         $this->assertContains('Los Angeles', $block->renderAddress($address));

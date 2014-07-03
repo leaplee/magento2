@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_User
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\User\Block;
 /**
  * User block
  *
- * @category   Magento
- * @package    Magento_User
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class User extends \Magento\Backend\Block\Widget\Grid\Container
@@ -60,12 +56,14 @@ class User extends \Magento\Backend\Block\Widget\Grid\Container
      */
     protected function _construct()
     {
-        $this->addData(array(
-            \Magento\Backend\Block\Widget\Container::PARAM_CONTROLLER => 'user',
-            \Magento\Backend\Block\Widget\Grid\Container::PARAM_BLOCK_GROUP => 'Magento_User',
-            \Magento\Backend\Block\Widget\Grid\Container::PARAM_BUTTON_NEW => __('Add New User'),
-            \Magento\Backend\Block\Widget\Container::PARAM_HEADER_TEXT => __('Users'),
-        ));
+        $this->addData(
+            array(
+                \Magento\Backend\Block\Widget\Container::PARAM_CONTROLLER => 'user',
+                \Magento\Backend\Block\Widget\Grid\Container::PARAM_BLOCK_GROUP => 'Magento_User',
+                \Magento\Backend\Block\Widget\Grid\Container::PARAM_BUTTON_NEW => __('Add New User'),
+                \Magento\Backend\Block\Widget\Container::PARAM_HEADER_TEXT => __('Users')
+            )
+        );
         parent::_construct();
         $this->_addNewButton();
     }

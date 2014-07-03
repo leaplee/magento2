@@ -26,11 +26,9 @@ namespace Magento\Paypal\Controller;
 /**
  * Hosted Pro Checkout Controller
  *
- * @category   Magento
- * @package    Magento_Paypal
  * @author     Magento Core Team <core@magentocommerce.com>
  */
-class Hostedpro extends \Magento\App\Action\Action
+class Hostedpro extends \Magento\Framework\App\Action\Action
 {
     /**
      * @var \Magento\Checkout\Model\Session
@@ -38,10 +36,10 @@ class Hostedpro extends \Magento\App\Action\Action
     protected $_session;
 
     /**
-     * @param \Magento\App\Action\Context $context
+     * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Checkout\Model\Session $session
      */
-    public function __construct(\Magento\App\Action\Context $context, \Magento\Checkout\Model\Session $session)
+    public function __construct(\Magento\Framework\App\Action\Context $context, \Magento\Checkout\Model\Session $session)
     {
         parent::__construct($context);
         $this->_session = $session;
@@ -54,7 +52,7 @@ class Hostedpro extends \Magento\App\Action\Action
      */
     public function returnAction()
     {
-        $session = $this->_objectManager->get('Magento\Checkout\Model\Session');;
+        $session = $this->_objectManager->get('Magento\Checkout\Model\Session');
         //TODO: some actions with order
         if ($session->getLastRealOrderId()) {
             $this->_redirect('checkout/onepage/success');

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Tax
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -31,7 +29,7 @@ namespace Magento\Tax\Block\Sales\Order;
 
 use Magento\Sales\Model\Order;
 
-class Tax extends \Magento\View\Element\Template
+class Tax extends \Magento\Framework\View\Element\Template
 {
     /**
      * Tax configuration model
@@ -46,17 +44,17 @@ class Tax extends \Magento\View\Element\Template
     protected $_order;
 
     /**
-     * @var \Magento\Object
+     * @var \Magento\Framework\Object
      */
     protected $_source;
 
     /**
-     * @param \Magento\View\Element\Template\Context $context
+     * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Tax\Model\Config $taxConfig
      * @param array $data
      */
     public function __construct(
-        \Magento\View\Element\Template\Context $context,
+        \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Tax\Model\Config $taxConfig,
         array $data = array()
     ) {
@@ -77,7 +75,7 @@ class Tax extends \Magento\View\Element\Template
     /**
      * Get data (totals) source model
      *
-     * @return \Magento\Object
+     * @return \Magento\Framework\Object
      */
     public function getSource()
     {
@@ -93,13 +91,13 @@ class Tax extends \Magento\View\Element\Template
     {
         /** @var $parent \Magento\Sales\Block\Adminhtml\Order\Invoice\Totals */
         $parent = $this->getParentBlock();
-        $this->_order   = $parent->getOrder();
-        $this->_source  = $parent->getSource();
+        $this->_order = $parent->getOrder();
+        $this->_source = $parent->getSource();
 
         $store = $this->getStore();
-        $allowTax = ($this->_source->getTaxAmount() > 0) || ($this->_config->displaySalesZeroTax($store));
-        $grandTotal = (float) $this->_source->getGrandTotal();
-        if (!$grandTotal || ($allowTax && !$this->_config->displaySalesTaxWithGrandTotal($store))) {
+        $allowTax = $this->_source->getTaxAmount() > 0 || $this->_config->displaySalesZeroTax($store);
+        $grandTotal = (double)$this->_source->getGrandTotal();
+        if (!$grandTotal || $allowTax && !$this->_config->displaySalesTaxWithGrandTotal($store)) {
             $this->_addTax();
         }
 
@@ -116,12 +114,9 @@ class Tax extends \Magento\View\Element\Template
      * @param string $after
      * @return \Magento\Tax\Block\Sales\Order\Tax
      */
-    protected function _addTax($after='discount')
+    protected function _addTax($after = 'discount')
     {
-        $taxTotal = new \Magento\Object(array(
-            'code'      => 'tax',
-            'block_name'=> $this->getNameInLayout()
-        ));
+        $taxTotal = new \Magento\Framework\Object(array('code' => 'tax', 'block_name' => $this->getNameInLayout()));
         $this->getParentBlock()->addTotal($taxTotal, $after);
         return $this;
     }
@@ -129,7 +124,7 @@ class Tax extends \Magento\View\Element\Template
     /**
      * Get order store object
      *
-     * @return \Magento\Core\Model\Store
+     * @return \Magento\Store\Model\Store
      */
     public function getStore()
     {
@@ -141,56 +136,70 @@ class Tax extends \Magento\View\Element\Template
      */
     protected function _initSubtotal()
     {
-        $store  = $this->getStore();
+        $store = $this->getStore();
         $parent = $this->getParentBlock();
         $subtotal = $parent->getTotal('subtotal');
         if (!$subtotal) {
             return $this;
         }
         if ($this->_config->displaySalesSubtotalBoth($store)) {
-            $subtotal       = (float) $this->_source->getSubtotal();
-            $baseSubtotal   = (float) $this->_source->getBaseSubtotal();
-            $subtotalIncl   = (float) $this->_source->getSubtotalInclTax();
-            $baseSubtotalIncl= (float) $this->_source->getBaseSubtotalInclTax();
+            $subtotal = (double)$this->_source->getSubtotal();
+            $baseSubtotal = (double)$this->_source->getBaseSubtotal();
+            $subtotalIncl = (double)$this->_source->getSubtotalInclTax();
+            $baseSubtotalIncl = (double)$this->_source->getBaseSubtotalInclTax();
 
-            if (!$subtotalIncl) {
-                $subtotalIncl = $subtotal+ $this->_source->getTaxAmount()
+            if (!$subtotalIncl || !$baseSubtotalIncl) {
+                // Calculate the subtotal if it is not set
+                $subtotalIncl = $subtotal
+                    + $this->_source->getTaxAmount()
                     - $this->_source->getShippingTaxAmount();
-            }
-            if (!$baseSubtotalIncl) {
-                $baseSubtotalIncl = $baseSubtotal + $this->_source->getBaseTaxAmount()
+                $baseSubtotalIncl = $baseSubtotal
+                    + $this->_source->getBaseTaxAmount()
                     - $this->_source->getBaseShippingTaxAmount();
+
+                if ($this->_source instanceof Order) {
+                    // Adjust for the discount tax compensation
+                    foreach ($this->_source->getAllItems() as $item) {
+                        $subtotalIncl += $item->getHiddenTaxAmount();
+                        $baseSubtotalIncl += $item->getBaseHiddenTaxAmount();
+                    }
+                }
             }
+
             $subtotalIncl = max(0, $subtotalIncl);
             $baseSubtotalIncl = max(0, $baseSubtotalIncl);
-            $totalExcl = new \Magento\Object(array(
-                'code'      => 'subtotal_excl',
-                'value'     => $subtotal,
-                'base_value'=> $baseSubtotal,
-                'label'     => __('Subtotal (Excl.Tax)')
-            ));
-            $totalIncl = new \Magento\Object(array(
-                'code'      => 'subtotal_incl',
-                'value'     => $subtotalIncl,
-                'base_value'=> $baseSubtotalIncl,
-                'label'     => __('Subtotal (Incl.Tax)')
-            ));
+            $totalExcl = new \Magento\Framework\Object(
+                array(
+                    'code' => 'subtotal_excl',
+                    'value' => $subtotal,
+                    'base_value' => $baseSubtotal,
+                    'label' => __('Subtotal (Excl.Tax)')
+                )
+            );
+            $totalIncl = new \Magento\Framework\Object(
+                array(
+                    'code' => 'subtotal_incl',
+                    'value' => $subtotalIncl,
+                    'base_value' => $baseSubtotalIncl,
+                    'label' => __('Subtotal (Incl.Tax)')
+                )
+            );
             $parent->addTotal($totalExcl, 'subtotal');
             $parent->addTotal($totalIncl, 'subtotal_excl');
             $parent->removeTotal('subtotal');
         } elseif ($this->_config->displaySalesSubtotalInclTax($store)) {
-            $subtotalIncl   = (float) $this->_source->getSubtotalInclTax();
-            $baseSubtotalIncl= (float) $this->_source->getBaseSubtotalInclTax();
+            $subtotalIncl = (double)$this->_source->getSubtotalInclTax();
+            $baseSubtotalIncl = (double)$this->_source->getBaseSubtotalInclTax();
 
             if (!$subtotalIncl) {
-                $subtotalIncl = $this->_source->getSubtotal()
-                    + $this->_source->getTaxAmount()
-                    - $this->_source->getShippingTaxAmount();
+                $subtotalIncl = $this->_source->getSubtotal() +
+                    $this->_source->getTaxAmount() -
+                    $this->_source->getShippingTaxAmount();
             }
             if (!$baseSubtotalIncl) {
-                $baseSubtotalIncl = $this->_source->getBaseSubtotal()
-                    + $this->_source->getBaseTaxAmount()
-                    - $this->_source->getBaseShippingTaxAmount();
+                $baseSubtotalIncl = $this->_source->getBaseSubtotal() +
+                    $this->_source->getBaseTaxAmount() -
+                    $this->_source->getBaseShippingTaxAmount();
             }
 
             $total = $parent->getTotal('subtotal');
@@ -207,7 +216,7 @@ class Tax extends \Magento\View\Element\Template
      */
     protected function _initShipping()
     {
-        $store  = $this->getStore();
+        $store = $this->getStore();
         $parent = $this->getParentBlock();
         $shipping = $parent->getTotal('shipping');
         if (!$shipping) {
@@ -215,41 +224,44 @@ class Tax extends \Magento\View\Element\Template
         }
 
         if ($this->_config->displaySalesShippingBoth($store)) {
-            $shipping           = (float) $this->_source->getShippingAmount();
-            $baseShipping       = (float) $this->_source->getBaseShippingAmount();
-            $shippingIncl       = (float) $this->_source->getShippingInclTax();
+            $shipping = (double)$this->_source->getShippingAmount();
+            $baseShipping = (double)$this->_source->getBaseShippingAmount();
+            $shippingIncl = (double)$this->_source->getShippingInclTax();
             if (!$shippingIncl) {
-                $shippingIncl   = $shipping + (float) $this->_source->getShippingTaxAmount();
+                $shippingIncl = $shipping + (double)$this->_source->getShippingTaxAmount();
             }
-            $baseShippingIncl   = (float) $this->_source->getBaseShippingInclTax();
+            $baseShippingIncl = (double)$this->_source->getBaseShippingInclTax();
             if (!$baseShippingIncl) {
-                $baseShippingIncl = $baseShipping + (float) $this->_source->getBaseShippingTaxAmount();
+                $baseShippingIncl = $baseShipping + (double)$this->_source->getBaseShippingTaxAmount();
             }
 
-            $totalExcl = new \Magento\Object(array(
-                'code'      => 'shipping',
-                'value'     => $shipping,
-                'base_value'=> $baseShipping,
-                'label'     => __('Shipping & Handling (Excl.Tax)')
-            ));
-            $totalIncl = new \Magento\Object(array(
-                'code'      => 'shipping_incl',
-                'value'     => $shippingIncl,
-                'base_value'=> $baseShippingIncl,
-                'label'     => __('Shipping & Handling (Incl.Tax)')
-            ));
+            $totalExcl = new \Magento\Framework\Object(
+                array(
+                    'code' => 'shipping',
+                    'value' => $shipping,
+                    'base_value' => $baseShipping,
+                    'label' => __('Shipping & Handling (Excl.Tax)')
+                )
+            );
+            $totalIncl = new \Magento\Framework\Object(
+                array(
+                    'code' => 'shipping_incl',
+                    'value' => $shippingIncl,
+                    'base_value' => $baseShippingIncl,
+                    'label' => __('Shipping & Handling (Incl.Tax)')
+                )
+            );
             $parent->addTotal($totalExcl, 'shipping');
             $parent->addTotal($totalIncl, 'shipping');
         } elseif ($this->_config->displaySalesShippingInclTax($store)) {
-            $shippingIncl       = $this->_source->getShippingInclTax();
+            $shippingIncl = $this->_source->getShippingInclTax();
             if (!$shippingIncl) {
-                $shippingIncl = $this->_source->getShippingAmount()
-                    + $this->_source->getShippingTaxAmount();
+                $shippingIncl = $this->_source->getShippingAmount() + $this->_source->getShippingTaxAmount();
             }
-            $baseShippingIncl   = $this->_source->getBaseShippingInclTax();
+            $baseShippingIncl = $this->_source->getBaseShippingInclTax();
             if (!$baseShippingIncl) {
-                $baseShippingIncl = $this->_source->getBaseShippingAmount()
-                    + $this->_source->getBaseShippingTaxAmount();
+                $baseShippingIncl = $this->_source->getBaseShippingAmount() +
+                    $this->_source->getBaseShippingTaxAmount();
             }
             $total = $parent->getTotal('shipping');
             if ($total) {
@@ -265,13 +277,12 @@ class Tax extends \Magento\View\Element\Template
      */
     protected function _initDiscount()
     {
-//        $store  = $this->getStore();
-//        $parent = $this->getParentBlock();
-//        if ($this->_config->displaySales) {
-//
-//        } elseif ($this->_config->displaySales) {
-//
-//        }
+        //        $store  = $this->getStore();
+        //        $parent = $this->getParentBlock();
+        //        if ($this->_config->displaySales) {
+        //
+        //        } elseif ($this->_config->displaySales) {
+        //        }
     }
 
     /**
@@ -279,34 +290,38 @@ class Tax extends \Magento\View\Element\Template
      */
     protected function _initGrandTotal()
     {
-        $store  = $this->getStore();
+        $store = $this->getStore();
         $parent = $this->getParentBlock();
         $grandototal = $parent->getTotal('grand_total');
-        if (!$grandototal || !(float)$this->_source->getGrandTotal()) {
+        if (!$grandototal || !(double)$this->_source->getGrandTotal()) {
             return $this;
         }
 
         if ($this->_config->displaySalesTaxWithGrandTotal($store)) {
-            $grandtotal         = $this->_source->getGrandTotal();
-            $baseGrandtotal     = $this->_source->getBaseGrandTotal();
-            $grandtotalExcl     = $grandtotal - $this->_source->getTaxAmount();
+            $grandtotal = $this->_source->getGrandTotal();
+            $baseGrandtotal = $this->_source->getBaseGrandTotal();
+            $grandtotalExcl = $grandtotal - $this->_source->getTaxAmount();
             $baseGrandtotalExcl = $baseGrandtotal - $this->_source->getBaseTaxAmount();
-            $grandtotalExcl     = max($grandtotalExcl, 0);
+            $grandtotalExcl = max($grandtotalExcl, 0);
             $baseGrandtotalExcl = max($baseGrandtotalExcl, 0);
-            $totalExcl = new \Magento\Object(array(
-                'code'      => 'grand_total',
-                'strong'    => true,
-                'value'     => $grandtotalExcl,
-                'base_value'=> $baseGrandtotalExcl,
-                'label'     => __('Grand Total (Excl.Tax)')
-            ));
-            $totalIncl = new \Magento\Object(array(
-                'code'      => 'grand_total_incl',
-                'strong'    => true,
-                'value'     => $grandtotal,
-                'base_value'=> $baseGrandtotal,
-                'label'     => __('Grand Total (Incl.Tax)')
-            ));
+            $totalExcl = new \Magento\Framework\Object(
+                array(
+                    'code' => 'grand_total',
+                    'strong' => true,
+                    'value' => $grandtotalExcl,
+                    'base_value' => $baseGrandtotalExcl,
+                    'label' => __('Grand Total (Excl.Tax)')
+                )
+            );
+            $totalIncl = new \Magento\Framework\Object(
+                array(
+                    'code' => 'grand_total_incl',
+                    'strong' => true,
+                    'value' => $grandtotal,
+                    'base_value' => $baseGrandtotal,
+                    'label' => __('Grand Total (Incl.Tax)')
+                )
+            );
             $parent->addTotal($totalExcl, 'grand_total');
             $this->_addTax('grand_total');
             $parent->addTotal($totalIncl, 'tax');

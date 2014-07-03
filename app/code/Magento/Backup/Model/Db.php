@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backup
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -30,7 +28,7 @@ namespace Magento\Backup\Model;
  *
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Db implements \Magento\Backup\Db\BackupDbInterface
+class Db implements \Magento\Framework\Backup\Db\BackupDbInterface
 {
     /**
      * Buffer length for multi rows
@@ -48,16 +46,18 @@ class Db implements \Magento\Backup\Db\BackupDbInterface
     /**
      * Core resource model
      *
-     * @var \Magento\App\Resource
+     * @var \Magento\Framework\App\Resource
      */
     protected $_resource = null;
 
     /**
      * @param \Magento\Backup\Model\Resource\Db $resourceDb
-     * @param \Magento\App\Resource $resource
+     * @param \Magento\Framework\App\Resource $resource
      */
-    public function __construct(\Magento\Backup\Model\Resource\Db $resourceDb, \Magento\App\Resource $resource)
-    {
+    public function __construct(
+        \Magento\Backup\Model\Resource\Db $resourceDb,
+        \Magento\Framework\App\Resource $resource
+    ) {
         $this->_resourceDb = $resourceDb;
         $this->_resource = $resource;
     }
@@ -67,9 +67,7 @@ class Db implements \Magento\Backup\Db\BackupDbInterface
      *
      * @var array
      */
-    protected $_ignoreDataTablesList = array(
-        'importexport/importdata'
-    );
+    protected $_ignoreDataTablesList = array('importexport/importdata');
 
     /**
      * Retrieve resource model
@@ -94,7 +92,7 @@ class Db implements \Magento\Backup\Db\BackupDbInterface
      * @param bool $addDropIfExists
      * @return string
      */
-    public function getTableCreateScript($tableName, $addDropIfExists=false)
+    public function getTableCreateScript($tableName, $addDropIfExists = false)
     {
         return $this->getResource()->getTableCreateScript($tableName, $addDropIfExists);
     }
@@ -134,21 +132,21 @@ class Db implements \Magento\Backup\Db\BackupDbInterface
 
         $tables = $this->getTables();
         foreach ($tables as $tableName) {
-            $sql.= $this->getTableCreateScript($tableName, true);
-            $sql.= $this->getTableDataDump($tableName);
+            $sql .= $this->getTableCreateScript($tableName, true);
+            $sql .= $this->getTableDataDump($tableName);
         }
 
-        $sql.= $this->getFooter();
+        $sql .= $this->getFooter();
         return $sql;
     }
 
     /**
      * Create backup and stream write to adapter
      *
-     * @param \Magento\Backup\Db\BackupInterface $backup
+     * @param \Magento\Framework\Backup\Db\BackupInterface $backup
      * @return $this
      */
-    public function createBackup(\Magento\Backup\Db\BackupInterface $backup)
+    public function createBackup(\Magento\Framework\Backup\Db\BackupInterface $backup)
     {
         $backup->open(true);
 
@@ -161,8 +159,9 @@ class Db implements \Magento\Backup\Db\BackupDbInterface
         $ignoreDataTablesList = $this->getIgnoreDataTablesList();
 
         foreach ($tables as $table) {
-            $backup->write($this->getResource()->getTableHeader($table)
-                . $this->getResource()->getTableDropSql($table) . "\n");
+            $backup->write(
+                $this->getResource()->getTableHeader($table) . $this->getResource()->getTableDropSql($table) . "\n"
+            );
             $backup->write($this->getResource()->getTableCreateSql($table, false) . "\n");
 
             $tableStatus = $this->getResource()->getTableStatus($table);
@@ -183,8 +182,8 @@ class Db implements \Magento\Backup\Db\BackupDbInterface
                     $multiRowsLength = 1;
                 }
 
-                for ($i = 0; $i < $multiRowsLength; $i ++) {
-                    $backup->write($this->getResource()->getTableDataSql($table, $limit, $i*$limit));
+                for ($i = 0; $i < $multiRowsLength; $i++) {
+                    $backup->write($this->getResource()->getTableDataSql($table, $limit, $i * $limit));
                 }
 
                 $backup->write($this->getResource()->getTableDataAfterSql($table));

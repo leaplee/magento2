@@ -18,23 +18,17 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Review
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Review\Model\Resource;
 
-use Magento\Core\Model\AbstractModel;
+use Magento\Framework\Model\AbstractModel;
 
 /**
  * Review resource model
- *
- * @category    Magento
- * @package     Magento_Review
- * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Review extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
      * Review table
@@ -83,49 +77,49 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
      *
      * @var array
      */
-    private $_deleteCache   = array();
+    private $_deleteCache = array();
 
     /**
      * Core date model
      *
-     * @var \Magento\Stdlib\DateTime\DateTime
+     * @var \Magento\Framework\Stdlib\DateTime\DateTime
      */
     protected $_date;
 
     /**
      * Core model store manager interface
      *
-     * @var \Magento\Core\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
 
     /**
      * Rating model
      *
-     * @var \Magento\Rating\Model\RatingFactory
+     * @var \Magento\Review\Model\RatingFactory
      */
     protected $_ratingFactory;
 
     /**
      * Rating resource model
      *
-     * @var \Magento\Rating\Model\Resource\Rating\Option
+     * @var \Magento\Review\Model\Resource\Rating\Option
      */
     protected $_ratingOptions;
 
     /**
-     * @param \Magento\App\Resource $resource
-     * @param \Magento\Stdlib\DateTime\DateTime $date
-     * @param \Magento\Core\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Rating\Model\RatingFactory $ratingFactory
-     * @param \Magento\Rating\Model\Resource\Rating\Option $ratingOptions
+     * @param \Magento\Framework\App\Resource $resource
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Review\Model\RatingFactory $ratingFactory
+     * @param \Magento\Review\Model\Resource\Rating\Option $ratingOptions
      */
     public function __construct(
-        \Magento\App\Resource $resource,
-        \Magento\Stdlib\DateTime\DateTime $date,
-        \Magento\Core\Model\StoreManagerInterface $storeManager,
-        \Magento\Rating\Model\RatingFactory $ratingFactory,
-        \Magento\Rating\Model\Resource\Rating\Option $ratingOptions
+        \Magento\Framework\App\Resource $resource,
+        \Magento\Framework\Stdlib\DateTime\DateTime $date,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Review\Model\RatingFactory $ratingFactory,
+        Rating\Option $ratingOptions
     ) {
         $this->_date = $date;
         $this->_storeManager = $storeManager;
@@ -143,12 +137,12 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
     protected function _construct()
     {
         $this->_init('review', 'review_id');
-        $this->_reviewTable         = $this->getTable('review');
-        $this->_reviewDetailTable   = $this->getTable('review_detail');
-        $this->_reviewStatusTable   = $this->getTable('review_status');
-        $this->_reviewEntityTable   = $this->getTable('review_entity');
-        $this->_reviewStoreTable    = $this->getTable('review_store');
-        $this->_aggregateTable      = $this->getTable('review_entity_summary');
+        $this->_reviewTable = $this->getTable('review');
+        $this->_reviewDetailTable = $this->getTable('review_detail');
+        $this->_reviewStatusTable = $this->getTable('review_status');
+        $this->_reviewEntityTable = $this->getTable('review_entity');
+        $this->_reviewStoreTable = $this->getTable('review_store');
+        $this->_aggregateTable = $this->getTable('review_entity_summary');
     }
 
     /**
@@ -164,7 +158,7 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
         $select = parent::_getLoadSelect($field, $value, $object);
         $select->join(
             $this->_reviewDetailTable,
-            $this->getMainTable().".review_id = {$this->_reviewDetailTable}.review_id"
+            $this->getMainTable() . ".review_id = {$this->_reviewDetailTable}.review_id"
         );
         return $select;
     }
@@ -193,7 +187,7 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
     /**
      * Perform actions after object save
      *
-     * @param AbstractModel $object
+     * @param \Magento\Framework\Model\AbstractModel $object
      * @return $this
      */
     protected function _afterSave(AbstractModel $object)
@@ -203,22 +197,20 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
          * save detail
          */
         $detail = array(
-            'title'     => $object->getTitle(),
-            'detail'    => $object->getDetail(),
-            'nickname'  => $object->getNickname(),
+            'title' => $object->getTitle(),
+            'detail' => $object->getDetail(),
+            'nickname' => $object->getNickname()
         );
-        $select = $adapter->select()
-            ->from($this->_reviewDetailTable, 'detail_id')
-            ->where('review_id = :review_id');
+        $select = $adapter->select()->from($this->_reviewDetailTable, 'detail_id')->where('review_id = :review_id');
         $detailId = $adapter->fetchOne($select, array(':review_id' => $object->getId()));
 
         if ($detailId) {
             $condition = array("detail_id = ?" => $detailId);
             $adapter->update($this->_reviewDetailTable, $detail, $condition);
         } else {
-            $detail['store_id']   = $object->getStoreId();
-            $detail['customer_id']= $object->getCustomerId();
-            $detail['review_id']  = $object->getId();
+            $detail['store_id'] = $object->getStoreId();
+            $detail['customer_id'] = $object->getCustomerId();
+            $detail['review_id'] = $object->getId();
             $adapter->insert($this->_reviewDetailTable, $detail);
         }
 
@@ -237,19 +229,13 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
                 }
 
                 $insertedStoreIds[] = $storeId;
-                $storeInsert = array(
-                    'store_id' => $storeId,
-                    'review_id'=> $object->getId()
-                );
+                $storeInsert = array('store_id' => $storeId, 'review_id' => $object->getId());
                 $adapter->insert($this->_reviewStoreTable, $storeInsert);
             }
         }
 
         // reaggregate ratings, that depend on this review
-        $this->_aggregateRatings(
-            $this->_loadVotedRatingIds($object->getId()),
-            $object->getEntityPkValue()
-        );
+        $this->_aggregateRatings($this->_loadVotedRatingIds($object->getId()), $object->getEntityPkValue());
 
         return $this;
     }
@@ -257,15 +243,18 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
     /**
      * Perform actions after object load
      *
-     * @param AbstractModel $object
+     * @param \Magento\Framework\Model\AbstractModel $object
      * @return $this
      */
     protected function _afterLoad(AbstractModel $object)
     {
         $adapter = $this->_getReadAdapter();
-        $select = $adapter->select()
-            ->from($this->_reviewStoreTable, array('store_id'))
-            ->where('review_id = :review_id');
+        $select = $adapter->select()->from(
+            $this->_reviewStoreTable,
+            array('store_id')
+        )->where(
+            'review_id = :review_id'
+        );
         $stores = $adapter->fetchCol($select, array(':review_id' => $object->getId()));
         if (empty($stores) && $this->_storeManager->hasSingleStore()) {
             $object->setStores(array($this->_storeManager->getStore(true)->getId()));
@@ -278,14 +267,14 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
     /**
      * Action before delete
      *
-     * @param AbstractModel $object
+     * @param \Magento\Framework\Model\AbstractModel $object
      * @return $this
      */
     protected function _beforeDelete(AbstractModel $object)
     {
         // prepare rating ids, that depend on review
         $this->_deleteCache = array(
-            'ratingIds'     => $this->_loadVotedRatingIds($object->getId()),
+            'ratingIds' => $this->_loadVotedRatingIds($object->getId()),
             'entityPkValue' => $object->getEntityPkValue()
         );
         return $this;
@@ -294,7 +283,7 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
     /**
      * Perform actions after object delete
      *
-     * @param AbstractModel $object
+     * @param \Magento\Framework\Model\AbstractModel $object
      * @return $this
      */
     public function afterDeleteCommit(AbstractModel $object)
@@ -302,10 +291,7 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
         $this->aggregate($object);
 
         // reaggregate ratings, that depended on this review
-        $this->_aggregateRatings(
-            $this->_deleteCache['ratingIds'],
-            $this->_deleteCache['entityPkValue']
-        );
+        $this->_aggregateRatings($this->_deleteCache['ratingIds'], $this->_deleteCache['entityPkValue']);
         $this->_deleteCache = array();
 
         return $this;
@@ -322,18 +308,20 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
     public function getTotalReviews($entityPkValue, $approvedOnly = false, $storeId = 0)
     {
         $adapter = $this->_getReadAdapter();
-        $select = $adapter->select()
-            ->from($this->_reviewTable,
-                array(
-                    'review_count' => new \Zend_Db_Expr('COUNT(*)')
-                ))
-            ->where("{$this->_reviewTable}.entity_pk_value = :pk_value");
+        $select = $adapter->select()->from(
+            $this->_reviewTable,
+            array('review_count' => new \Zend_Db_Expr('COUNT(*)'))
+        )->where(
+            "{$this->_reviewTable}.entity_pk_value = :pk_value"
+        );
         $bind = array(':pk_value' => $entityPkValue);
         if ($storeId > 0) {
-            $select->join(array('store'=>$this->_reviewStoreTable),
-                $this->_reviewTable.'.review_id=store.review_id AND store.store_id = :store_id',
-                array());
-            $bind[':store_id'] = (int)$storeId;
+            $select->join(
+                array('store' => $this->_reviewStoreTable),
+                $this->_reviewTable . '.review_id=store.review_id AND store.store_id = :store_id',
+                array()
+            );
+            $bind[':store_id'] = (int) $storeId;
         }
         if ($approvedOnly) {
             $select->where("{$this->_reviewTable}.status_id = :status_id");
@@ -345,19 +333,19 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
     /**
      * Aggregate
      *
-     * @param AbstractModel $object
+     * @param \Magento\Framework\Model\AbstractModel $object
      * @return void
      */
     public function aggregate($object)
     {
-        $readAdapter    = $this->_getReadAdapter();
-        $writeAdapter   = $this->_getWriteAdapter();
+        $readAdapter = $this->_getReadAdapter();
+        $writeAdapter = $this->_getWriteAdapter();
         if (!$object->getEntityPkValue() && $object->getId()) {
             $object->load($object->getReviewId());
         }
 
-        $ratingModel    = $this->_ratingFactory->create();
-        $ratingSummaries= $ratingModel->getEntitySummary($object->getEntityPkValue(), false);
+        $ratingModel = $this->_ratingFactory->create();
+        $ratingSummaries = $ratingModel->getEntitySummary($object->getEntityPkValue(), false);
 
         foreach ($ratingSummaries as $ratingSummaryObject) {
             if ($ratingSummaryObject->getCount()) {
@@ -371,27 +359,26 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
                 true,
                 $ratingSummaryObject->getStoreId()
             );
-            $select = $readAdapter->select()
-                ->from($this->_aggregateTable)
+            $select = $readAdapter->select()->from($this->_aggregateTable)
                 ->where('entity_pk_value = :pk_value')
                 ->where('entity_type = :entity_type')
                 ->where('store_id = :store_id');
             $bind = array(
-                ':pk_value'    => $object->getEntityPkValue(),
+                ':pk_value' => $object->getEntityPkValue(),
                 ':entity_type' => $object->getEntityId(),
-                ':store_id'    =>$ratingSummaryObject->getStoreId()
+                ':store_id' => $ratingSummaryObject->getStoreId()
             );
             $oldData = $readAdapter->fetchRow($select, $bind);
 
-            $data = new \Magento\Object();
+            $data = new \Magento\Framework\Object();
 
             $data->setReviewsCount($reviewsCount)
                 ->setEntityPkValue($object->getEntityPkValue())
                 ->setEntityType($object->getEntityId())
-                ->setRatingSummary(($ratingSummary > 0) ? $ratingSummary : 0)
+                ->setRatingSummary($ratingSummary > 0 ? $ratingSummary : 0)
                 ->setStoreId($ratingSummaryObject->getStoreId());
 
-           $writeAdapter->beginTransaction();
+            $writeAdapter->beginTransaction();
             try {
                 if ($oldData['primary_id'] > 0) {
                     $condition = array("{$this->_aggregateTable}.primary_id = ?" => $oldData['primary_id']);
@@ -418,8 +405,7 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
         if (empty($reviewId)) {
             return array();
         }
-        $select = $adapter->select()
-            ->from(array('v' => $this->getTable('rating_option_vote')), 'r.rating_id')
+        $select = $adapter->select()->from(array('v' => $this->getTable('rating_option_vote')), 'r.rating_id')
             ->joinInner(array('r' => $this->getTable('rating')), 'v.rating_id=r.rating_id')
             ->where('v.review_id = :revire_id');
         return $adapter->fetchCol($select, array(':revire_id' => $reviewId));
@@ -467,8 +453,7 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
     public function getEntityIdByCode($entityCode)
     {
         $adapter = $this->_getReadAdapter();
-        $select = $adapter->select()
-            ->from($this->_reviewEntityTable, array('entity_id'))
+        $select = $adapter->select()->from($this->_reviewEntityTable, array('entity_id'))
             ->where('entity_code = :entity_code');
         return $adapter->fetchOne($select, array(':entity_code' => $entityCode));
     }
@@ -482,14 +467,20 @@ class Review extends \Magento\Core\Model\Resource\Db\AbstractDb
      */
     public function deleteReviewsByProductId($productId)
     {
-        $this->_getWriteAdapter()->delete($this->_reviewTable, array(
-            'entity_pk_value=?' => $productId,
-            'entity_id=?' => $this->getEntityIdByCode(\Magento\Review\Model\Review::ENTITY_PRODUCT_CODE)
-        ));
-        $this->_getWriteAdapter()->delete($this->getTable('review_entity_summary'), array(
-            'entity_pk_value=?' => $productId,
-            'entity_type=?' => $this->getEntityIdByCode(\Magento\Review\Model\Review::ENTITY_PRODUCT_CODE)
-        ));
+        $this->_getWriteAdapter()->delete(
+            $this->_reviewTable,
+            array(
+                'entity_pk_value=?' => $productId,
+                'entity_id=?' => $this->getEntityIdByCode(\Magento\Review\Model\Review::ENTITY_PRODUCT_CODE)
+            )
+        );
+        $this->_getWriteAdapter()->delete(
+            $this->getTable('review_entity_summary'),
+            array(
+                'entity_pk_value=?' => $productId,
+                'entity_type=?' => $this->getEntityIdByCode(\Magento\Review\Model\Review::ENTITY_PRODUCT_CODE)
+            )
+        );
         return $this;
     }
 }

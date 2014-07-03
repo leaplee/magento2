@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Payment
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -61,14 +59,16 @@ class Observer
         $this->_paymentConfig = $paymentConfig;
         $this->_resourceConfig = $resourceConfig;
     }
+
     /**
      * Set forced canCreditmemo flag
      *
-     * @param \Magento\Event\Observer $observer
+     * @param \Magento\Framework\Event\Observer $observer
      * @return $this
      */
     public function salesOrderBeforeSave($observer)
     {
+        /** @var \Magento\Sales\Model\Order $order */
         $order = $observer->getEvent()->getOrder();
 
         if ($order->getPayment()->getMethodInstance()->getCode() != 'free') {
@@ -79,7 +79,7 @@ class Observer
             return $this;
         }
 
-        if ($order->isCanceled() || $order->getState() === \Magento\Sales\Model\Order::STATE_CLOSED) {
+        if ($order->isCanceled() || $order->getState() == \Magento\Sales\Model\Order::STATE_CLOSED) {
             return $this;
         }
         /**
@@ -92,12 +92,12 @@ class Observer
     }
 
     /**
-     * @param \Magento\Event\Observer $observer
+     * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
-    public function updateOrderStatusForPaymentMethods(\Magento\Event\Observer $observer)
+    public function updateOrderStatusForPaymentMethods(\Magento\Framework\Event\Observer $observer)
     {
-        if ($observer->getEvent()->getState() !== \Magento\Sales\Model\Order::STATE_NEW) {
+        if ($observer->getEvent()->getState() != \Magento\Sales\Model\Order::STATE_NEW) {
             return;
         }
         $status = $observer->getEvent()->getStatus();
@@ -106,7 +106,10 @@ class Observer
         foreach ($methods as $method) {
             if ($method->getConfigData('order_status') == $status) {
                 $this->_resourceConfig->saveConfig(
-                    'payment/' . $method->getCode() . '/order_status', $defaultStatus, 'default', 0
+                    'payment/' . $method->getCode() . '/order_status',
+                    $defaultStatus,
+                    'default',
+                    0
                 );
             }
         }

@@ -18,26 +18,32 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Customer
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-$customer = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-    ->create('Magento\Customer\Model\Customer');
-$customer
-    ->setWebsiteId(1)
-    ->setId(5)
-    ->setEntityTypeId(1)
-    ->setAttributeSetId(1)
-    ->setEmail('customer5@example.com')
-    ->setPassword('password')
-    ->setGroupId(1)
-    ->setStoreId(1)
-    ->setIsActive(1)
-    ->setFirstname('Firstname')
-    ->setLastname('Lastname')
-;
+$customer = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create('Magento\Customer\Model\Customer');
+$customer->setWebsiteId(
+    1
+)->setId(
+    5
+)->setEntityTypeId(
+    1
+)->setAttributeSetId(
+    1
+)->setEmail(
+    'customer5@example.com'
+)->setPassword(
+    'password'
+)->setGroupId(
+    1
+)->setStoreId(
+    1
+)->setIsActive(
+    1
+)->setFirstname(
+    'Firstname'
+)->setLastname(
+    'Lastname'
+);
 $customer->isObjectNew(true);
 $customer->save();

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -28,8 +26,6 @@ namespace Magento\Sales\Block\Adminhtml\Order\Create\Sidebar;
 /**
  * Adminhtml sales order create sidebar cart block
  *
- * @category   Magento
- * @package    Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Reorder extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\AbstractSidebar
@@ -98,18 +94,25 @@ class Reorder extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\Abstra
     public function getLastOrder()
     {
         $storeIds = $this->getQuote()->getStore()->getWebsite()->getStoreIds();
-        $collection = $this->_ordersFactory->create()
-            ->addFieldToFilter('customer_id', $this->getCustomerId())
-            ->addFieldToFilter('store_id', array('in' => $storeIds))
-            ->setOrder('created_at', 'desc')
-            ->setPageSize(1)
-            ->load();
+        $collection = $this->_ordersFactory->create()->addFieldToFilter(
+            'customer_id',
+            $this->getCustomerId()
+        )->addFieldToFilter(
+            'store_id',
+            array('in' => $storeIds)
+        )->setOrder(
+            'created_at',
+            'desc'
+        )->setPageSize(
+            1
+        )->load();
         foreach ($collection as $order) {
             return $order;
         }
 
         return false;
     }
+
     /**
      * Retrieve item collection
      *
@@ -162,7 +165,7 @@ class Reorder extends \Magento\Sales\Block\Adminhtml\Order\Create\Sidebar\Abstra
     /**
      * Retrieve identifier of block item
      *
-     * @param \Magento\Object $item
+     * @param \Magento\Framework\Object $item
      * @return int
      */
     public function getIdentifierId($item)

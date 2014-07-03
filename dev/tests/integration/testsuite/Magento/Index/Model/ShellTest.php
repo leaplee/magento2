@@ -18,13 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Index
- * @subpackage  integration_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Index\Model;
 
 class ShellTest extends \PHPUnit_Framework_TestCase
@@ -37,8 +33,10 @@ class ShellTest extends \PHPUnit_Framework_TestCase
      */
     protected function _getModel($entryPoint = 'fake.php')
     {
-        return \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create('Magento\Index\Model\Shell', array('entryPoint' => $entryPoint));
+        return \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            'Magento\Index\Model\Shell',
+            array('entryPoint' => $entryPoint)
+        );
     }
 
     /**
@@ -103,7 +101,7 @@ class ShellTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'execution without issues' => array('info', false),
-            'issue with wrong index' => array('--reindex=wrong_index_code', true),
+            'issue with wrong index' => array('--reindex=wrong_index_code', true)
         );
     }
 }

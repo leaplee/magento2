@@ -18,24 +18,20 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Index
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Index\Model\Resource;
 
-use Magento\Core\Model\AbstractModel;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Index\Model\Process as ProcessModel;
 
 /**
  * Index Event Resource Model
  *
- * @category    Magento
- * @package     Magento_Index
  * @author      Magento Core Team <core@magentocommerce.com>
  */
-class Event extends \Magento\Core\Model\Resource\Db\AbstractDb
+class Event extends \Magento\Framework\Model\Resource\Db\AbstractDb
 {
     /**
      * @return void
@@ -57,10 +53,15 @@ class Event extends \Magento\Core\Model\Resource\Db\AbstractDb
          * Check if event already exist and merge previous data
          */
         if (!$object->getId()) {
-            $select = $this->_getReadAdapter()->select()
-                ->from($this->getMainTable())
-                ->where('type=?', $object->getType())
-                ->where('entity=?', $object->getEntity());
+            $select = $this->_getReadAdapter()->select()->from(
+                $this->getMainTable()
+            )->where(
+                'type=?',
+                $object->getType()
+            )->where(
+                'entity=?',
+                $object->getEntity()
+            );
             if ($object->hasEntityPk()) {
                 $select->where('entity_pk=?', $object->getEntityPk());
             }
@@ -76,7 +77,7 @@ class Event extends \Magento\Core\Model\Resource\Db\AbstractDb
     /**
      * Save assigned processes
      *
-     * @param AbstractModel $object
+     * @param \Magento\Framework\Model\AbstractModel $object
      * @return $this
      */
     protected function _afterSave(AbstractModel $object)
@@ -89,16 +90,16 @@ class Event extends \Magento\Core\Model\Resource\Db\AbstractDb
             } else {
                 foreach ($processIds as $processId => $processStatus) {
                     if (is_null($processStatus) || $processStatus == ProcessModel::EVENT_STATUS_DONE) {
-                        $this->_getWriteAdapter()->delete($processTable, array(
-                            'process_id = ?' => $processId,
-                            'event_id = ?'   => $object->getId(),
-                        ));
+                        $this->_getWriteAdapter()->delete(
+                            $processTable,
+                            array('process_id = ?' => $processId, 'event_id = ?' => $object->getId())
+                        );
                         continue;
                     }
                     $data = array(
                         'process_id' => $processId,
-                        'event_id'   => $object->getId(),
-                        'status'     => $processStatus
+                        'event_id' => $object->getId(),
+                        'status' => $processStatus
                     );
                     $this->_getWriteAdapter()->insertOnDuplicate($processTable, $data, array('status'));
                 }

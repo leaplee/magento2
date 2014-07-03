@@ -23,10 +23,22 @@
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <type name="Magento\CatalogSearch\Block\Layer">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Module\Setup\Migration">
         <arguments>
-            <argument name="catalogLayer" xsi:type="object">Magento\CatalogSearch\Model\Layer\Proxy</argument>
+            <argument name="compositeModules" xsi:type="array">
+                <item name="catalogsearch" xsi:type="string">Magento_CatalogSearch</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="advancedSearchFilterList" type="Magento\Catalog\Model\Layer\FilterList">
+        <arguments>
+            <argument name="filterableAttributes" xsi:type="object">Magento\CatalogSearch\Model\Layer\Advanced\FilterableAttributeList</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\CatalogSearch\Model\Layer\Advanced\FilterableAttributeList">
+        <arguments>
+            <argument name="layer" xsi:type="object">Magento\CatalogSearch\Model\Layer\Advanced</argument>
         </arguments>
     </type>
 </config>

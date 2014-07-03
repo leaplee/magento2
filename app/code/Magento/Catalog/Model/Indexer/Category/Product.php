@@ -23,7 +23,7 @@
  */
 namespace Magento\Catalog\Model\Indexer\Category;
 
-class Product implements \Magento\Indexer\Model\ActionInterface, \Magento\Mview\ActionInterface
+class Product implements \Magento\Indexer\Model\ActionInterface, \Magento\Framework\Mview\ActionInterface
 {
     /**
      * Indexer ID in configuration
@@ -78,8 +78,7 @@ class Product implements \Magento\Indexer\Model\ActionInterface, \Magento\Mview\
      */
     public function executeFull()
     {
-        $this->fullActionFactory->create()
-            ->execute();
+        $this->fullActionFactory->create()->execute();
     }
 
     /**
@@ -101,7 +100,7 @@ class Product implements \Magento\Indexer\Model\ActionInterface, \Magento\Mview\
      */
     public function executeRow($id)
     {
-        $this->executeAction([$id]);
+        $this->executeAction(array($id));
     }
 
     /**

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -60,20 +58,21 @@ class Tabs extends \Magento\Backend\Block\Widget
      * @var \Magento\Backend\Model\Auth\Session
      */
     protected $_authSession;
+
     /**
-     * @var \Magento\Json\EncoderInterface
+     * @var \Magento\Framework\Json\EncoderInterface
      */
     private $_jsonEncoder;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Json\EncoderInterface $jsonEncoder
+     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
      * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        \Magento\Json\EncoderInterface $jsonEncoder,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         \Magento\Backend\Model\Auth\Session $authSession,
         array $data = array()
     ) {
@@ -108,7 +107,7 @@ class Tabs extends \Magento\Backend\Block\Widget
      * Add new tab after another
      *
      * @param   string $tabId new tab Id
-     * @param   array|\Magento\Object $tab
+     * @param   array|\Magento\Framework\Object $tab
      * @param   string $afterTabId
      * @return  void
      */
@@ -122,15 +121,15 @@ class Tabs extends \Magento\Backend\Block\Widget
      * Add new tab
      *
      * @param   string $tabId
-     * @param   array|\Magento\Object|string $tab
+     * @param   array|\Magento\Framework\Object|string $tab
      * @return  $this
      * @throws  \Exception
      */
     public function addTab($tabId, $tab)
     {
         if (is_array($tab)) {
-            $this->_tabs[$tabId] = new \Magento\Object($tab);
-        } elseif ($tab instanceof \Magento\Object) {
+            $this->_tabs[$tabId] = new \Magento\Framework\Object($tab);
+        } elseif ($tab instanceof \Magento\Framework\Object) {
             $this->_tabs[$tabId] = $tab;
             if (!$this->_tabs[$tabId]->hasTabId()) {
                 $this->_tabs[$tabId]->setTabId($tabId);
@@ -138,9 +137,7 @@ class Tabs extends \Magento\Backend\Block\Widget
         } elseif (is_string($tab)) {
             $this->_addTabByName($tab, $tabId);
         } else {
-            throw new \Exception(
-                __('Please correct the tab configuration and try again.')
-            );
+            throw new \Exception(__('Please correct the tab configuration and try again.'));
         }
 
         if (is_null($this->_tabs[$tabId]->getUrl())) {
@@ -175,20 +172,15 @@ class Tabs extends \Magento\Backend\Block\Widget
     protected function _addTabByName($tab, $tabId)
     {
         if (strpos($tab, '\Block\\')) {
-            $this->_tabs[$tabId] = $this->getLayout()->createBlock(
-                $tab,
-                $this->getNameInLayout() . '_tab_' . $tabId
-            );
+            $this->_tabs[$tabId] = $this->getLayout()->createBlock($tab, $this->getNameInLayout() . '_tab_' . $tabId);
         } elseif ($this->getChildBlock($tab)) {
             $this->_tabs[$tabId] = $this->getChildBlock($tab);
         } else {
             $this->_tabs[$tabId] = null;
         }
 
-        if (!($this->_tabs[$tabId] instanceof TabInterface)) {
-            throw new \Exception(
-                __('Please correct the tab configuration and try again.')
-            );
+        if (!$this->_tabs[$tabId] instanceof TabInterface) {
+            throw new \Exception(__('Please correct the tab configuration and try again.'));
         }
     }
 
@@ -209,10 +201,16 @@ class Tabs extends \Magento\Backend\Block\Widget
      */
     public function setActiveTab($tabId)
     {
-        if (isset($this->_tabs[$tabId]) && $this->canShowTab($this->_tabs[$tabId])
-            && !$this->getTabIsHidden($this->_tabs[$tabId])) {
+        if (isset(
+            $this->_tabs[$tabId]
+        ) && $this->canShowTab(
+            $this->_tabs[$tabId]
+        ) && !$this->getTabIsHidden(
+            $this->_tabs[$tabId]
+        )
+        ) {
             $this->_activeTab = $tabId;
-            if (!(is_null($this->_activeTab)) && ($tabId !== $this->_activeTab)) {
+            if (!is_null($this->_activeTab) && $tabId !== $this->_activeTab) {
                 foreach ($this->_tabs as $id => $tab) {
                     $tab->setActive($id === $tabId);
                 }
@@ -251,13 +249,13 @@ class Tabs extends \Magento\Backend\Block\Widget
         }
 
         $_new = array();
-        foreach ($this->_tabs  as $key => $tab ) {
-            foreach ($this->_tabs  as $k => $t ) {
-                if ( $t->getAfter() == $key ) {
+        foreach ($this->_tabs as $key => $tab) {
+            foreach ($this->_tabs as $k => $t) {
+                if ($t->getAfter() == $key) {
                     $_new[$key] = $tab;
                     $_new[$k] = $t;
                 } else {
-                    if ( !$tab->getAfter() || !in_array($tab->getAfter(), array_keys($this->_tabs)) ) {
+                    if (!$tab->getAfter() || !in_array($tab->getAfter(), array_keys($this->_tabs))) {
                         $_new[$key] = $tab;
                     }
                 }
@@ -292,20 +290,20 @@ class Tabs extends \Magento\Backend\Block\Widget
     }
 
     /**
-     * @param \Magento\Object|TabInterface $tab
+     * @param \Magento\Framework\Object|TabInterface $tab
      * @param bool $withPrefix
      * @return string
      */
     public function getTabId($tab, $withPrefix = true)
     {
         if ($tab instanceof TabInterface) {
-            return ($withPrefix ? $this->getId().'_' : '').$tab->getTabId();
+            return ($withPrefix ? $this->getId() . '_' : '') . $tab->getTabId();
         }
-        return ($withPrefix ? $this->getId().'_' : '').$tab->getId();
+        return ($withPrefix ? $this->getId() . '_' : '') . $tab->getId();
     }
 
     /**
-     * @param \Magento\Object|TabInterface $tab
+     * @param \Magento\Framework\Object|TabInterface $tab
      * @return bool
      */
     public function canShowTab($tab)
@@ -317,7 +315,7 @@ class Tabs extends \Magento\Backend\Block\Widget
     }
 
     /**
-     * @param \Magento\Object|TabInterface $tab
+     * @param \Magento\Framework\Object|TabInterface $tab
      * @return bool
      */
     public function getTabIsHidden($tab)
@@ -329,7 +327,7 @@ class Tabs extends \Magento\Backend\Block\Widget
     }
 
     /**
-     * @param \Magento\Object|TabInterface $tab
+     * @param \Magento\Framework\Object|TabInterface $tab
      * @return string
      */
     public function getTabUrl($tab)
@@ -347,7 +345,7 @@ class Tabs extends \Magento\Backend\Block\Widget
     }
 
     /**
-     * @param \Magento\Object|TabInterface $tab
+     * @param \Magento\Framework\Object|TabInterface $tab
      * @return string
      */
     public function getTabTitle($tab)
@@ -359,7 +357,7 @@ class Tabs extends \Magento\Backend\Block\Widget
     }
 
     /**
-     * @param \Magento\Object|TabInterface $tab
+     * @param \Magento\Framework\Object|TabInterface $tab
      * @return string
      */
     public function getTabClass($tab)
@@ -374,7 +372,7 @@ class Tabs extends \Magento\Backend\Block\Widget
     }
 
     /**
-     * @param \Magento\Object|TabInterface $tab
+     * @param \Magento\Framework\Object|TabInterface $tab
      * @return string
      */
     public function getTabLabel($tab)
@@ -386,7 +384,7 @@ class Tabs extends \Magento\Backend\Block\Widget
     }
 
     /**
-     * @param \Magento\Object|TabInterface $tab
+     * @param \Magento\Framework\Object|TabInterface $tab
      * @return string
      */
     public function getTabContent($tab)
@@ -412,7 +410,7 @@ class Tabs extends \Magento\Backend\Block\Widget
     {
         $tabs = array();
         $args = func_get_args();
-        if ((!empty($args)) && (count($args) > 1)) {
+        if (!empty($args) && count($args) > 1) {
             foreach ($args as $tabId) {
                 if (isset($this->_tabs[$tabId])) {
                     $tabs[$tabId] = $tabId;
@@ -425,10 +423,10 @@ class Tabs extends \Magento\Backend\Block\Widget
                         if (!$this->_tabs[$tabToId]->getData('shadow_tabs')) {
                             $this->_tabs[$tabToId]->setData('shadow_tabs', array());
                         }
-                        $this->_tabs[$tabToId]->setData('shadow_tabs', array_merge(
-                            $this->_tabs[$tabToId]->getData('shadow_tabs'),
-                            array($blockId . '_' . $tabId)
-                        ));
+                        $this->_tabs[$tabToId]->setData(
+                            'shadow_tabs',
+                            array_merge($this->_tabs[$tabToId]->getData('shadow_tabs'), array($blockId . '_' . $tabId))
+                        );
                     }
                 }
             }
@@ -468,7 +466,7 @@ class Tabs extends \Magento\Backend\Block\Widget
      */
     public function setTabData($tab, $key, $value)
     {
-        if (isset($this->_tabs[$tab]) && $this->_tabs[$tab] instanceof \Magento\Object) {
+        if (isset($this->_tabs[$tab]) && $this->_tabs[$tab] instanceof \Magento\Framework\Object) {
             if ($key == 'url') {
                 $value = $this->getUrl($value, array('_current' => true, '_use_rewrite' => true));
             }
@@ -492,4 +490,3 @@ class Tabs extends \Magento\Backend\Block\Widget
         return $this;
     }
 }
-

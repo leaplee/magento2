@@ -18,14 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Backend\Model\Config\Source\Web;
 
-class Protocol implements \Magento\Option\ArrayInterface
+class Protocol implements \Magento\Framework\Option\ArrayInterface
 {
     /**
      * @return array
@@ -33,10 +31,9 @@ class Protocol implements \Magento\Option\ArrayInterface
     public function toOptionArray()
     {
         return array(
-            array('value'=>'', 'label'=>''),
-            array('value'=>'http', 'label'=>__('HTTP (unsecure)')),
-            array('value'=>'https', 'label'=>__('HTTPS (SSL)')),
+            array('value' => '', 'label' => ''),
+            array('value' => 'http', 'label' => __('HTTP (unsecure)')),
+            array('value' => 'https', 'label' => __('HTTPS (SSL)'))
         );
     }
-
 }

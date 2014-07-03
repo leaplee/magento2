@@ -23,17 +23,17 @@
  */
 namespace Magento\Checkout\Helper;
 
-use Magento\Checkout\Controller\Express\RedirectLoginInterface as RedirectLoginInterface;
+use Magento\Checkout\Controller\Express\RedirectLoginInterface;
 
-class ExpressRedirect extends \Magento\App\Helper\AbstractHelper
+class ExpressRedirect extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
-     * @var \Magento\App\ActionFlag
+     * @var \Magento\Framework\App\ActionFlag
      */
     protected $_actionFlag;
 
     /**
-     * @var \Magento\ObjectManager
+     * @var \Magento\Framework\ObjectManager
      */
     protected $_objectManager;
 
@@ -45,16 +45,16 @@ class ExpressRedirect extends \Magento\App\Helper\AbstractHelper
     protected $_customerSession;
 
     /**
-     * @param \Magento\App\ActionFlag $actionFlag
-     * @param \Magento\ObjectManager $objectManager
+     * @param \Magento\Framework\App\ActionFlag $actionFlag
+     * @param \Magento\Framework\ObjectManager $objectManager
      * @param \Magento\Customer\Model\Session $customerSession
-     * @param \Magento\App\Helper\Context $context
+     * @param \Magento\Framework\App\Helper\Context $context
      */
     public function __construct(
-        \Magento\App\ActionFlag $actionFlag,
-        \Magento\ObjectManager $objectManager,
+        \Magento\Framework\App\ActionFlag $actionFlag,
+        \Magento\Framework\ObjectManager $objectManager,
         \Magento\Customer\Model\Session $customerSession,
-        \Magento\App\Helper\Context $context
+        \Magento\Framework\App\Helper\Context $context
     ) {
         $this->_actionFlag = $actionFlag;
         $this->_objectManager = $objectManager;
@@ -77,7 +77,9 @@ class ExpressRedirect extends \Magento\App\Helper\AbstractHelper
         }
 
         $expressRedirect->getResponse()->setRedirect(
-            $this->_objectManager->get('Magento\Core\Helper\Url')->addRequestParam(
+            $this->_objectManager->get(
+                'Magento\Core\Helper\Url'
+            )->addRequestParam(
                 $expressRedirect->getLoginUrl(),
                 array('context' => 'checkout')
             )
@@ -88,8 +90,7 @@ class ExpressRedirect extends \Magento\App\Helper\AbstractHelper
             $customerBeforeAuthUrl = $expressRedirect->getCustomerBeforeAuthUrl();
         }
         if ($customerBeforeAuthUrl) {
-            $this->_customerSession
-                ->setBeforeAuthUrl($customerBeforeAuthUrl);
+            $this->_customerSession->setBeforeAuthUrl($customerBeforeAuthUrl);
         }
     }
-} 
+}

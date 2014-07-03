@@ -18,12 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_SalesRule
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\SalesRule\Model\Rule\Action\Discount;
 
 class ToFixed extends AbstractDiscount
@@ -41,10 +38,10 @@ class ToFixed extends AbstractDiscount
 
         $store = $item->getQuote()->getStore();
 
-        $itemPrice              = $this->validator->getItemPrice($item);
-        $baseItemPrice          = $this->validator->getItemBasePrice($item);
-        $itemOriginalPrice      = $this->validator->getItemOriginalPrice($item);
-        $baseItemOriginalPrice  = $this->validator->getItemBaseOriginalPrice($item);
+        $itemPrice = $this->validator->getItemPrice($item);
+        $baseItemPrice = $this->validator->getItemBasePrice($item);
+        $itemOriginalPrice = $this->validator->getItemOriginalPrice($item);
+        $baseItemOriginalPrice = $this->validator->getItemBaseOriginalPrice($item);
 
         $quoteAmount = $store->convertPrice($rule->getDiscountAmount());
 
@@ -54,6 +51,5 @@ class ToFixed extends AbstractDiscount
         $discountData->setBaseOriginalAmount($qty * ($baseItemOriginalPrice - $rule->getDiscountAmount()));
 
         return $discountData;
-
     }
 }

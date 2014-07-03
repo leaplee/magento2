@@ -18,14 +18,12 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Sales
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Magento\Sales\Model\Quote\Address;
 
-use \Magento\Core\Model\AbstractModel;
+use Magento\Framework\Model\AbstractModel;
 
 /**
  * @method \Magento\Sales\Model\Resource\Quote\Address\Rate _getResource()
@@ -53,8 +51,6 @@ use \Magento\Core\Model\AbstractModel;
  * @method string getMethodTitle()
  * @method \Magento\Sales\Model\Quote\Address\Rate setMethodTitle(string $value)
  *
- * @category    Magento
- * @package     Magento_Sales
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Rate extends AbstractModel
@@ -109,18 +105,31 @@ class Rate extends AbstractModel
     public function importShippingRate(\Magento\Sales\Model\Quote\Address\RateResult\AbstractResult $rate)
     {
         if ($rate instanceof \Magento\Sales\Model\Quote\Address\RateResult\Error) {
-            $this->setCode($rate->getCarrier() . '_error')
-                ->setCarrier($rate->getCarrier())
-                ->setCarrierTitle($rate->getCarrierTitle())
-                ->setErrorMessage($rate->getErrorMessage());
+            $this->setCode(
+                $rate->getCarrier() . '_error'
+            )->setCarrier(
+                $rate->getCarrier()
+            )->setCarrierTitle(
+                $rate->getCarrierTitle()
+            )->setErrorMessage(
+                $rate->getErrorMessage()
+            );
         } elseif ($rate instanceof \Magento\Sales\Model\Quote\Address\RateResult\Method) {
-            $this->setCode($rate->getCarrier() . '_' . $rate->getMethod())
-                ->setCarrier($rate->getCarrier())
-                ->setCarrierTitle($rate->getCarrierTitle())
-                ->setMethod($rate->getMethod())
-                ->setMethodTitle($rate->getMethodTitle())
-                ->setMethodDescription($rate->getMethodDescription())
-                ->setPrice($rate->getPrice());
+            $this->setCode(
+                $rate->getCarrier() . '_' . $rate->getMethod()
+            )->setCarrier(
+                $rate->getCarrier()
+            )->setCarrierTitle(
+                $rate->getCarrierTitle()
+            )->setMethod(
+                $rate->getMethod()
+            )->setMethodTitle(
+                $rate->getMethodTitle()
+            )->setMethodDescription(
+                $rate->getMethodDescription()
+            )->setPrice(
+                $rate->getPrice()
+            );
         }
         return $this;
     }

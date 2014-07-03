@@ -21,13 +21,21 @@
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\Webapi\Controller;
 
+use Magento\Authz\Model\UserIdentifier;
 use Magento\Authz\Service\AuthorizationV1Interface as AuthorizationService;
+use Magento\Framework\Exception\AuthorizationException;
+use Magento\Framework\Service\Data\AbstractObject;
+use Magento\Framework\Service\Data\Eav\AbstractObject as EavAbstractObject;
+use Magento\Framework\Service\EavDataObjectConverter;
 use Magento\Webapi\Controller\Rest\Request as RestRequest;
 use Magento\Webapi\Controller\Rest\Response as RestResponse;
+use Magento\Webapi\Controller\Rest\Response\PartialResponseProcessor;
 use Magento\Webapi\Controller\Rest\Router;
+use Magento\Webapi\Model\Config\Converter;
+use Magento\Webapi\Model\PathProcessor;
+use Magento\Webapi\Controller\Rest\Router\Route;
 
 /**
  * Front controller for WebAPI REST area.
@@ -35,11 +43,15 @@ use Magento\Webapi\Controller\Rest\Router;
  * TODO: Consider warnings suppression removal
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
-class Rest implements \Magento\App\FrontControllerInterface
+class Rest implements \Magento\Framework\App\FrontControllerInterface
 {
     /** @var Router */
     protected $_router;
+
+    /** @var Route */
+    protected $_route;
 
     /** @var RestRequest */
     protected $_request;
@@ -47,19 +59,19 @@ class Rest implements \Magento\App\FrontControllerInterface
     /** @var RestResponse */
     protected $_response;
 
-    /** @var \Magento\ObjectManager */
+    /** @var \Magento\Framework\ObjectManager */
     protected $_objectManager;
 
-    /** @var \Magento\App\State */
+    /** @var \Magento\Framework\App\State */
     protected $_appState;
 
-    /** @var \Magento\AppInterface */
-    protected $_application;
+    /** @var \Magento\Framework\View\LayoutInterface */
+    protected $_layout;
 
-    /** @var \Magento\Oauth\OauthInterface */
+    /** @var \Magento\Framework\Oauth\OauthInterface */
     protected $_oauthService;
 
-    /** @var  \Magento\Oauth\Helper\Request */
+    /** @var  \Magento\Framework\Oauth\Helper\Request */
     protected $_oauthHelper;
 
     /** @var AuthorizationService */
@@ -71,20 +83,42 @@ class Rest implements \Magento\App\FrontControllerInterface
     /** @var ErrorProcessor */
     protected $_errorProcessor;
 
+    /** @var PathProcessor */
+    protected $_pathProcessor;
+
     /**
-     * Initialize dependencies.
+     * @var \Magento\Framework\App\AreaList
+     */
+    protected $areaList;
+
+    /**
+     * @var PartialResponseProcessor
+     */
+    protected $partialResponseProcessor;
+
+    /**
+     * @var \Magento\Framework\Session\Generic
+     */
+    protected $session;
+
+    /**
+     * Initialize dependencies
      *
      * @param RestRequest $request
      * @param RestResponse $response
      * @param Router $router
-     * @param \Magento\ObjectManager $objectManager
-     * @param \Magento\App\State $appState
-     * @param \Magento\AppInterface $application
-     * @param \Magento\Oauth\OauthInterface $oauthService
-     * @param \Magento\Oauth\Helper\Request $oauthHelper
+     * @param \Magento\Framework\ObjectManager $objectManager
+     * @param \Magento\Framework\App\State $appState
+     * @param \Magento\Framework\View\LayoutInterface $layout
+     * @param \Magento\Framework\Oauth\OauthInterface $oauthService
+     * @param \Magento\Framework\Oauth\Helper\Request $oauthHelper
      * @param AuthorizationService $authorizationService
      * @param ServiceArgsSerializer $serializer
      * @param ErrorProcessor $errorProcessor
+     * @param PathProcessor $pathProcessor
+     * @param \Magento\Framework\App\AreaList $areaList
+     * @param PartialResponseProcessor $partialResponseProcessor
+     * @param \Magento\Framework\Session\Generic $session
      *
      * TODO: Consider removal of warning suppression
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -93,68 +127,54 @@ class Rest implements \Magento\App\FrontControllerInterface
         RestRequest $request,
         RestResponse $response,
         Router $router,
-        \Magento\ObjectManager $objectManager,
-        \Magento\App\State $appState,
-        \Magento\AppInterface $application,
-        \Magento\Oauth\OauthInterface $oauthService,
-        \Magento\Oauth\Helper\Request $oauthHelper,
+        \Magento\Framework\ObjectManager $objectManager,
+        \Magento\Framework\App\State $appState,
+        \Magento\Framework\View\LayoutInterface $layout,
+        \Magento\Framework\Oauth\OauthInterface $oauthService,
+        \Magento\Framework\Oauth\Helper\Request $oauthHelper,
         AuthorizationService $authorizationService,
         ServiceArgsSerializer $serializer,
-        ErrorProcessor $errorProcessor
+        ErrorProcessor $errorProcessor,
+        PathProcessor $pathProcessor,
+        \Magento\Framework\App\AreaList $areaList,
+        PartialResponseProcessor $partialResponseProcessor,
+        \Magento\Framework\Session\Generic $session
     ) {
         $this->_router = $router;
         $this->_request = $request;
         $this->_response = $response;
         $this->_objectManager = $objectManager;
         $this->_appState = $appState;
-        $this->_application = $application;
+        $this->_layout = $layout;
         $this->_oauthService = $oauthService;
         $this->_oauthHelper = $oauthHelper;
         $this->_authorizationService = $authorizationService;
         $this->_serializer = $serializer;
         $this->_errorProcessor = $errorProcessor;
+        $this->_pathProcessor = $pathProcessor;
+        $this->areaList = $areaList;
+        $this->partialResponseProcessor = $partialResponseProcessor;
+        $this->session = $session;
     }
 
     /**
      * Handle REST request
      *
-     * @param \Magento\App\RequestInterface $request
-     * @return \Magento\App\ResponseInterface
+     * @param \Magento\Framework\App\RequestInterface $request
+     * @return \Magento\Framework\App\ResponseInterface
      */
-    public function dispatch(\Magento\App\RequestInterface $request)
+    public function dispatch(\Magento\Framework\App\RequestInterface $request)
     {
-        $pathParts = explode('/', trim($request->getPathInfo(), '/'));
-        array_shift($pathParts);
-        $request->setPathInfo('/' . implode('/', $pathParts));
-        $this->_application->loadAreaPart(
-            $this->_application->getLayout()->getArea(),
-            \Magento\Core\Model\App\Area::PART_TRANSLATE
-        );
+        $path = $this->_pathProcessor->process($request->getPathInfo());
+        $this->_request->setPathInfo($path);
+        $this->areaList->getArea($this->_appState->getAreaCode())
+            ->load(\Magento\Framework\App\Area::PART_TRANSLATE);
         try {
             if (!$this->_appState->isInstalled()) {
                 throw new \Magento\Webapi\Exception(__('Magento is not yet installed'));
             }
-            $oauthRequest = $this->_oauthHelper->prepareRequest($this->_request);
-            $consumerId = $this->_oauthService->validateAccessTokenRequest(
-                $oauthRequest,
-                $this->_oauthHelper->getRequestUrl($this->_request),
-                $this->_request->getMethod()
-            );
-            $this->_request->setConsumerId($consumerId);
-            $route = $this->_router->match($this->_request);
-
-            if (!$this->_authorizationService->isAllowed($route->getAclResources())) {
-                // TODO: Consider passing Integration ID instead of Consumer ID
-                throw new \Magento\Service\AuthorizationException(
-                    "Not Authorized.",
-                    0,
-                    null,
-                    array(),
-                    'authorization',
-                    "Consumer ID = {$consumerId}",
-                    implode($route->getAclResources(), ', '));
-            }
-
+            $this->_checkPermissions();
+            $route = $this->_getCurrentRoute();
             if ($route->isSecure() && !$this->_request->isSecure()) {
                 throw new \Magento\Webapi\Exception(__('Operation allowed only in HTTPS'));
             }
@@ -162,12 +182,16 @@ class Rest implements \Magento\App\FrontControllerInterface
             $inputData = $this->_request->getRequestData();
             $serviceMethodName = $route->getServiceMethod();
             $serviceClassName = $route->getServiceClass();
+            $inputData = $this->_overrideParams($inputData, $route->getParameters());
             $inputParams = $this->_serializer->getInputData($serviceClassName, $serviceMethodName, $inputData);
             $service = $this->_objectManager->get($serviceClassName);
-            /** @var \Magento\Service\Data\AbstractObject $outputData */
+            /** @var \Magento\Framework\Service\Data\AbstractObject $outputData */
             $outputData = call_user_func_array([$service, $serviceMethodName], $inputParams);
-            $outputArray = $this->_processServiceOutput($outputData);
-            $this->_response->prepareResponse($outputArray);
+            $outputData = $this->_processServiceOutput($outputData);
+            if ($this->_request->getParam(PartialResponseProcessor::FILTER_PARAMETER) && is_array($outputData)) {
+                $outputData = $this->partialResponseProcessor->filter($outputData);
+            }
+            $this->_response->prepareResponse($outputData);
         } catch (\Exception $e) {
             $maskedException = $this->_errorProcessor->maskException($e);
             $this->_response->setException($maskedException);
@@ -192,35 +216,119 @@ class Rest implements \Magento\App\FrontControllerInterface
         if (is_array($data)) {
             $result = [];
             foreach ($data as $datum) {
-                if (is_object($datum)) {
-                    $result[] = $this->_convertDataObjectToArray($datum);
-                } else {
-                    $result[] = $datum;
+                if ($datum instanceof AbstractObject) {
+                    $datum = $this->processDataObject($datum->__toArray());
                 }
+                $result[] = $datum;
             }
-        } else if (is_object($data)) {
-            $result = $this->_convertDataObjectToArray($data);
+            return $result;
+        } else if ($data instanceof AbstractObject) {
+            return $this->processDataObject($data->__toArray());
         } else if (is_null($data)) {
-            $result = [];
+            return [];
         } else {
             /** No processing is required for scalar types */
-            $result = $data;
+            return $data;
         }
-        return $result;
     }
 
     /**
-     * Convert Data Object to array.
+     * Convert data object to array and process available custom attributes
      *
-     * @param object $dataObject
+     * @param array $dataObjectArray
      * @return array
-     * @throws \InvalidArgumentException
      */
-    protected function _convertDataObjectToArray($dataObject)
+    protected function processDataObject($dataObjectArray)
     {
-        if (!is_object($dataObject) || !method_exists($dataObject, '__toArray')) {
-            throw new \InvalidArgumentException("All objects returned by service must implement __toArray().");
+        if (isset($dataObjectArray[EavAbstractObject::CUSTOM_ATTRIBUTES_KEY])) {
+            $dataObjectArray = EavDataObjectConverter::convertCustomAttributesToSequentialArray($dataObjectArray);
         }
-        return $dataObject->__toArray();
+        //Check for nested custom_attributes
+        foreach ($dataObjectArray as $key => $value) {
+            if (is_array($value)) {
+                $dataObjectArray[$key] = $this->processDataObject($value);
+            }
+        }
+        return $dataObjectArray;
+    }
+
+    /**
+     * Override parameter values based on webapi.xml
+     *
+     * @param array $inputData Incoming data from request
+     * @param array $parameters Contains parameters to replace or default
+     * @return array Data in same format as $inputData with appropriate parameters added or changed
+     */
+    protected function _overrideParams(array $inputData, array $parameters)
+    {
+        foreach ($parameters as $name => $paramData) {
+            if ($paramData[Converter::KEY_FORCE] || !isset($inputData[$name])) {
+                $value = isset($paramData['source']) && $paramData['source'] == 'session'
+                    ? $this->session->{$paramData['method']}()
+                    : $paramData[Converter::KEY_VALUE];
+                $inputData[$name] = $value;
+            }
+        }
+        return $inputData;
+    }
+
+    /**
+     * Retrieve current route.
+     *
+     * @return Route
+     */
+    protected function _getCurrentRoute()
+    {
+        if (!$this->_route) {
+            $this->_route = $this->_router->match($this->_request);
+        }
+        return $this->_route;
+    }
+
+    /**
+     * Perform authentication and authorization.
+     *
+     * Authentication can be based on active customer/guest session or it can be based on OAuth headers.
+     *
+     * @throws \Magento\Framework\Exception\AuthorizationException
+     * @return void
+     */
+    protected function _checkPermissions()
+    {
+        /**
+         * All mobile clients are expected to pass session cookie along with the request which will allow
+         * to start session automatically. User ID and user type are initialized when session is created
+         * during login call.
+         */
+        $userId = $this->session->getUserId();
+        $userType = $this->session->getUserType();
+        $userIdentifier = null;
+        $consumerId = null;
+        if ($userType) {
+            /** @var \Magento\Authz\Model\UserIdentifier $userIdentifier */
+            $userIdentifier = $this->_objectManager->create(
+                'Magento\Authz\Model\UserIdentifier',
+                ['userType' => $userType, 'userId' => $userId]
+            );
+        } else {
+            $oauthRequest = $this->_oauthHelper->prepareRequest($this->_request);
+            $consumerId = $this->_oauthService->validateAccessTokenRequest(
+                $oauthRequest,
+                $this->_oauthHelper->getRequestUrl($this->_request),
+                $this->_request->getMethod()
+            );
+            $this->_request->setConsumerId($consumerId);
+        }
+
+        $route = $this->_getCurrentRoute();
+
+        if (!$this->_authorizationService->isAllowed($route->getAclResources(), $userIdentifier)) {
+            $params = ['resources' => implode(', ', $route->getAclResources())];
+            $userParam = $consumerId
+                ? ['consumer_id' => $consumerId]
+                : ['userType' => $userType, 'userId' => $userId];
+            $params = array_merge($params, $userParam);
+            throw new AuthorizationException(AuthorizationException::NOT_AUTHORIZED, $params);
+        }
     }
 }

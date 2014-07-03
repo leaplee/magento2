@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Backend
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -27,8 +25,6 @@
 /**
  * Dashboard admin controller
  *
- * @category   Magento
- * @package    Magento_Backend
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Magento\Backend\Controller\Adminhtml;
@@ -94,16 +90,17 @@ class Dashboard extends \Magento\Backend\App\Action
      */
     public function ajaxBlockAction()
     {
-        $output   = '';
+        $output = '';
         $blockTab = $this->getRequest()->getParam('block');
         $blockClassSuffix = str_replace(
             ' ',
-            \Magento\Autoload\IncludePath::NS_SEPARATOR,
+            \Magento\Framework\Autoload\IncludePath::NS_SEPARATOR,
             ucwords(str_replace('_', ' ', $blockTab))
         );
         if (in_array($blockTab, array('tab_orders', 'tab_amounts', 'totals'))) {
-            $output = $this->_view->getLayout()->createBlock('Magento\\Backend\\Block\\Dashboard\\' . $blockClassSuffix)
-                ->toHtml();
+            $output = $this->_view->getLayout()->createBlock(
+                'Magento\\Backend\\Block\\Dashboard\\' . $blockClassSuffix
+            )->toHtml();
         }
         $this->getResponse()->setBody($output);
         return;
@@ -130,29 +127,43 @@ class Dashboard extends \Magento\Backend\App\Action
                 $params = json_decode(base64_decode(urldecode($gaData)), true);
                 if ($params) {
                     try {
-                        /** @var $httpClient \Magento\HTTP\ZendClient */
-                        $httpClient = $this->_objectManager->create('Magento\HTTP\ZendClient');
-                        $response = $httpClient->setUri(\Magento\Backend\Block\Dashboard\Graph::API_URL)
-                            ->setParameterGet($params)
-                            ->setConfig(array('timeout' => 5))
-                            ->request('GET');
+                        /** @var $httpClient \Magento\Framework\HTTP\ZendClient */
+                        $httpClient = $this->_objectManager->create('Magento\Framework\HTTP\ZendClient');
+                        $response = $httpClient->setUri(
+                            \Magento\Backend\Block\Dashboard\Graph::API_URL
+                        )->setParameterGet(
+                            $params
+                        )->setConfig(
+                            array('timeout' => 5)
+                        )->request(
+                            'GET'
+                        );
 
                         $headers = $response->getHeaders();
 
-                        $this->_response->setHeader('Content-type', $headers['Content-type'])
-                            ->setBody($response->getBody());
+                        $this->_response->setHeader(
+                            'Content-type',
+                            $headers['Content-type']
+                        )->setBody(
+                            $response->getBody()
+                        );
                         return;
                     } catch (\Exception $e) {
-                        $this->_objectManager->get('Magento\Logger')->logException($e);
+                        $this->_objectManager->get('Magento\Framework\Logger')->logException($e);
                         $error = __('see error log for details');
                         $httpCode = 503;
                     }
                 }
             }
         }
-        $this->_response->setBody(__('Service unavailable: %1', $error))
-            ->setHeader('Content-Type', 'text/plain; charset=UTF-8')
-            ->setHttpResponseCode($httpCode);
+        $this->_response->setBody(
+            __('Service unavailable: %1', $error)
+        )->setHeader(
+            'Content-Type',
+            'text/plain; charset=UTF-8'
+        )->setHttpResponseCode(
+            $httpCode
+        );
     }
 
     /**

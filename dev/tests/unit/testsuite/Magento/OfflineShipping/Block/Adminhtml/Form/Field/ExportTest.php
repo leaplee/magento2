@@ -18,11 +18,9 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @subpackage  unit_tests
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 namespace Magento\OfflineShipping\Block\Adminhtml\Form\Field;
 
 class ExportTest extends \PHPUnit_Framework_TestCase
@@ -38,8 +36,9 @@ class ExportTest extends \PHPUnit_Framework_TestCase
         $backendUrl->expects($this->once())->method('getUrl')->with("*/*/exportTablerates", array('website' => 1));
 
         $objectManager = new \Magento\TestFramework\Helper\ObjectManager($this);
-        $this->_object = $objectManager->getObject('Magento\OfflineShipping\Block\Adminhtml\Form\Field\Export', array(
-            'backendUrl' => $backendUrl)
+        $this->_object = $objectManager->getObject(
+            'Magento\OfflineShipping\Block\Adminhtml\Form\Field\Export',
+            array('backendUrl' => $backendUrl)
         );
     }
 
@@ -47,15 +46,20 @@ class ExportTest extends \PHPUnit_Framework_TestCase
     {
         $expected = 'some test data';
 
-        $form = $this->getMock('Magento\Data\Form', array('getParent'), array(), '', false, false);
-        $parentObjectMock = $this->getMock('Magento\Backend\Block\Template',
-            array('getLayout'), array(), '', false, false
+        $form = $this->getMock('Magento\Framework\Data\Form', array('getParent'), array(), '', false, false);
+        $parentObjectMock = $this->getMock(
+            'Magento\Backend\Block\Template',
+            array('getLayout'),
+            array(),
+            '',
+            false,
+            false
         );
-        $layoutMock = $this->getMock('Magento\Core\Model\Layout', array(), array(), '', false, false);
+        $layoutMock = $this->getMock('Magento\Framework\View\Layout', array(), array(), '', false, false);
 
         $blockMock = $this->getMock('Magento\Backend\Block\Widget\Button', array(), array(), '', false, false);
 
-        $requestMock = $this->getMock('Magento\App\RequestInterface', array(), array(), '', false, false);
+        $requestMock = $this->getMock('Magento\Framework\App\RequestInterface', array(), array(), '', false, false);
         $requestMock->expects($this->once())->method('getParam')->with('website')->will($this->returnValue(1));
 
         $mockData = $this->getMock('StdClass', array('toHtml'));

@@ -18,8 +18,6 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magentocommerce.com for more information.
  *
- * @category    Magento
- * @package     Magento_Reports
  * @copyright   Copyright (c) 2014 X.commerce, Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -68,9 +66,11 @@ class Grid extends \Magento\Reports\Block\Adminhtml\Grid\Shopcart
     protected function _prepareCollection()
     {
         //TODO: add full name logic
-        $collection = $this->_customersFactory->create()
-          ->addAttributeToSelect('firstname')
-          ->addAttributeToSelect('lastname');
+        $collection = $this->_customersFactory->create()->addAttributeToSelect(
+            'firstname'
+        )->addAttributeToSelect(
+            'lastname'
+        );
 
         $this->setCollection($collection);
         return parent::_prepareCollection();
@@ -89,44 +89,42 @@ class Grid extends \Magento\Reports\Block\Adminhtml\Grid\Shopcart
      */
     protected function _prepareColumns()
     {
-        $this->addColumn('entity_id', array(
-            'header'    =>__('ID'),
-            'width'     =>'50px',
-            'align'     =>'right',
-            'index'     =>'entity_id'
-        ));
+        $this->addColumn(
+            'entity_id',
+            array('header' => __('ID'), 'width' => '50px', 'align' => 'right', 'index' => 'entity_id')
+        );
 
-        $this->addColumn('firstname', array(
-            'header'    =>__('First Name'),
-            'index'     =>'firstname'
-        ));
+        $this->addColumn('firstname', array('header' => __('First Name'), 'index' => 'firstname'));
 
-        $this->addColumn('lastname', array(
-            'header'    =>__('Last Name'),
-            'index'     =>'lastname'
-        ));
+        $this->addColumn('lastname', array('header' => __('Last Name'), 'index' => 'lastname'));
 
-        $this->addColumn('items', array(
-            'header'    =>__('Items in Cart'),
-            'width'     =>'70px',
-            'sortable'  =>false,
-            'align'     =>'right',
-            'index'     =>'items'
-        ));
+        $this->addColumn(
+            'items',
+            array(
+                'header' => __('Items in Cart'),
+                'width' => '70px',
+                'sortable' => false,
+                'align' => 'right',
+                'index' => 'items'
+            )
+        );
 
         $currencyCode = $this->getCurrentCurrencyCode();
 
-        $this->addColumn('total', array(
-            'header'    =>__('Total'),
-            'width'     =>'70px',
-            'sortable'  =>false,
-            'type'      =>'currency',
-            'align'     =>'right',
-            'currency_code' => $currencyCode,
-            'index'     =>'total',
-            'renderer'  =>'Magento\Reports\Block\Adminhtml\Grid\Column\Renderer\Currency',
-            'rate'          => $this->getRate($currencyCode),
-        ));
+        $this->addColumn(
+            'total',
+            array(
+                'header' => __('Total'),
+                'width' => '70px',
+                'sortable' => false,
+                'type' => 'currency',
+                'align' => 'right',
+                'currency_code' => $currencyCode,
+                'index' => 'total',
+                'renderer' => 'Magento\Reports\Block\Adminhtml\Grid\Column\Renderer\Currency',
+                'rate' => $this->getRate($currencyCode)
+            )
+        );
 
         $this->setFilterVisibility(false);
 
